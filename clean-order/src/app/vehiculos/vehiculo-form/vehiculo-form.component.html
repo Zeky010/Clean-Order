@@ -1,0 +1,25 @@
+<div class="card">
+  <form #vehiculoForm="ngForm" (ngSubmit)="crearVehiculo()">
+    <div class="form-columns">
+      <div class="form-group">
+        <label for="patente">Patente:</label>
+        <input id="patente" name="patente" [(ngModel)]="nuevoVehiculo.patente" required />
+      </div>
+      <div class="form-group">
+        <label for="capacidad">Capacidad:</label>
+        <input id="capacidad" name="capacidad" type="number" [(ngModel)]="nuevoVehiculo.capacidad" required />
+      </div>
+    </div>
+    <div class="form-columns">
+      <div class="form-group">
+        <label for="tipo">Tipo:</label>
+        <input id="tipo" name="tipo" [(ngModel)]="nuevoVehiculo.tipo" required />
+      </div>
+      <div class="form-group">
+        <label for="idTipo">ID Tipo:</label>
+        <input id="idTipo" name="idTipo" type="number" [(ngModel)]="nuevoVehiculo.idTipo" required />
+      </div>
+    </div>
+    <button type="submit" [disabled]="vehiculoForm.invalid">Crear Vehículo</button>
+  </form>
+</div>

@@ -1,0 +1,23 @@
+<p>vehiculos works!</p>
+<app-vehiculo-form (vehiculoCreado)="agregarVehiculo($event)"></app-vehiculo-form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Patente</th>
+      <th>Capacidad</th>
+      <th>Tipo</th>
+      <th>ID Tipo</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (v of vehiculos; track $index) {
+        <tr>
+            <td>{{ v.patente }}</td>
+            <td>{{ v.capacidad }}</td>
+            <td>{{ v.tipo }}</td>
+            <td>{{ v.idTipo }}</td>
+        </tr>
+    }
+  </tbody>
+</table>

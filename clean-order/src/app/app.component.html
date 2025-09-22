@@ -1,0 +1,10 @@
+@if (router.url !== '/login') {
+  <app-header></app-header>
+  
+  <div class="main-layout">
+    <app-side-menu></app-side-menu>
+    <router-outlet></router-outlet>
+  </div>
+} @else {
+  <router-outlet></router-outlet>
+}
