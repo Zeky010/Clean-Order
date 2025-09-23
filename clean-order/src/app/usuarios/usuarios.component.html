@@ -1,0 +1,54 @@
+<div class="usuarios-container">
+  <div class="header">
+    <h2>Lista de Usuarios</h2>
+    <button class="btn-primary" (click)="crearUsuario()">
+      Nuevo Usuario
+    </button>
+  </div>
+
+  @if (showForm) {
+    <app-usuario-form 
+      [usuario]="selectedUsuario"
+      [isEditMode]="isEditMode"
+      (formSubmit)="onFormSubmit($event)"
+      (formCancel)="closeForm()">
+    </app-usuario-form>
+  } @else {
+    <table class="usuarios-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (usuario of usuarios; track usuario.id) {
+          <tr>
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.rol }}</td>
+            <td>
+              <span [class]="usuario.activo ? 'status-active' : 'status-inactive'">
+                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-edit" (click)="editarUsuario(usuario)">
+                Editar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    
+    @if(usuarios.length === 0) {
+      <div class="no-data">
+        No hay usuarios registrados
+      </div>
+    }
+  }
+</div>

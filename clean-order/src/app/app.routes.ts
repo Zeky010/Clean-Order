@@ -3,6 +3,7 @@ import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { VehiculosComponent } from './vehiculos/vehiculos.component';
 import { AuthGuard } from './services/authguard.service';
+import { UsuarioComponent } from './usuarios/usuarios.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -13,7 +14,8 @@ export const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
       { path: '', component: HomeComponent },
-      { path: 'vehiculos', component: VehiculosComponent }
+      { path: 'vehiculos', component: VehiculosComponent },
+      { path: 'usuarios', component: UsuarioComponent }
     ]
   },
   { path: '**', redirectTo: '' }

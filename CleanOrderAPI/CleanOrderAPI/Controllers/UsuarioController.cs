@@ -24,9 +24,9 @@ namespace GestionOT.Controllers
 
         // GET: /Usuario
         [HttpGet]
-        [Authorize(Roles = "2")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
-        {
+        {           
             return await _context.Usuarios.Where(u => u.Activo == 1).ToListAsync();
         }
 
