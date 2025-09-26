@@ -14,16 +14,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 // Register ApplicationDbContext with MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(10, 4, 32)) // Adjust MySQL version as needed
-    ));
+        new MySqlServerVersion(new Version(10, 4, 32)),
+           mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
+       ));
 
 builder.Services.AddSingleton<JWTService>();
-
+builder.Services.AddScoped<PasswordService>();
 // CORS for Angular dev app (must match your front-end origin)
 builder.Services.AddCors(options =>
 {

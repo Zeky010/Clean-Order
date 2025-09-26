@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Usuario } from './usuario.types';
+import { Usuario, UsuarioCreation, UsuarioUpdate } from './usuario.types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
-  private apiUrl = 'https://localhost:7226/usuario/'; // Adjust your API URL
+  private apiUrl = 'https://localhost:7226/usuario'; // Adjust your API URL
 
   private httpClient: HttpClient = inject(HttpClient);
   getUsuarios(): Observable<Usuario[]> {
@@ -18,12 +18,12 @@ export class UsuarioService {
     return this.httpClient.get<Usuario>(`${this.apiUrl}/${id}`);
   }
 
-  createUsuario(usuario: Omit<Usuario, 'id'>): Observable<Usuario> {
-    return this.httpClient.post<Usuario>(this.apiUrl, usuario);
+  createUsuario(usuarioCreation: UsuarioCreation): Observable<Usuario> {
+    return this.httpClient.post<Usuario>(this.apiUrl, usuarioCreation);
   }
 
-  updateUsuario(id: number, usuario: Partial<Usuario>): Observable<Usuario> {
-    return this.httpClient.put<Usuario>(`${this.apiUrl}/${id}`, usuario);
+  updateUsuario(usuario: Partial<UsuarioUpdate>): Observable<Usuario> {
+    return this.httpClient.put<Usuario>(this.apiUrl, usuario);
   }
 
 /*   deleteUsuario(id: number): Observable<void> {

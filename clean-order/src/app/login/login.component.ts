@@ -33,10 +33,19 @@ export class LoginComponent {
           }
         },
         error: (err: { status: number }) => {
-          if (err.status === 401) {
-            window.alert('Correo o Contraseña incorrectos');
-          } else {
-            window.alert('Error en el inicio de sesión');
+          switch (err.status) {
+            case 401:
+              window.alert('Correo o Contraseña incorrectos');
+              break;
+            case 403:
+              window.alert('Usuario inactivo. Contacte al administrador.');
+              break;
+            case 500:
+              window.alert('Error en el servidor, intente más tarde');
+              break;          
+            default:
+              window.alert('Error en el inicio de sesión');          
+              break;
           }
         },
       });

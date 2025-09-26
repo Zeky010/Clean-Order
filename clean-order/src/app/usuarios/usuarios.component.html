@@ -6,18 +6,21 @@
     </button>
   </div>
 
-  @if (showForm) {
-    <app-usuario-form 
+  @if (showCreateForm) {
+    <app-create-usuario-form
+      (formSubmit)="onCreateSubmit($event)"
+      (formCancel)="closeCreateForm()">
+    </app-create-usuario-form>
+  } @else if (showEditForm && selectedUsuario) {
+    <app-update-usuario-form
       [usuario]="selectedUsuario"
-      [isEditMode]="isEditMode"
-      (formSubmit)="onFormSubmit($event)"
-      (formCancel)="closeForm()">
-    </app-usuario-form>
+      (formSubmit)="onEditSubmit($event)"
+      (formCancel)="closeEditForm()">
+    </app-update-usuario-form>
   } @else {
     <table class="usuarios-table">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Correo</th>
           <th>Rol</th>
           <th>Estado</th>
@@ -27,7 +30,6 @@
       <tbody>
         @for (usuario of usuarios; track usuario.id) {
           <tr>
-            <td>{{ usuario.id }}</td>
             <td>{{ usuario.correo }}</td>
             <td>{{ usuario.rol }}</td>
             <td>

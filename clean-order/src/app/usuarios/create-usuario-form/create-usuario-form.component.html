@@ -1,0 +1,105 @@
+<div class="form-container">
+  <h2>Crear Usuario</h2>
+  
+  <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="correo">Correo Electrónico</label>
+      <input 
+        type="email" 
+        id="correo" 
+        formControlName="correo"
+        class="form-control"
+        [class.error]="usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched"
+        placeholder="ejemplo@correo.com"
+      >
+      @if (usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched) {
+        <div class="error-message">
+          @if (usuarioForm.get('correo')?.errors?.['required']) {
+            El correo es requerido
+          }
+          @if (usuarioForm.get('correo')?.errors?.['email']) {
+            El correo debe ser válido
+          }
+        </div>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="rolId">Rol</label>
+      <select 
+        id="rolId" 
+        formControlName="rolId"
+        class="form-control"
+        [class.error]="usuarioForm.get('rolId')?.invalid && usuarioForm.get('rolId')?.touched"
+      >
+        <option value="">Selecciona un rol</option>
+        @for (role of roles; track role.id) {
+          <option [value]="role.id">{{ role.nombre }}</option>
+        }
+      </select>
+      @if (usuarioForm.get('rolId')?.invalid && usuarioForm.get('rolId')?.touched) {
+        <div class="error-message">El rol es requerido</div>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="password">Contraseña</label>
+      <input 
+        type="password" 
+        id="password" 
+        formControlName="password"
+        class="form-control"
+        [class.error]="usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched"
+        placeholder="Mínimo 6 caracteres"
+      >
+      @if (usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched) {
+        <div class="error-message">
+          @if (usuarioForm.get('password')?.errors?.['required']) {
+            La contraseña es requerida
+          }
+          @if (usuarioForm.get('password')?.errors?.['minlength']) {
+            La contraseña debe tener al menos 6 caracteres
+          }
+        </div>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="repeatPassword">Repetir Contraseña</label>
+      <input 
+        type="password" 
+        id="repeatPassword" 
+        formControlName="repeatPassword"
+        class="form-control"
+        [class.error]="(usuarioForm.get('repeatPassword')?.invalid && usuarioForm.get('repeatPassword')?.touched) || isPasswordMismatch"
+        placeholder="Confirmar contraseña"
+      >
+      @if (usuarioForm.get('repeatPassword')?.invalid && usuarioForm.get('repeatPassword')?.touched) {
+        <div class="error-message">Confirmar contraseña es requerido</div>
+      }
+      @if (isPasswordMismatch) {
+        <div class="error-message">Las contraseñas no coinciden</div>
+      }
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          formControlName="activo"
+        >
+        <span class="checkmark"></span>
+        Usuario Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="usuarioForm.invalid">
+        Crear Usuario
+      </button>
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

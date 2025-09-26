@@ -1,22 +1,22 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Usuario } from './usuario.types';
+import { Usuario, UsuarioCreation, UsuarioUpdate } from './usuario.types';
 import { UsuarioService } from './usuarios.service';
-import { UsuarioFormComponent } from './usuario-form/usuario-form.component';
+import { CreateUsuarioFormComponent } from './create-usuario-form/create-usuario-form.component';
+import { UpdateUsuarioComponent } from './update-usuario-form/update-usuario-form.component';
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule, UsuarioFormComponent],
+  imports: [CommonModule, CreateUsuarioFormComponent, UpdateUsuarioComponent],
   templateUrl: './usuarios.component.html',
   styleUrl: './usuarios.component.css'
 })
 export class UsuarioComponent implements OnInit {
-
   private usuarioService = inject(UsuarioService);
   usuarios: Usuario[] = [];
-  showForm = false;
+  showCreateForm = false;
+  showEditForm = false;
   selectedUsuario?: Usuario;
-  isEditMode = false;
 
   ngOnInit(): void {
     this.loadUsuarios();
@@ -30,41 +30,74 @@ export class UsuarioComponent implements OnInit {
 
   editarUsuario(usuario: Usuario): void {
     this.selectedUsuario = usuario;
-    this.isEditMode = true;
-    this.showForm = true;
+    this.showEditForm = true;
   }
 
   crearUsuario(): void {
-    this.selectedUsuario = undefined;
-    this.isEditMode = false;
-    this.showForm = true;
+    this.showCreateForm = true;
   }
 
-  onFormSubmit(usuarioData: Partial<Usuario>): void {
-    if (this.isEditMode && this.selectedUsuario) {
-      // Update existing usuario
-      this.usuarioService.updateUsuario(this.selectedUsuario.id, usuarioData).subscribe({
-        next: () => {
-          this.loadUsuarios();
-          this.closeForm();
-        },
-        error: (error) => console.error('Error updating usuario:', error)
-      });
-    } else {
-      // Create new usuario
-      this.usuarioService.createUsuario(usuarioData as Omit<Usuario, 'id'>).subscribe({
-        next: () => {
-          this.loadUsuarios();
-          this.closeForm();
-        },
-        error: (error) => console.error('Error creating usuario:', error)
-      });
+  onCreateSubmit(data: UsuarioCreation): void {
+    this.usuarioService.createUsuario(data).subscribe({
+      next: () => {
+        this.loadUsuarios();
+        this.closeCreateForm();
+      },
+      error: (error) =>{
+        switch (error.status) {
+          case 400:
+            alert('Error: Usuario con este correo ya existe.');
+            break;
+          case 500:
+            alert('Error del servidor. Por favor, inténtelo de nuevo más tarde.');
+            break;
+          default:
+            console.error('Error creating usuario:', error);
+        }
+      },
+    });
+  }
+
+  onEditSubmit(data: UsuarioUpdate): void {
+    if (!this.selectedUsuario) {
+      console.error('No selected usuario for update');
+      return;
     }
+    
+    // Pass the selected usuario's ID
+    this.usuarioService.updateUsuario(data).subscribe({
+      next: () => {
+        this.loadUsuarios();
+        this.closeEditForm();
+      },
+      error: (error) => {
+        switch (error.status) {
+          case 400:
+            alert('Error: Datos inválidos proporcionados.');
+            break;
+          case 404:
+            alert("Error: Usuario no encontrado.");
+            break;
+          case 500:
+            alert('Error del servidor. Por favor, inténtelo de nuevo más tarde.');
+            break;
+          default:
+            console.error('Error updating usuario:', error);
+        }
+
+        if (error.status === 404) {
+          alert("Error: Usuario no encontrado.");
+        } 
+      }
+    });
   }
 
-  closeForm(): void {
-    this.showForm = false;
+  closeCreateForm(): void {
+    this.showCreateForm = false;
+  }
+
+  closeEditForm(): void {
+    this.showEditForm = false;
     this.selectedUsuario = undefined;
-    this.isEditMode = false;
   }
 }

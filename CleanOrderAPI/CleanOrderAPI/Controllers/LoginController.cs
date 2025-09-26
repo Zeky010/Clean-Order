@@ -14,12 +14,14 @@ namespace GestionOT.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly JWTService _jwtService;
+        private readonly PasswordService _passwordService;
         private const string JwtCookieName = "AuthToken";
 
-        public LoginController(ApplicationDbContext context, JWTService jwtService)
+        public LoginController(ApplicationDbContext context, JWTService jwtService, PasswordService passwordService)
         {
             _context = context;
             _jwtService = jwtService;
+            _passwordService = passwordService;
         }
 
         [HttpPost]
@@ -31,13 +33,32 @@ namespace GestionOT.Controllers
                 return BadRequest("Correo y password son obligatorios.");
             }
 
-            // WARNING: plain-text password check; replace with hashing in production
+            // Find user by email only
             Usuario? user = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Correo == request.correo && u.Password == request.password);
+                .FirstOrDefaultAsync(u => u.Correo == request.correo);
 
             if (user is null)
             {
                 return Unauthorized("Correo o password invalidos.");
+            }
+
+            if (user.Activo != 1)
+            {
+                return StatusCode(403, "Usuario inactivo. Contacte al administrador.");
+            }
+
+            // Verify password using BCrypt
+            bool isPasswordValid = _passwordService.VerifyPassword(request.password, user.Password);
+
+            if (!isPasswordValid)
+            {
+                return Unauthorized("Correo o password invalidos.");
+            }
+
+            // Check if user is active
+            if (user.Activo != 1)
+            {
+                return Unauthorized("Usuario inactivo.");
             }
 
             // Generate JWT Token

@@ -1,0 +1,49 @@
+<div class="form-container">
+  <h2>Editar Usuario</h2>
+  
+  <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <span class="form-label">Correo Electrónico</span>
+      <div class="form-control-static">{{ usuario.correo }}</div>
+      <small class="form-text">El correo no se puede modificar</small>
+    </div>
+
+    <div class="form-group">
+      <label for="rolId">Rol</label>
+      <select 
+        id="rolId" 
+        formControlName="rolId"
+        class="form-control"
+        [class.error]="usuarioForm.get('rolId')?.invalid && usuarioForm.get('rolId')?.touched"
+      >
+        <option value="">Selecciona un rol</option>
+        @for (role of roles; track role.id) {
+          <option [value]="role.id">{{ role.nombre }}</option>
+        }
+      </select>
+      @if (usuarioForm.get('rolId')?.invalid && usuarioForm.get('rolId')?.touched) {
+        <div class="error-message">El rol es requerido</div>
+      }
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          formControlName="activo"
+        >
+        <span class="checkmark"></span>
+        Usuario Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="usuarioForm.invalid">
+        Actualizar Usuario
+      </button>
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
