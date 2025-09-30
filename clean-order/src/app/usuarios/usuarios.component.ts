@@ -9,7 +9,7 @@ import { UpdateUsuarioComponent } from './update-usuario-form/update-usuario-for
   selector: 'app-usuarios',
   imports: [CommonModule, CreateUsuarioFormComponent, UpdateUsuarioComponent],
   templateUrl: './usuarios.component.html',
-  styleUrl: './usuarios.component.css'
+  styleUrls: ['./usuarios.component.css', '../shared/entity-table.css']  // add shared css
 })
 export class UsuarioComponent implements OnInit {
   private usuarioService = inject(UsuarioService);

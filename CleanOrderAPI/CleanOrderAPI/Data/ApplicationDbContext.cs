@@ -2,52 +2,30 @@
 using System.Collections.Generic;
 using GestionOT.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace GestionOT.Data;
 
 public partial class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext()
-    {
-    }
-
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<Cliente> Clientes { get; set; }
-
     public virtual DbSet<Comuna> Comunas { get; set; }
-
     public virtual DbSet<Documento> Documentos { get; set; }
-
     public virtual DbSet<Empleado> Empleados { get; set; }
-
     public virtual DbSet<ImagenesReporte> ImagenesReportes { get; set; }
-
     public virtual DbSet<Orden> Ordens { get; set; }
-
     public virtual DbSet<OrdenEmpleado> OrdenEmpleados { get; set; }
-
     public virtual DbSet<OrdenEstado> OrdenEstados { get; set; }
-
     public virtual DbSet<Region> Regions { get; set; }
-
     public virtual DbSet<Reporte> Reportes { get; set; }
-
     public virtual DbSet<Rol> Rols { get; set; }
-
     public virtual DbSet<TipoCarga> TipoCargas { get; set; }
-
     public virtual DbSet<Usuario> Usuarios { get; set; }
-
     public virtual DbSet<Vehiculo> Vehiculos { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;port=3306;database=gestion-ot;user=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.32-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,8 +126,6 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => e.FkComuna, "EMPLEADOS_COMUNA");
 
-            entity.HasIndex(e => e.FkIdUsuario, "USUARIO_EMPLEADO");
-
             entity.Property(e => e.RutEmpleado)
                 .HasMaxLength(10)
                 .HasColumnName("RUT_EMPLEADO");
@@ -170,9 +146,6 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.FkComuna)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_COMUNA");
-            entity.Property(e => e.FkIdUsuario)
-                .HasColumnType("int(11)")
-                .HasColumnName("FK_ID_USUARIO");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .HasColumnName("NOMBRE");
@@ -183,10 +156,6 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.FkComunaNavigation).WithMany(p => p.Empleados)
                 .HasForeignKey(d => d.FkComuna)
                 .HasConstraintName("EMPLEADOS_COMUNA");
-
-            entity.HasOne(d => d.FkIdUsuarioNavigation).WithMany(p => p.Empleados)
-                .HasForeignKey(d => d.FkIdUsuario)
-                .HasConstraintName("USUARIO_EMPLEADO");
         });
 
         modelBuilder.Entity<ImagenesReporte>(entity =>
@@ -409,6 +378,10 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("usuario");
 
+            entity.HasIndex(e => e.Correo, "CORREO").IsUnique();
+
+            entity.HasIndex(e => e.FkRutEmpleado, "EMPLEADO_USUARIO");
+
             entity.HasIndex(e => e.FkIdRol, "USUARIO_ROL");
 
             entity.Property(e => e.IdUsuario)
@@ -423,6 +396,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.FkIdRol)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_ID_ROL");
+            entity.Property(e => e.FkRutEmpleado)
+                .HasMaxLength(10)
+                .HasColumnName("FK_RUT_EMPLEADO");
             entity.Property(e => e.Password)
                 .HasMaxLength(100)
                 .IsFixedLength()
@@ -432,6 +408,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.FkIdRol)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("USUARIO_ROL");
+
+            entity.HasOne(d => d.FkRutEmpleadoNavigation).WithMany(p => p.Usuarios)
+                .HasForeignKey(d => d.FkRutEmpleado)
+                .HasConstraintName("EMPLEADO_USUARIO");
         });
 
         modelBuilder.Entity<Vehiculo>(entity =>

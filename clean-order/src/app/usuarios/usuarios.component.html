@@ -1,4 +1,4 @@
-<div class="usuarios-container">
+<div class="entity-container">
   <div class="header">
     <h2>Lista de Usuarios</h2>
     <button class="btn-primary" (click)="crearUsuario()">
@@ -18,7 +18,7 @@
       (formCancel)="closeEditForm()">
     </app-update-usuario-form>
   } @else {
-    <table class="usuarios-table">
+    <table class="entity-table">
       <thead>
         <tr>
           <th>Correo</th>
@@ -46,7 +46,7 @@
         }
       </tbody>
     </table>
-    
+
     @if(usuarios.length === 0) {
       <div class="no-data">
         No hay usuarios registrados

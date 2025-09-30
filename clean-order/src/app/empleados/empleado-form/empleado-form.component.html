@@ -1,0 +1,136 @@
+<div class="form-container">
+  <div class="form-header">
+    <h3>{{ isEditMode ? 'Editar Empleado' : 'Crear Empleado' }}</h3>
+  </div>
+
+  <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()" class="empleado-form">
+    
+    <!-- RUT Field -->
+    <div class="form-group">
+      <label for="rut">RUT *</label>
+      <input 
+        type="number" 
+        id="rut" 
+        formControlName="rut"
+        [readonly]="isEditMode"
+        [class.readonly]="isEditMode"
+        placeholder="Ej: 12345678">
+      @if (empleadoForm.get('rut')?.invalid && empleadoForm.get('rut')?.touched) {
+        <div class="error-message">
+          @if (empleadoForm.get('rut')?.errors?.['required']) {
+            El RUT es requerido
+          }
+          @if (empleadoForm.get('rut')?.errors?.['min']) {
+            El RUT debe ser mayor a 0
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Nombre Field -->
+    <div class="form-group">
+      <label for="nombre">Nombre *</label>
+      <input 
+        type="text" 
+        id="nombre" 
+        formControlName="nombre"
+        placeholder="Ingrese el nombre">
+      @if (empleadoForm.get('nombre')?.invalid && empleadoForm.get('nombre')?.touched) {
+        <div class="error-message">
+          @if (empleadoForm.get('nombre')?.errors?.['required']) {
+            El nombre es requerido
+          }
+          @if (empleadoForm.get('nombre')?.errors?.['minlength']) {
+            El nombre debe tener al menos 2 caracteres
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Apellido Field -->
+    <div class="form-group">
+      <label for="apellido">Apellido *</label>
+      <input 
+        type="text" 
+        id="apellido" 
+        formControlName="apellido"
+        placeholder="Ingrese el apellido">
+      @if (empleadoForm.get('apellido')?.invalid && empleadoForm.get('apellido')?.touched) {
+        <div class="error-message">
+          @if (empleadoForm.get('apellido')?.errors?.['required']) {
+            El apellido es requerido
+          }
+          @if (empleadoForm.get('apellido')?.errors?.['minlength']) {
+            El apellido debe tener al menos 2 caracteres
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Dirección Field -->
+    <div class="form-group">
+      <label for="direccion">Dirección *</label>
+      <input 
+        type="text" 
+        id="direccion" 
+        formControlName="direccion"
+        placeholder="Ingrese la dirección">
+      @if (empleadoForm.get('direccion')?.invalid && empleadoForm.get('direccion')?.touched) {
+        <div class="error-message">
+          El dirección es requerida
+        </div>
+      }
+    </div>
+
+    <!-- Teléfono Field -->
+    <div class="form-group">
+      <label for="telefono">Teléfono *</label>
+      <input 
+        type="tel" 
+        id="telefono" 
+        formControlName="telefono"
+        placeholder="Ej: +56912345678">
+      @if (empleadoForm.get('telefono')?.invalid && empleadoForm.get('telefono')?.touched) {
+        <div class="error-message">
+          @if (empleadoForm.get('telefono')?.errors?.['required']) {
+            El teléfono es requerido
+          }
+          @if (empleadoForm.get('telefono')?.errors?.['pattern']) {
+            Formato de teléfono inválido
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Comuna Field -->
+    <div class="form-row">
+      <label class="form-label" for="idComuna">Región / Comuna</label>
+      <app-comuna-region-selector
+        formControlName="idComuna"
+        [disabled]="isSubmitting">
+      </app-comuna-region-selector>
+      @if (empleadoForm.get('idComuna')?.touched && empleadoForm.get('idComuna')?.invalid) 
+      {
+        <div class="error-message">
+          Seleccione una comuna.
+        </div>
+      }
+    </div>
+
+    <!-- Estado Field -->
+    <div class="form-row">
+      <label for="activo" class="form-label">Activo</label>
+      <select id="activo" class="form-select" formControlName="activo" [disabled]="isSubmitting">
+        <option value="S">Sí</option>
+        <option value="N">No</option>
+      </select>
+    </div>
+
+    <!-- Submit / Cancel buttons -->
+    <div class="actions">
+      <button type="button" (click)="onSubmit()" [disabled]="isSubmitting">Guardar</button>
+      <button type="button" (click)="onCancel()" [disabled]="isSubmitting">Cancelar</button>
+    </div>
+
+  </form>
+</div>

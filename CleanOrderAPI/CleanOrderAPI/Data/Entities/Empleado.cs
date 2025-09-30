@@ -20,10 +20,7 @@ public partial class Empleado
     public string Activo { get; set; } = null!;
 
     public int? FkComuna { get; set; }
-
-    public int? FkIdUsuario { get; set; }
-
     public virtual Comuna? FkComunaNavigation { get; set; }
 
-    public virtual Usuario? FkIdUsuarioNavigation { get; set; }
+    public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 }

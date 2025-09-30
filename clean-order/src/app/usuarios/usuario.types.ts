@@ -4,6 +4,7 @@ export interface Usuario {
     rol: string;
     rolId: number;
     activo: boolean;
+    rutEmpelado: string;
 }
 
 export interface PasswordChange {  
@@ -17,6 +18,7 @@ export interface UsuarioCreation {
     rolId: number;
     password: string;
     activo: number;
+    rutEmpelado?: string;
 }
 
 export interface UsuarioUpdate {

@@ -2,16 +2,17 @@
 {
     public class UsuarioModel
     {
-        public int id { get; set; }
-        public string correo { get; set; } = null!;
-        public int activo { get; set; }
-        public string rol { get; set; }
-        public int rolId { get; set; }
+        public int Id { get; set; }
+        public string Correo { get; set; } = null!;
+        public int Activo { get; set; }
+        public required string Rol { get; set; }
+        public string? RutEmpleado { get; set; }
+        public int RolId { get; set; }
 
 
         public bool AreFieldsValid()
         {
-            return !string.IsNullOrEmpty(correo) && activo >= 0 && rolId >= 0;
+            return !string.IsNullOrEmpty(Correo) && Activo >= 0 && RolId >= 0;
         }
     }
     public class PasswordChangeRequest
@@ -23,10 +24,10 @@
 
     public class CreateUserRequest
     {
-        public string correo { get; set; } = null!;
-        public int activo { get; set; }
-        public int rolId { get; set; }
-        public required string password { get; set; }
+        public string Correo { get; set; } = null!;
+        public int Activo { get; set; }
+        public int RolId { get; set; }
+        public required string Password { get; set; }
     }
 
     public class UpdateUserRequest

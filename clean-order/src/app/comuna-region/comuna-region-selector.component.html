@@ -1,0 +1,35 @@
+<div class="comuna-region-selector">
+  <div class="form-group">
+    <label for="region-select" class="form-label">Región</label>
+    <select
+      #regionSelect
+      id="region-select"
+      class="form-select"
+      [value]="selectedRegionId ?? ''"
+      (change)="onRegionChange(regionSelect.value)"
+      [disabled]="disabled">
+      <option value="">Seleccione una región</option>
+      @for (region of regions; track region.id) 
+      {
+        <option [value]="region.id">{{ region.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="comuna-select" class="form-label">Comuna</label>
+    <select
+      #comunaSelect
+      id="comuna-select"
+      class="form-select"
+      [value]="selectedComunaId ?? ''"
+      (change)="onComunaChange(comunaSelect.value)"
+      [disabled]="disabled || !selectedRegionId || comunas.length === 0">
+      <option value="">Seleccione una comuna</option>
+      @for (comuna of comunas; track comuna.id) 
+      {
+        <option [value]="comuna.id">{{ comuna.nombre }}</option>
+      }
+    </select>
+  </div>
+</div>

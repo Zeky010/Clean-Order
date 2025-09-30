@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Usuario, UsuarioCreation, UsuarioUpdate } from './usuario.types';
 
@@ -8,6 +8,13 @@ import { Usuario, UsuarioCreation, UsuarioUpdate } from './usuario.types';
 })
 export class UsuarioService {
   private apiUrl = 'https://localhost:7226/usuario'; // Adjust your API URL
+
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  };
+
 
   private httpClient: HttpClient = inject(HttpClient);
   getUsuarios(): Observable<Usuario[]> {
@@ -19,14 +26,14 @@ export class UsuarioService {
   }
 
   createUsuario(usuarioCreation: UsuarioCreation): Observable<Usuario> {
-    return this.httpClient.post<Usuario>(this.apiUrl, usuarioCreation);
+    return this.httpClient.post<Usuario>(this.apiUrl, usuarioCreation, this.httpOptions);
   }
 
   updateUsuario(usuario: Partial<UsuarioUpdate>): Observable<Usuario> {
-    return this.httpClient.put<Usuario>(this.apiUrl, usuario);
+    return this.httpClient.put<Usuario>(this.apiUrl, usuario, this.httpOptions);
   }
 
-/*   deleteUsuario(id: number): Observable<void> {
+/*deleteUsuario(id: number): Observable<void> {
     return this.httpClient.delete<void>(`${this.apiUrl}/${id}`);
   } */
 }

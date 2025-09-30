@@ -15,7 +15,8 @@ public partial class Usuario
 
     public int FkIdRol { get; set; }
 
-    public virtual ICollection<Empleado> Empleados { get; set; } = new List<Empleado>();
-
+    public string? FkRutEmpleado { get; set; }
     public virtual Rol FkIdRolNavigation { get; set; } = null!;
+
+    public virtual Empleado? FkRutEmpleadoNavigation { get; set; }
 }

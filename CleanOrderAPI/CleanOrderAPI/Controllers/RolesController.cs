@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanOrderAPI.Controllers
+namespace GestionOT.Controllers
 {
     [Route("[controller]")]
     [ApiController]

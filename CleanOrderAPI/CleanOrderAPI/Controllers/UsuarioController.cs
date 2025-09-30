@@ -5,15 +5,13 @@ using GestionOT.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace GestionOT.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize] // Require a valid JWT for all actions
+    [Authorize(Roles = "1")] // Require a valid JWT for all actions
     public class UsuarioController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,20 +25,19 @@ namespace GestionOT.Controllers
 
         // GET: /Usuario
         [HttpGet]
-        [Authorize(Roles = "1")]
         public async Task<ActionResult<IEnumerable<UsuarioModel>>> GetUsuarios()
         {
-            List<Usuario> usuarios = await _context.Usuarios
+            List<Usuario> usuarios = await _context.Usuarios.AsNoTracking()
                 .Include(u => u.FkIdRolNavigation)
                 .ToListAsync();
                 
             List<UsuarioModel> usuarioModels = usuarios.Select(u => new UsuarioModel
             {
-                id = u.IdUsuario,
-                correo = u.Correo,
-                activo = u.Activo,
-                rol = u.FkIdRolNavigation?.Nombre ?? "",
-                rolId = u.FkIdRol
+                Id = u.IdUsuario,
+                Correo = u.Correo,
+                Activo = u.Activo,
+                Rol = u.FkIdRolNavigation?.Nombre ?? "",
+                RolId = u.FkIdRol
             }).ToList();
             
             return usuarioModels;
@@ -48,7 +45,6 @@ namespace GestionOT.Controllers
 
         // GET: /Usuario/{id}
         [HttpGet("{id}")]
-        [Authorize(Roles = "1")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
@@ -63,32 +59,31 @@ namespace GestionOT.Controllers
 
         // POST: /Usuario - SECURE: Password in request body
         [HttpPost]
-        [Authorize(Roles = "1")]
         public async Task<ActionResult<Usuario>> CreateUsuario([FromBody] CreateUserRequest request)
         {
             try
             {
-                if (request == null || string.IsNullOrWhiteSpace(request.correo) || string.IsNullOrWhiteSpace(request.password))
+                if (request == null || string.IsNullOrWhiteSpace(request.Correo) || string.IsNullOrWhiteSpace(request.Password))
                 {
                     return BadRequest("Invalid request data. Email and password are required.");
                 }
 
                 // Validate password strength
-                if (request.password.Length < 6)
+                if (request.Password.Length < 6)
                 {
                     return BadRequest("Password must be at least 6 characters long.");
                 }
 
                 // VALIDATE ROLE EXISTS FIRST - This guarantees the role is not null
-                Rol? existingRole = await _context.Rols.FirstOrDefaultAsync(r => r.IdRol == request.rolId);
+                Rol? existingRole = await _context.Rols.FirstOrDefaultAsync(r => r.IdRol == request.RolId);
                 if (existingRole == null)
                 {
-                    return BadRequest($"Rol con ID {request.rolId} no existe.");
+                    return BadRequest($"Rol con ID {request.RolId} no existe.");
                 }
 
                 // Check if user already exists
                 Usuario? existingUser = await _context.Usuarios
-                    .FirstOrDefaultAsync(u => u.Correo.Equals(request.correo, StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefaultAsync(u => u.Correo.Equals(request.Correo, StringComparison.OrdinalIgnoreCase));
 
                 if (existingUser != null)
                 {
@@ -97,10 +92,10 @@ namespace GestionOT.Controllers
 
                 // Create new user using CreateUserRequest properties directly
                 Usuario usr = new Usuario();
-                usr.Correo = request.correo;
-                usr.Password = _passwordService.HashPassword(request.password); // Hash the password
-                usr.Activo = request.activo;
-                usr.FkIdRol = request.rolId;
+                usr.Correo = request.Correo;
+                usr.Password = _passwordService.HashPassword(request.Password); // Hash the password
+                usr.Activo = request.Activo;
+                usr.FkIdRol = request.RolId;
 
                 _context.Usuarios.Add(usr);
                 await _context.SaveChangesAsync();
@@ -108,11 +103,11 @@ namespace GestionOT.Controllers
                 // Create UsuarioModel for response
                 UsuarioModel responseModel = new UsuarioModel
                 {
-                    id = usr.IdUsuario,
-                    correo = usr.Correo,
-                    activo = usr.Activo,
-                    rol = existingRole.Nombre,
-                    rolId = usr.FkIdRol
+                    Id = usr.IdUsuario,
+                    Correo = usr.Correo,
+                    Activo = usr.Activo,
+                    Rol = existingRole.Nombre,
+                    RolId = usr.FkIdRol
                 };
 
                 return CreatedAtAction(nameof(GetUsuario), new { id = usr.IdUsuario }, responseModel);
@@ -126,7 +121,6 @@ namespace GestionOT.Controllers
 
         // PUT: /Usuario - Update user using UpdateUserRequest, find by email from request
         [HttpPut]
-        [Authorize(Roles = "1")]
         public async Task<IActionResult> UpdateUsuario([FromBody] UpdateUserRequest request)
         {
             try
@@ -178,7 +172,6 @@ namespace GestionOT.Controllers
 
         // PUT: /Usuario/cambiar-password/{id} - SECURE: Password in request body
         [HttpPut("cambiar-password/")]
-        [Authorize(Roles = "1")]
         public async Task<IActionResult> CambiarPassword([FromBody] PasswordChangeRequest request)
         {
             try

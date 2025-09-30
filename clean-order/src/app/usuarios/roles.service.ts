@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Rol } from './roles.types';
 
@@ -9,6 +9,12 @@ import { Rol } from './roles.types';
 export class RolesService {
   private apiUrl = 'https://localhost:7226/roles/'; // Adjust your API URL
   private httpClient: HttpClient = inject(HttpClient);
+  
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  };
 
   getRoles(): Observable<Rol[]> {
     return this.httpClient.get<Rol[]>(this.apiUrl);
@@ -19,11 +25,11 @@ export class RolesService {
   }
 /*
   createRole(role: Rol): Observable<Rol> {
-    return this.httpClient.post<Rol>(this.apiUrl, role);
+    return this.httpClient.post<Rol>(this.apiUrl, role, this.httpOptions);
   }
 
   updateRole(role: Rol): Observable<Rol> {
-    return this.httpClient.put<Rol>(`${this.apiUrl}${role.id}`, role);
+    return this.httpClient.put<Rol>(`${this.apiUrl}${role.id}`, role, this.httpOptions);
   }
 
   deleteRole(id: number): Observable<void> {
