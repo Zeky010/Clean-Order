@@ -111,33 +111,56 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
   }
 
   // Simplificado: usar RegionService.getRegionByComunaId en lugar de getComunaById + deducir región
-  writeValue(value: string | null): void {
-    const NumericValue = value ? Number(value) : null;
-    if (NumericValue == null || NumericValue <= 0) {
+  writeValue(value: string | number | null): void {
+    // Limpiar estado si no hay valor
+    if (value == null || value === '' || value === 0) {
+      this.selectedRegionId = null;
       this.selectedComunaId = null;
+      this.comunas = [];
       return;
     }
-    if (NumericValue === this.selectedComunaId) return;
 
-    this.selectedComunaId = NumericValue;
+    const comunaId = typeof value === 'string' ? Number(value) : value;
+    
+    // Si es el mismo valor que ya tenemos, no hacer nada
+    if (comunaId === this.selectedComunaId) {
+      return;
+    }
 
-    // Obtener región directamente desde la comuna
-    this.regionService.getRegionByComunaId(NumericValue).subscribe({
-      next: region => {
-        if (!region) return;
-        const regionId = region.id;
-        if (regionId !== this.selectedRegionId) {
-          this.selectedRegionId = regionId;
-          this.loadComunasByRegion(regionId, () => {
-            // asegurar selección
-            if (this.comunas.some(c => c.id === NumericValue)) {
-              this.selectedComunaId = NumericValue;
-              this.updateValue(false);
-            }
-          });
+    // Obtener la región que contiene esta comuna
+    this.regionService.getRegionByComunaId(comunaId).subscribe({
+      next: (region) => {
+        if (!region) {
+          console.warn(`No se encontró región para la comuna ID: ${comunaId}`);
+          return;
         }
+
+        // Establecer la región
+        this.selectedRegionId = region.id;
+
+        // Cargar las comunas de esta región
+        this.loadComunasByRegion(region.id, () => {
+          // Verificar que la comuna existe en la lista cargada
+          const comunaExists = this.comunas.some(c => c.id === comunaId);
+          
+          if (comunaExists) {
+            // Usar setTimeout para asegurar que el DOM se actualice
+            setTimeout(() => {
+            this.selectedComunaId = comunaId;            
+              this.updateValue(false);
+            }, 200);
+          } else {
+            console.warn(`Comuna ID ${comunaId} no encontrada en la región ${region.nombre}`);
+          }
+        });
       },
-      error: err => console.error('Error obteniendo región por comuna', err)
+      error: (err) => {
+        console.error('Error al obtener región por comuna ID:', err);
+        // En caso de error, limpiar el estado
+        this.selectedRegionId = null;
+        this.selectedComunaId = null;
+        this.comunas = [];
+      }
     });
   }
 

@@ -16,6 +16,8 @@
 
         public string Activo { get; set; } = null!;
         public int? IdComuna { get; set; }
+        public string? NombreComuna { get; set; }
+        public string? NombreRegion { get; set; }
 
     }
 }
