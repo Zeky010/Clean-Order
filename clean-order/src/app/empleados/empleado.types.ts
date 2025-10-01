@@ -1,5 +1,5 @@
 export interface Empleado {
-  rut: number;
+  rut: string;
   dv: string;
   nombre: string;
   apellido: string;

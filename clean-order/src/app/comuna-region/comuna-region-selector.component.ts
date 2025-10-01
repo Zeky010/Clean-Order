@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input, forwardRef, inject, OnChanges, SimpleChanges } from '@angular/core';
+import { noop } from 'rxjs';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Comuna, Region } from './comuna-region.types';
 import { ComunaRegionService } from './comuna.service';
@@ -31,8 +32,8 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
   public selectedRegionId: number | null = null;
   public selectedComunaId: number | null = null;
 
-  private onChange = (_value: number | null) => {};
-  private onTouched = () => {};
+  private onChange: (value: number | null) => void = noop; //se implementa noop para eliminar alerta de fucnion vacia
+  private onTouched: () => void = noop; //se implementa noop para eliminar alerta de fucnion vacia
 
   ngOnInit(): void {
     this.loadRegions();
@@ -65,7 +66,10 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
   loadRegions(): void {
     this.regionService.getRegions().subscribe({
       next: regs => this.regions = regs,
-      error: err => console.error('Error loading regions', err)
+      error: err => {
+        console.error('Error loading regions', err)
+      }
+        
     });
   }
 
@@ -107,17 +111,18 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
   }
 
   // Simplificado: usar RegionService.getRegionByComunaId en lugar de getComunaById + deducir región
-  writeValue(value: number | null): void {
-    if (value == null) {
+  writeValue(value: string | null): void {
+    const NumericValue = value ? Number(value) : null;
+    if (NumericValue == null || NumericValue <= 0) {
       this.selectedComunaId = null;
       return;
     }
-    if (value === this.selectedComunaId) return;
+    if (NumericValue === this.selectedComunaId) return;
 
-    this.selectedComunaId = value;
+    this.selectedComunaId = NumericValue;
 
     // Obtener región directamente desde la comuna
-    this.regionService.getRegionByComunaId(value).subscribe({
+    this.regionService.getRegionByComunaId(NumericValue).subscribe({
       next: region => {
         if (!region) return;
         const regionId = region.id;
@@ -125,8 +130,8 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
           this.selectedRegionId = regionId;
           this.loadComunasByRegion(regionId, () => {
             // asegurar selección
-            if (this.comunas.some(c => c.id === value)) {
-              this.selectedComunaId = value;
+            if (this.comunas.some(c => c.id === NumericValue)) {
+              this.selectedComunaId = NumericValue;
               this.updateValue(false);
             }
           });

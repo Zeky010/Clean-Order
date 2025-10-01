@@ -33,12 +33,12 @@ export class EmpleadoService {
   }
 
   // Update empleado
-  updateEmpleado(rut: number, empleado: Empleado): Observable<Empleado> {
-    return this.httpClient.put<Empleado>(`${this.baseUrl}/${rut}`, empleado, this.httpOptions);
+  updateEmpleado(empleado: Empleado): Observable<Empleado> {
+    return this.httpClient.put<Empleado>(`${this.baseUrl}`, empleado, this.httpOptions);
   }
 
   // Delete empleado
-  deleteEmpleado(rut: number): Observable<void> {
+  deleteEmpleado(rut: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.baseUrl}/${rut}`);
   }
 

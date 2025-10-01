@@ -41,7 +41,8 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      rut: ['', [Validators.required, Validators.min(1000000)]],
+      rut: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)]],
+      dv: ['', [Validators.required, Validators.pattern(/^[0-9Kk]$/), Validators.minLength(1), Validators.maxLength(1)]],
       nombre: ['', [Validators.required, Validators.minLength(1)]],
       apellido: ['', [Validators.required, Validators.minLength(2)]],
       direccion: ['', Validators.required],
@@ -56,6 +57,7 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
     if (this.empleado) {
       this.empleadoForm.patchValue({
         rut: this.empleado.rut,
+        dv: this.empleado.dv,
         nombre: this.empleado.nombre,
         apellido: this.empleado.apellido,
         direccion: this.empleado.direccion,
@@ -67,25 +69,34 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
   }
 
   onSubmit(): void {
+    Object.entries(this.empleadoForm.controls).forEach(([key, ctl]) => {
+      if (ctl.invalid) {
+        console.log(`Control inválido: ${key}`, {
+          value: ctl.value,
+          errors: ctl.errors
+        });
+      }
+    });
+
     if (this.empleadoForm.valid) {
       this.isSubmitting = true;
-      const formValue = this.empleadoForm.value;
-
+      this.empleadoForm.get('activo')?.disable();
+      this.empleadoForm.get('idComuna')?.disable(); // opcional si quieres bloquear todo
+      const formValue = this.empleadoForm.getRawValue();
       const empleadoData: Empleado = {
-        rut: Number(formValue.rut),
+        rut: formValue.rut,
+        dv: formValue.dv,
         nombre: formValue.nombre.trim(),
         apellido: formValue.apellido.trim(),
         direccion: formValue.direccion.trim(),
         telefono: formValue.telefono.trim(),
         idComuna: Number(formValue.idComuna),
-        activo: formValue.activo // string 'S' | 'N'
+        activo: formValue.activo
       };
-
+      
       this.formSubmit.emit(empleadoData);
     } else {
-      Object.keys(this.empleadoForm.controls).forEach(key => {
-        this.empleadoForm.get(key)?.markAsTouched();
-      });
+      this.empleadoForm.markAllAsTouched();
     }
   }
 
@@ -95,7 +106,12 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
 
   resetForm(): void {
     this.isSubmitting = false;
-    this.empleadoForm.reset();
-    this.empleadoForm.patchValue({ activo: 'S' });
+    this.empleadoForm.enable(); // re-activa todos
+    this.empleadoForm.reset({ activo: 'S' });
+  }
+
+  onCheckboxChange(event: Event): void {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    this.empleadoForm.get('activo')?.setValue(isChecked ? 'S' : 'N');
   }
 }

@@ -39,7 +39,7 @@ namespace CleanOrderAPI.Controllers
             return Ok(result);
         }
 
-        // GET: api/Empleado/{rut}
+        // GET: Empleado/{rut}
         [HttpGet("{rut}")]
         public async Task<ActionResult<EmpleadoModel>> GetByRut(string rut)
         {
@@ -63,10 +63,10 @@ namespace CleanOrderAPI.Controllers
             if (model == null)
                 return BadRequest("Datos inválidos.");
 
-            model.RutEmpleado = (model.RutEmpleado ?? "").Trim();
+            model.Rut = (model.Rut ?? "").Trim();
             model.Dv = (model.Dv ?? "").Trim().ToUpperInvariant();
 
-            if (string.IsNullOrWhiteSpace(model.RutEmpleado) ||
+            if (string.IsNullOrWhiteSpace(model.Rut) ||
                 string.IsNullOrWhiteSpace(model.Dv) ||
                 string.IsNullOrWhiteSpace(model.Nombre) ||
                 string.IsNullOrWhiteSpace(model.Apellido))
@@ -74,13 +74,13 @@ namespace CleanOrderAPI.Controllers
                 return BadRequest("Rut, Dv, Nombre y Apellido son obligatorios.");
             }
 
-            bool exists = await _context.Empleados.AnyAsync(e => e.RutEmpleado == model.RutEmpleado);
+            bool exists = await _context.Empleados.AnyAsync(e => e.RutEmpleado == model.Rut);
             if (exists)
-                return Conflict($"Empleado con rut {model.RutEmpleado} ya existe.");
+                return Conflict($"Empleado con rut {model.Rut} ya existe.");
 
             Empleado entity = new Empleado
             {
-                RutEmpleado = model.RutEmpleado,
+                RutEmpleado = model.Rut,
                 Dv = model.Dv,
                 Nombre = model.Nombre,
                 Apellido = model.Apellido,
@@ -94,20 +94,20 @@ namespace CleanOrderAPI.Controllers
             await _context.SaveChangesAsync();
 
             EmpleadoModel createdModel = ToModel(entity);
-            return CreatedAtAction(nameof(GetByRut), new { rut = createdModel.RutEmpleado }, createdModel);
+            return CreatedAtAction(nameof(GetByRut), new { rut = createdModel.Rut }, createdModel);
         }
 
-        // PUT: api/Empleado/{rut}
+        // PUT: Empleado/
         [HttpPut]
         public async Task<ActionResult<EmpleadoModel>> Update([FromBody] EmpleadoModel model)
         {
-            if (string.IsNullOrWhiteSpace(model.RutEmpleado))
+            if (string.IsNullOrWhiteSpace(model.Rut))
                 return BadRequest("Rut requerido.");
 
             if (model == null)
                 return BadRequest("Datos inválidos.");
 
-            Empleado? entity = await _context.Empleados.FirstOrDefaultAsync(e => e.RutEmpleado == model.RutEmpleado);
+            Empleado? entity = await _context.Empleados.FirstOrDefaultAsync(e => e.RutEmpleado == model.Rut);
             if (entity == null)
                 return NotFound();
 
@@ -145,7 +145,7 @@ namespace CleanOrderAPI.Controllers
 
         private static EmpleadoModel ToModel(Empleado e) => new()
         {
-            RutEmpleado = e.RutEmpleado,
+            Rut = e.RutEmpleado,
             Dv = e.Dv,
             Nombre = e.Nombre,
             Apellido = e.Apellido,

@@ -78,14 +78,16 @@ export class EmpleadosComponent implements OnInit {
 
   onEditSubmit(empleado: Empleado): void {
     if (!this.selectedEmpleado) return;
-    const rut = this.selectedEmpleado.rut;
-    const payload: Empleado = { ...empleado, rut, dv: this.selectedEmpleado.dv };
-    this.empleadoService.updateEmpleado(rut, payload).subscribe({
+    const payload: Empleado = { ...empleado, rut: this.selectedEmpleado.rut, dv: this.selectedEmpleado.dv };
+    this.empleadoService.updateEmpleado(payload).subscribe({
       next: () => {
         this.closeForms();
         this.loadEmpleados();
       },
-      error: (err) => this.handleMutationError(err, 'actualizar')
+      error: (err) =>{
+        this.handleMutationError(err, 'actualizar');
+
+      } 
     });
   }
 

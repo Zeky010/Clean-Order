@@ -2,7 +2,7 @@
 {
     public class EmpleadoModel
     {
-        public string RutEmpleado { get; set; } = null!;
+        public string Rut { get; set; } = null!;
 
         public string Dv { get; set; } = null!;
 

@@ -9,7 +9,7 @@
     <div class="form-group">
       <label for="rut">RUT *</label>
       <input 
-        type="number" 
+        type="text"
         id="rut" 
         formControlName="rut"
         [readonly]="isEditMode"
@@ -20,8 +20,32 @@
           @if (empleadoForm.get('rut')?.errors?.['required']) {
             El RUT es requerido
           }
-          @if (empleadoForm.get('rut')?.errors?.['min']) {
-            El RUT debe ser mayor a 0
+          @if (empleadoForm.get('rut')?.errors?.['minlength'] || empleadoForm.get('rut')?.errors?.['maxlength']) {
+            El RUT debe tener entre 7 y 8 dígitos
+          }
+        </div>
+      }
+      <label for="dv">DV</label>
+      <input 
+        type="text" 
+        id="dv" 
+        formControlName="dv"
+        [readonly]="isEditMode"
+        [class.readonly]="isEditMode"
+        placeholder="Ej: K">
+      @if (empleadoForm.get('dv')?.invalid && empleadoForm.get('dv')?.touched) {
+        <div class="error-message">
+          @if (empleadoForm.get('dv')?.errors?.['required']) {
+            El DV es requerido
+          }
+          @if (empleadoForm.get('dv')?.errors?.['pattern']) {
+            El DV debe ser un único dígito (0-9 o K)
+          }
+          @if(empleadoForm.get('dv')?.errors?.['minlength']) {
+            El DV debe tener 1 carácter
+          }
+          @if(empleadoForm.get('dv')?.errors?.['maxlength']) {
+            El DV debe tener 1 carácter
           }
         </div>
       }
@@ -96,7 +120,7 @@
             El teléfono es requerido
           }
           @if (empleadoForm.get('telefono')?.errors?.['pattern']) {
-            Formato de teléfono inválido
+            Formato de teléfono debe tener numeros de 8 a 9 digitos
           }
         </div>
       }
@@ -106,8 +130,7 @@
     <div class="form-row">
       <label class="form-label" for="idComuna">Región / Comuna</label>
       <app-comuna-region-selector
-        formControlName="idComuna"
-        [disabled]="isSubmitting">
+        formControlName="idComuna">
       </app-comuna-region-selector>
       @if (empleadoForm.get('idComuna')?.touched && empleadoForm.get('idComuna')?.invalid) 
       {
@@ -118,12 +141,15 @@
     </div>
 
     <!-- Estado Field -->
-    <div class="form-row">
-      <label for="activo" class="form-label">Activo</label>
-      <select id="activo" class="form-select" formControlName="activo" [disabled]="isSubmitting">
-        <option value="S">Sí</option>
-        <option value="N">No</option>
-      </select>
+    <div class="form-row checkbox-container">
+      <div class="checkbox-wrapper">
+        <input 
+          type="checkbox" 
+          id="activo" 
+          [checked]="empleadoForm.get('activo')?.value === 'S'"
+          (change)="onCheckboxChange($event)">
+        <label for="activo" class="form-label checkbox-label">Activo</label>
+      </div>
     </div>
 
     <!-- Submit / Cancel buttons -->

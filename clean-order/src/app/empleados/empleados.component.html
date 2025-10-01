@@ -6,6 +6,24 @@
     </button>
   </div>
 
+    <!-- Formulario Crear -->
+  @if(showCreateForm) {
+    <app-empleado-form
+      (formSubmit)="onCreateSubmit($event)"
+      (formCancel)="onCancelForm()">
+    </app-empleado-form>
+  }
+
+  <!-- Formulario Editar -->
+  @if(showEditForm && selectedEmpleado) {
+    <app-empleado-form
+      [empleado]="selectedEmpleado"
+      (formSubmit)="onEditSubmit($event)"
+      (formCancel)="onCancelForm()">
+    </app-empleado-form>
+  }
+
+
   <table class="entity-table">
     <thead>
       <tr>
@@ -15,9 +33,8 @@
         <th>Dirección</th>
         <th>Teléfono</th>
         <th>Comuna</th>
-        <th>Usuario</th>
         <th>Estado</th>
-        <th>Acciones</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -62,20 +79,5 @@
     </div>
   }
 
-  <!-- Formulario Crear -->
-  @if(showCreateForm) {
-    <app-empleado-form
-      (formSubmit)="onCreateSubmit($event)"
-      (formCancel)="onCancelForm()">
-    </app-empleado-form>
-  }
 
-  <!-- Formulario Editar -->
-  @if(showEditForm && selectedEmpleado) {
-    <app-empleado-form
-      [empleado]="selectedEmpleado"
-      (formSubmit)="onEditSubmit($event)"
-      (formCancel)="onCancelForm()">
-    </app-empleado-form>
-  }
 </div>

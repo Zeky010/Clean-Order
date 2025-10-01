@@ -7,7 +7,7 @@ import { Comuna } from './comuna-region.types';
   providedIn: 'root'
 })
 export class ComunaRegionService {
-  private apiUrl = 'https://localhost:7226/Comuna/'; // Base API URL
+  private apiUrl = 'https://localhost:7226/Comuna'; // Base API URL
   private httpClient: HttpClient = inject(HttpClient);
 
   // Get all comunas
@@ -22,6 +22,6 @@ export class ComunaRegionService {
 
   // Get comuna by ID
   getComunaById(id: number): Observable<Comuna> {
-    return this.httpClient.get<Comuna>(`${this.apiUrl}${id}`);
+    return this.httpClient.get<Comuna>(`${this.apiUrl}/${id}`);
   }
 }

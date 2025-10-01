@@ -23,7 +23,7 @@ namespace CleanOrderAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Region
+        // GET: /Region
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RegionModel>>> GetAll()
         {
@@ -39,7 +39,7 @@ namespace CleanOrderAPI.Controllers
             return Ok(regions);
         }
 
-        // GET: api/Region/{id}
+        // GET: /Region/{id}
         [HttpGet("{id:int}")]
         public async Task<ActionResult<RegionModel>> GetById(int id)
         {
@@ -57,7 +57,7 @@ namespace CleanOrderAPI.Controllers
             });
         }
 
-        [HttpGet("/GetByComunaId/{id:int}")]
+        [HttpGet("GetByComunaId/{id:int}")]
         public async Task<ActionResult<RegionModel>> GetByComunaId(int id)
         {
             Comuna? comuna= await _context.Comunas
