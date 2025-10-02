@@ -1,0 +1,49 @@
+<div class="entity-container">
+  <div class="entity-header">
+    <h2>Asignar Empleado al Usuario: {{ usuario.correo }}</h2>
+    <button class="btn-secondary" (click)="cancelar()">Cancelar</button>
+  </div>
+
+  <div class="entity-content">
+    <table class="entity-table">
+      <thead>
+        <tr>
+          <th>RUT</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Estado</th>
+
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let empleado of empleados">
+          <td>{{ empleado.rut }}</td>
+          <td>{{ empleado.nombre }}</td>
+          <td>{{ empleado.apellido }}</td>
+
+          <td>
+            <span class="status-badge" [class]="empleado.activo ? 'active' : 'inactive'">
+              {{ empleado.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button 
+              class="btn btn-primary btn-sm" 
+              (click)="asignarUsuario(empleado.rut)"
+              [disabled]="!empleado.activo">
+              Asignar a este Empleado
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    @if(empleados.length === 0){
+        <div class="no-data">
+        No hay empleados disponibles
+        </div>
+    }
+
+  </div>
+</div>

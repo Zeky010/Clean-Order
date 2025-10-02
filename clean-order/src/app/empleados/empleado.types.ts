@@ -7,4 +7,6 @@ export interface Empleado {
   telefono: string;
   activo: 'S' | 'N';
   idComuna: number;
+  nombreComuna?: string;
+  nombreRegion?: string;
 }

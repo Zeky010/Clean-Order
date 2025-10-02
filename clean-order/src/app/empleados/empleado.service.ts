@@ -51,4 +51,6 @@ export class EmpleadoService {
   getEmpleadosByComuna(idComuna: number): Observable<Empleado[]> {
     return this.httpClient.get<Empleado[]>(`${this.baseUrl}?idComuna=${idComuna}`);
   }
+
+
 }

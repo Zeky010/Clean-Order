@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using GestionOT.Data;
 using GestionOT.Data.Entities;
 using GestionOT.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace CleanOrderAPI.Controllers
 {
@@ -20,7 +18,25 @@ namespace CleanOrderAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Empleado
+        // Re-usable server-translatable projection (safe in LINQ to EF)
+        private static readonly Expression<Func<Empleado, EmpleadoModel>> EmpleadoProjection =
+            e => new EmpleadoModel
+            {
+                Rut = e.RutEmpleado,
+                Dv = e.Dv,
+                Nombre = e.Nombre,
+                Apellido = e.Apellido,
+                Direccion = e.Direccion,
+                Telefono = e.Telefono,
+                Activo = e.Activo,
+                IdComuna = e.FkComuna,
+                NombreComuna = e.FkComunaNavigation != null ? e.FkComunaNavigation.Nombre : null,
+                NombreRegion = e.FkComunaNavigation != null
+                               ? e.FkComunaNavigation.FkCodigoRegionNavigation.Nombre
+                               : null
+            };
+
+        // GET: Empleado/
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmpleadoModel>>> GetAll([FromQuery] bool? onlyActive = null)
         {
@@ -28,12 +44,12 @@ namespace CleanOrderAPI.Controllers
 
             if (onlyActive.HasValue)
             {
-                // Assuming Activo = "S" (Sí) / "N" (No)
                 query = query.Where(e => (onlyActive.Value && e.Activo == "S") || (!onlyActive.Value && e.Activo != "S"));
             }
 
+            // Projection translated to SQL (LEFT JOINs generated automatically)
             var result = await query
-                .Select(e => ToModel(e))
+                .Select(EmpleadoProjection)
                 .ToListAsync();
 
             return Ok(result);
@@ -46,17 +62,19 @@ namespace CleanOrderAPI.Controllers
             if (string.IsNullOrWhiteSpace(rut))
                 return BadRequest("Rut requerido.");
 
-            var empleado = await _context.Empleados
+            var model = await _context.Empleados
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.RutEmpleado == rut);
+                .Where(e => e.RutEmpleado == rut)
+                .Select(EmpleadoProjection)
+                .FirstOrDefaultAsync();
 
-            if (empleado == null)
+            if (model == null)
                 return NotFound();
 
-            return Ok(ToModel(empleado));
+            return Ok(model);
         }
 
-        // POST: api/Empleado
+        // POST: Empleado
         [HttpPost]
         public async Task<ActionResult<EmpleadoModel>> Create([FromBody] EmpleadoModel model)
         {
@@ -78,7 +96,7 @@ namespace CleanOrderAPI.Controllers
             if (exists)
                 return Conflict($"Empleado con rut {model.Rut} ya existe.");
 
-            Empleado entity = new Empleado
+            var entity = new Empleado
             {
                 RutEmpleado = model.Rut,
                 Dv = model.Dv,
@@ -93,25 +111,29 @@ namespace CleanOrderAPI.Controllers
             _context.Empleados.Add(entity);
             await _context.SaveChangesAsync();
 
-            EmpleadoModel createdModel = ToModel(entity);
-            return CreatedAtAction(nameof(GetByRut), new { rut = createdModel.Rut }, createdModel);
+            // Return projected model (single query)
+            var created = await _context.Empleados
+                .AsNoTracking()
+                .Where(e => e.RutEmpleado == entity.RutEmpleado)
+                .Select(EmpleadoProjection)
+                .FirstAsync();
+
+            return CreatedAtAction(nameof(GetByRut), new { rut = created.Rut }, created);
         }
 
         // PUT: Empleado/
         [HttpPut]
         public async Task<ActionResult<EmpleadoModel>> Update([FromBody] EmpleadoModel model)
         {
+            if (model == null)
+                return BadRequest("Datos inválidos.");
             if (string.IsNullOrWhiteSpace(model.Rut))
                 return BadRequest("Rut requerido.");
 
-            if (model == null)
-                return BadRequest("Datos inválidos.");
-
-            Empleado? entity = await _context.Empleados.FirstOrDefaultAsync(e => e.RutEmpleado == model.Rut);
+            var entity = await _context.Empleados.FirstOrDefaultAsync(e => e.RutEmpleado == model.Rut);
             if (entity == null)
                 return NotFound();
 
-            // Update allowed fields
             entity.Dv = model.Dv?.Trim().ToUpperInvariant() ?? entity.Dv;
             entity.Nombre = model.Nombre ?? entity.Nombre;
             entity.Apellido = model.Apellido ?? entity.Apellido;
@@ -123,10 +145,16 @@ namespace CleanOrderAPI.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(ToModel(entity));
+            var updated = await _context.Empleados
+                .AsNoTracking()
+                .Where(e => e.RutEmpleado == entity.RutEmpleado)
+                .Select(EmpleadoProjection)
+                .FirstAsync();
+
+            return Ok(updated);
         }
 
-        // DELETE: api/Empleado/{rut}
+        // DELETE: Empleado/{rut}
         [HttpDelete("{rut}")]
         public async Task<IActionResult> Delete(string rut)
         {
@@ -142,17 +170,5 @@ namespace CleanOrderAPI.Controllers
 
             return NoContent();
         }
-
-        private static EmpleadoModel ToModel(Empleado e) => new()
-        {
-            Rut = e.RutEmpleado,
-            Dv = e.Dv,
-            Nombre = e.Nombre,
-            Apellido = e.Apellido,
-            Direccion = e.Direccion,
-            Telefono = e.Telefono,
-            Activo = e.Activo,
-            IdComuna = e.FkComuna
-        };
     }
 }

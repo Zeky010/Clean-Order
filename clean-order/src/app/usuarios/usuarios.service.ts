@@ -33,7 +33,7 @@ export class UsuarioService {
     return this.httpClient.put<Usuario>(this.apiUrl, usuario, this.httpOptions);
   }
 
-/*deleteUsuario(id: number): Observable<void> {
-    return this.httpClient.delete<void>(`${this.apiUrl}/${id}`);
-  } */
+  asignarEmpleadoAUsuario(rutEmpleado: string, usuario: Usuario): Observable<Usuario> {
+    return this.httpClient.put<Usuario>(`${this.apiUrl}/asignar-empleado/${rutEmpleado}`, usuario, this.httpOptions);
+  }
 }

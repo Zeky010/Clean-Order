@@ -1,56 +1,64 @@
 <div class="entity-container">
+  @if (showCreateForm) {
+  <app-create-usuario-form
+    (formSubmit)="onCreateSubmit($event)"
+    (formCancel)="closeCreateForm()"
+  >
+  </app-create-usuario-form>
+  } @else if (showEditForm && selectedUsuario) {
+  <app-update-usuario-form
+    [usuario]="selectedUsuario"
+    (formSubmit)="onEditSubmit($event)"
+    (formCancel)="closeEditForm()"
+  >
+  </app-update-usuario-form>
+  } @else if (showAssignForm && selectedUsuarioForAssign) {
+  <app-asignar-usuario
+    [usuario]="selectedUsuarioForAssign"
+    (assignComplete)="onAssignSubmit()"
+    (assignCancel)="closeAssignForm()"
+  >
+  </app-asignar-usuario>
+  } @else {
   <div class="header">
     <h2>Lista de Usuarios</h2>
-    <button class="btn-primary" (click)="crearUsuario()">
-      Nuevo Usuario
-    </button>
+    <button class="btn-primary" (click)="crearUsuario()">Nuevo Usuario</button>
   </div>
+  <table class="entity-table">
+    <thead>
+      <tr>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (usuario of usuarios; track usuario.id) {
+      <tr>
+        <td>{{ usuario.correo }}</td>
+        <td>{{ usuario.rol }}</td>
+        <td>
+          <span [class]="usuario.activo ? 'status-active' : 'status-inactive'">
+            {{ usuario.activo ? "Activo" : "Inactivo" }}
+          </span>
+        </td>
+        <td>
+          <button class="btn-edit" (click)="editarUsuario(usuario)">
+            Editar
+          </button>
+          @if(usuario.rutEmpleado === null) {
+          <button class="btn-assign" (click)="asignarUsuario(usuario)">
+            Asignar Empleado
+          </button>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
 
-  @if (showCreateForm) {
-    <app-create-usuario-form
-      (formSubmit)="onCreateSubmit($event)"
-      (formCancel)="closeCreateForm()">
-    </app-create-usuario-form>
-  } @else if (showEditForm && selectedUsuario) {
-    <app-update-usuario-form
-      [usuario]="selectedUsuario"
-      (formSubmit)="onEditSubmit($event)"
-      (formCancel)="closeEditForm()">
-    </app-update-usuario-form>
-  } @else {
-    <table class="entity-table">
-      <thead>
-        <tr>
-          <th>Correo</th>
-          <th>Rol</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (usuario of usuarios; track usuario.id) {
-          <tr>
-            <td>{{ usuario.correo }}</td>
-            <td>{{ usuario.rol }}</td>
-            <td>
-              <span [class]="usuario.activo ? 'status-active' : 'status-inactive'">
-                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-            <td>
-              <button class="btn-edit" (click)="editarUsuario(usuario)">
-                Editar
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-
-    @if(usuarios.length === 0) {
-      <div class="no-data">
-        No hay usuarios registrados
-      </div>
-    }
-  }
+  @if(usuarios.length === 0) {
+  <div class="no-data">No hay usuarios registrados</div>
+  } }
 </div>

@@ -113,6 +113,9 @@ export class EmpleadosComponent implements OnInit {
       case 404:
         alert('Empleado no encontrado.');
         break;
+      case 409:
+        alert('Este rut ya está registrado.');
+        break;
       case 500:
         alert('Error interno del servidor.');
         break;

@@ -4,19 +4,24 @@ import { Usuario, UsuarioCreation, UsuarioUpdate } from './usuario.types';
 import { UsuarioService } from './usuarios.service';
 import { CreateUsuarioFormComponent } from './create-usuario-form/create-usuario-form.component';
 import { UpdateUsuarioComponent } from './update-usuario-form/update-usuario-form.component';
+import { AsignarUsuarioComponent } from './asignar-usuario/asignar-usuario.component';
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule, CreateUsuarioFormComponent, UpdateUsuarioComponent],
+  imports: [CommonModule, CreateUsuarioFormComponent, UpdateUsuarioComponent, AsignarUsuarioComponent],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css', '../shared/entity-table.css']  // add shared css
 })
 export class UsuarioComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   usuarios: Usuario[] = [];
+
+  selectedUsuario?: Usuario;
+  selectedUsuarioForAssign: Usuario | null = null;
+
   showCreateForm = false;
   showEditForm = false;
-  selectedUsuario?: Usuario;
+  showAssignForm = false;
 
   ngOnInit(): void {
     this.loadUsuarios();
@@ -35,6 +40,11 @@ export class UsuarioComponent implements OnInit {
 
   crearUsuario(): void {
     this.showCreateForm = true;
+  }
+
+  asignarUsuario(usuario: Usuario): void {
+    this.selectedUsuarioForAssign = usuario;
+    this.showAssignForm = true;
   }
 
   onCreateSubmit(data: UsuarioCreation): void {
@@ -100,4 +110,15 @@ export class UsuarioComponent implements OnInit {
     this.showEditForm = false;
     this.selectedUsuario = undefined;
   }
+
+  closeAssignForm(): void {
+    this.showAssignForm = false;
+    this.selectedUsuarioForAssign = null;
+  }
+
+  onAssignSubmit(): void {
+    this.closeAssignForm();
+    this.loadUsuarios(); // Recargar la lista de usuarios
+  }
+
 }

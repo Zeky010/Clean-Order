@@ -32,6 +32,7 @@
         <th>Apellido</th>
         <th>Dirección</th>
         <th>Teléfono</th>
+        <th>Región</th>
         <th>Comuna</th>
         <th>Estado</th>
         <th></th>
@@ -45,7 +46,8 @@
           <td>{{ empleado.apellido }}</td>
           <td>{{ empleado.direccion }}</td>
           <td>{{ empleado.telefono }}</td>
-          <td>{{ empleado.idComuna }}</td>
+          <td>{{ empleado.nombreRegion }}</td>
+          <td>{{ empleado.nombreComuna }}</td>
           <td>
             <span [class]="empleado.activo === 'S' ? 'status-active' : 'status-inactive'">
               {{ empleado.activo === 'S' ? 'Activo' : 'Inactivo' }}

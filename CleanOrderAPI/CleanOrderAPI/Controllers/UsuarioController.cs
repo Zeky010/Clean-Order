@@ -30,16 +30,17 @@ namespace GestionOT.Controllers
             List<Usuario> usuarios = await _context.Usuarios.AsNoTracking()
                 .Include(u => u.FkIdRolNavigation)
                 .ToListAsync();
-                
+
             List<UsuarioModel> usuarioModels = usuarios.Select(u => new UsuarioModel
             {
                 Id = u.IdUsuario,
                 Correo = u.Correo,
                 Activo = u.Activo,
                 Rol = u.FkIdRolNavigation?.Nombre ?? "",
-                RolId = u.FkIdRol
+                RolId = u.FkIdRol,
+                RutEmpleado = u.FkRutEmpleado
             }).ToList();
-            
+
             return usuarioModels;
         }
 
@@ -231,6 +232,27 @@ namespace GestionOT.Controllers
             return NoContent();
         }
 
+        [HttpGet("no-asignado/")]
+        [Authorize(Roles = "1")]
+        public async Task<ActionResult<IEnumerable<UsuarioModel>>> GetUsuariosNoAsignados()
+        {
+            List<Usuario> usuarios = await _context.Usuarios
+                .AsNoTracking()
+                .Include(u => u.FkIdRolNavigation)
+                .Where(u => u.FkRutEmpleado == null)
+                .ToListAsync();
+            List<UsuarioModel> usuarioModels = usuarios.Select(u => new UsuarioModel
+            {
+                Id = u.IdUsuario,
+                Correo = u.Correo,
+                Activo = u.Activo,
+                Rol = u.FkIdRolNavigation?.Nombre ?? "",
+                RolId = u.FkIdRol
+            }).ToList();
+            return usuarioModels;
+        }
+
+
         // DELETE: /Usuario/{id}
         /*
         [HttpDelete("{id}")]
@@ -253,5 +275,48 @@ namespace GestionOT.Controllers
         {
             return await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo.Equals(correo, StringComparison.OrdinalIgnoreCase));
         }
-    }
+
+        [HttpPut("asignar-empleado/{rutEmpleado}")]
+        [Authorize(Roles = "1")]
+        public async Task<IActionResult> asignarEmpleado(string rutEmpleado, [FromBody] UsuarioModel usuarioModel)
+        {
+            try
+            {
+                if (usuarioModel == null || string.IsNullOrWhiteSpace(usuarioModel.Correo))
+                {
+                    return BadRequest("Invalid request data. Email is required.");
+                }
+
+                // Find the user to update by email from request body
+                Usuario? usuario = await BuscaUsuario(usuarioModel.Correo);
+                if (usuario == null)
+                {
+                    return NotFound($"Usuario con correo '{usuarioModel.Correo}' no existe.");
+                }
+
+                // Assign the employee RUT to the user
+                usuario.FkRutEmpleado = rutEmpleado;
+
+                _context.Entry(usuario).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (await BuscaUsuario(usuarioModel.Correo) == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+    } 
 }
