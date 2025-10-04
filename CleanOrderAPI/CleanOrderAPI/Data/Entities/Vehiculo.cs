@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Vehiculo
 {

@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using GestionOT.Data;
-using GestionOT.Data.Entities;
-using GestionOT.Services;
+using CleanOrderAPI.Data;
+using CleanOrderAPI.Data.Entities;
+using CleanOrderAPI.Services;
 
-namespace GestionOT.Controllers
+namespace CleanOrderAPI.Controllers
 {
     [ApiController]
     public class LoginController : ControllerBase

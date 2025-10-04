@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Cliente
 {
-    public string IdCliente { get; set; } = null!;
-
     public string RutCliente { get; set; } = null!;
 
     public string Dv { get; set; } = null!;
 
-    public string Nombre { get; set; } = null!;
+    public string RazonSocial { get; set; } = null!;
 
     public string Correo { get; set; } = null!;
 

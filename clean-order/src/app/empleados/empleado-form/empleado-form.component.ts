@@ -69,14 +69,6 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
   }
 
   onSubmit(): void {
-    Object.entries(this.empleadoForm.controls).forEach(([key, ctl]) => {
-      if (ctl.invalid) {
-        console.log(`Control inválido: ${key}`, {
-          value: ctl.value,
-          errors: ctl.errors
-        });
-      }
-    });
 
     if (this.empleadoForm.valid) {
       this.isSubmitting = true;

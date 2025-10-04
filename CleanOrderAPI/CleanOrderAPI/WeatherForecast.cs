@@ -1,4 +1,4 @@
-namespace GestionOT
+namespace CleanOrderAPI
 {
     public class WeatherForecast
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Empleado
 {
@@ -20,6 +20,7 @@ public partial class Empleado
     public string Activo { get; set; } = null!;
 
     public int? FkComuna { get; set; }
+
     public virtual Comuna? FkComunaNavigation { get; set; }
 
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();

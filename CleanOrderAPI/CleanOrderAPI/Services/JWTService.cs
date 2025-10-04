@@ -2,10 +2,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using GestionOT.Data.Entities;
+using CleanOrderAPI.Data.Entities;
 using Microsoft.Extensions.Configuration;
 
-namespace GestionOT.Services
+namespace CleanOrderAPI.Services
 {
     public class JWTService
     {

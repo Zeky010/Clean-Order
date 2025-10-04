@@ -1,4 +1,4 @@
-﻿namespace GestionOT.Models
+﻿namespace CleanOrderAPI.Models
 {
     public class EmpleadoModel
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Orden
 {
@@ -23,21 +23,19 @@ public partial class Orden
 
     public int FkRegion { get; set; }
 
-    public string FkIdClientes { get; set; } = null!;
+    public string FkRutClientes { get; set; } = null!;
 
     public string FkPatente { get; set; } = null!;
 
     public int FkEstado { get; set; }
 
-    public int? FkIdReporte { get; set; }
-
     public virtual Comuna FkComunaNavigation { get; set; } = null!;
 
     public virtual OrdenEstado FkEstadoNavigation { get; set; } = null!;
 
-    public virtual Cliente FkIdClientesNavigation { get; set; } = null!;
-
     public virtual Vehiculo FkPatenteNavigation { get; set; } = null!;
 
-    public virtual Reporte? Reporte { get; set; }
+    public virtual Cliente FkRutClientesNavigation { get; set; } = null!;
+
+    public virtual ICollection<Reporte> Reportes { get; set; } = new List<Reporte>();
 }

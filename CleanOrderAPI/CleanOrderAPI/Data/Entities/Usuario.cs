@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Usuario
 {
@@ -16,6 +16,7 @@ public partial class Usuario
     public int FkIdRol { get; set; }
 
     public string? FkRutEmpleado { get; set; }
+
     public virtual Rol FkIdRolNavigation { get; set; } = null!;
 
     public virtual Empleado? FkRutEmpleadoNavigation { get; set; }

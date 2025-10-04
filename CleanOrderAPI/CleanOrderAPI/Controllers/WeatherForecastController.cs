@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace GestionOT.Controllers
+namespace CleanOrderAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]

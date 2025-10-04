@@ -1,0 +1,83 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>{{ isEditMode ? 'Editar Cliente' : 'Crear Cliente' }}</h2>
+    <button type="button" class="btn-close" (click)="onCancel()">×</button>
+  </div>
+
+  <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()" class="cliente-form">
+    <div class="row-inline">
+      <div class="form-group small">
+        <label for="rut">RUT *</label>
+        <input id="rut" type="text" formControlName="rut" [readonly]="isEditMode" [class.readonly]="isEditMode" placeholder="12345678" />
+        @if(clienteForm.get('rut')?.touched && clienteForm.get('rut')?.invalid){
+          <div class="error">
+            @if(clienteForm.get('rut')?.errors?.['required']){
+              <span>Obligatorio</span>
+            }
+            @if(clienteForm.get('rut')?.errors?.['minlength']){
+              <span>Mínimo 5 dígitos</span>
+            }
+          </div>
+        }
+
+      </div>
+      <div class="form-group tiny">
+        <label for="dv">DV *</label>
+        <input id="dv" type="text" maxlength="1" formControlName="dv" [readonly]="isEditMode" [class.readonly]="isEditMode" />
+        @if (clienteForm.get('dv')?.touched && clienteForm.get('dv')?.invalid) {
+          <div class="error">
+            <span>DV inválido</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="razonSocial">Razón Social *</label>
+      <input id="razonSocial" type="text" formControlName="razonSocial" placeholder="Nombre o Razón Social" />
+      @if(clienteForm.get('razonSocial')?.touched && clienteForm.get('razonSocial')?.invalid){
+        <div class="error">
+          @if(clienteForm.get('razonSocial')?.errors?.['required']) {
+            <span>Campo Obligatorio</span>
+          }
+          @if(clienteForm.get('razonSocial')?.errors?.['minLength']) {
+            <span>Razon Social debe ser de almenos 3 caracteres</span>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="correo">Correo</label>
+      <input id="correo" type="email" formControlName="correo" placeholder="cliente@dominio.com" />
+      @if(clienteForm.get('correo')?.touched && clienteForm.get('correo')?.invalid){
+        <div class="error">
+          @if(clienteForm.get('correo')?.errors?.['email']) {
+            <span>Email inválido</span>
+          }
+        </div>      
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" type="tel" formControlName="telefono" placeholder="+569 1234 5678" />
+    </div>
+
+    <div class="form-group inline">
+      <label>
+        <input type="checkbox" formControlName="activo" /> Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid || isSubmitting">
+        @if(isSubmitting){
+          <span *ngIf="isSubmitting" class="spinner"></span>
+        }       
+        {{ isEditMode ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </form>
+</div>

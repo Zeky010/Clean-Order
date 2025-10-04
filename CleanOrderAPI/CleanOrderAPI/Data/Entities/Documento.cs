@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Documento
 {
@@ -11,9 +11,9 @@ public partial class Documento
 
     public byte[] Archivo { get; set; } = null!;
 
-    public string FkIdCliente { get; set; } = null!;
+    public string FkRutCliente { get; set; } = null!;
 
     public string Activo { get; set; } = null!;
 
-    public virtual Cliente FkIdClienteNavigation { get; set; } = null!;
+    public virtual Cliente FkRutClienteNavigation { get; set; } = null!;
 }

@@ -1,9 +1,9 @@
-using GestionOT.Data;
+using CleanOrderAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using GestionOT.Services;
+using CleanOrderAPI.Services;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -24,6 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<JWTService>();
 builder.Services.AddScoped<PasswordService>();
+builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
 // CORS for Angular dev app (must match your front-end origin)
 builder.Services.AddCors(options =>
 {
@@ -78,7 +79,7 @@ builder.Services.AddAuthentication(options =>
                     int.TryParse(userIdStr, out var userId);
                     int.TryParse(roleStr, out var roleId);
 
-                    var newToken = jwtService.GenerateJwtToken(new GestionOT.Data.Entities.Usuario
+                    var newToken = jwtService.GenerateJwtToken(new CleanOrderAPI.Data.Entities.Usuario
                     {
                         IdUsuario = userId,
                         Correo = correo,

@@ -1,6 +1,6 @@
 using BCrypt.Net;
 
-namespace GestionOT.Services
+namespace CleanOrderAPI.Services
 {
     public class PasswordService
     {

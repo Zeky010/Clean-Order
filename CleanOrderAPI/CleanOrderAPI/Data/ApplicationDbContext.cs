@@ -1,31 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using GestionOT.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+using CleanOrderAPI.Data.Entities;
 
-namespace GestionOT.Data;
+namespace CleanOrderAPI.Data;
 
 public partial class ApplicationDbContext : DbContext
 {
+    public ApplicationDbContext()
+    {
+    }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<Cliente> Clientes { get; set; }
+
     public virtual DbSet<Comuna> Comunas { get; set; }
+
     public virtual DbSet<Documento> Documentos { get; set; }
+
     public virtual DbSet<Empleado> Empleados { get; set; }
+
     public virtual DbSet<ImagenesReporte> ImagenesReportes { get; set; }
+
     public virtual DbSet<Orden> Ordens { get; set; }
+
     public virtual DbSet<OrdenEmpleado> OrdenEmpleados { get; set; }
+
     public virtual DbSet<OrdenEstado> OrdenEstados { get; set; }
+
     public virtual DbSet<Region> Regions { get; set; }
+
     public virtual DbSet<Reporte> Reportes { get; set; }
+
     public virtual DbSet<Rol> Rols { get; set; }
+
     public virtual DbSet<TipoCarga> TipoCargas { get; set; }
+
     public virtual DbSet<Usuario> Usuarios { get; set; }
+
     public virtual DbSet<Vehiculo> Vehiculos { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,32 +54,29 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Cliente>(entity =>
         {
-            entity.HasKey(e => e.IdCliente).HasName("PRIMARY");
+            entity.HasKey(e => e.RutCliente).HasName("PRIMARY");
 
             entity.ToTable("cliente");
 
-            entity.Property(e => e.IdCliente)
+            entity.Property(e => e.RutCliente)
                 .HasMaxLength(10)
-                .HasColumnName("ID_CLIENTE");
+                .HasColumnName("RUT_CLIENTE");
             entity.Property(e => e.Activo)
                 .HasMaxLength(1)
                 .IsFixedLength()
                 .HasColumnName("ACTIVO");
             entity.Property(e => e.Correo)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("CORREO");
             entity.Property(e => e.Dv)
                 .HasMaxLength(1)
                 .IsFixedLength()
                 .HasColumnName("DV");
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(255)
-                .HasColumnName("NOMBRE");
-            entity.Property(e => e.RutCliente)
-                .HasMaxLength(10)
-                .HasColumnName("RUT_CLIENTE");
+            entity.Property(e => e.RazonSocial)
+                .HasMaxLength(60)
+                .HasColumnName("RAZON_SOCIAL");
             entity.Property(e => e.Telefono)
-                .HasMaxLength(255)
+                .HasMaxLength(12)
                 .HasColumnName("TELEFONO");
         });
 
@@ -95,7 +111,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("documento");
 
-            entity.HasIndex(e => e.FkIdCliente, "DOCUMENTOS_CLIENTES");
+            entity.HasIndex(e => e.FkRutCliente, "DOCUMENTOS_CLIENTES");
 
             entity.Property(e => e.IdDocumento)
                 .HasMaxLength(10)
@@ -105,15 +121,15 @@ public partial class ApplicationDbContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("ACTIVO");
             entity.Property(e => e.Archivo).HasColumnName("ARCHIVO");
-            entity.Property(e => e.FkIdCliente)
+            entity.Property(e => e.FkRutCliente)
                 .HasMaxLength(10)
-                .HasColumnName("FK_ID_CLIENTE");
+                .HasColumnName("FK_RUT_CLIENTE");
             entity.Property(e => e.TipoMime)
                 .HasMaxLength(50)
                 .HasColumnName("TIPO_MIME");
 
-            entity.HasOne(d => d.FkIdClienteNavigation).WithMany(p => p.Documentos)
-                .HasForeignKey(d => d.FkIdCliente)
+            entity.HasOne(d => d.FkRutClienteNavigation).WithMany(p => p.Documentos)
+                .HasForeignKey(d => d.FkRutCliente)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("DOCUMENTOS_CLIENTES");
         });
@@ -189,11 +205,9 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("orden");
 
-            entity.HasIndex(e => e.FkIdReporte, "FK_ID_REPORTE").IsUnique();
-
             entity.HasIndex(e => e.Folio, "FOLIO").IsUnique();
 
-            entity.HasIndex(e => e.FkIdClientes, "ORDENES_CLIENTES");
+            entity.HasIndex(e => e.FkRutClientes, "ORDENES_CLIENTES");
 
             entity.HasIndex(e => e.FkComuna, "ORDENES_COMUNA");
 
@@ -219,19 +233,15 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.FkEstado)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_ESTADO");
-            entity.Property(e => e.FkIdClientes)
-                .HasMaxLength(10)
-                .HasColumnName("FK_ID_CLIENTES");
-            entity.Property(e => e.FkIdReporte)
-                .IsRequired()
-                .HasColumnType("int(11)")
-                .HasColumnName("FK_ID_REPORTE");
             entity.Property(e => e.FkPatente)
                 .HasMaxLength(8)
                 .HasColumnName("FK_PATENTE");
             entity.Property(e => e.FkRegion)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_REGION");
+            entity.Property(e => e.FkRutClientes)
+                .HasMaxLength(10)
+                .HasColumnName("FK_RUT_CLIENTES");
             entity.Property(e => e.Folio)
                 .HasColumnType("int(11)")
                 .HasColumnName("FOLIO");
@@ -252,15 +262,15 @@ public partial class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ORDEN_ESTADO");
 
-            entity.HasOne(d => d.FkIdClientesNavigation).WithMany(p => p.Ordens)
-                .HasForeignKey(d => d.FkIdClientes)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("ORDENES_CLIENTES");
-
             entity.HasOne(d => d.FkPatenteNavigation).WithMany(p => p.Ordens)
                 .HasForeignKey(d => d.FkPatente)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ORDENES_VEHICULOS");
+
+            entity.HasOne(d => d.FkRutClientesNavigation).WithMany(p => p.Ordens)
+                .HasForeignKey(d => d.FkRutClientes)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("ORDENES_CLIENTES");
         });
 
         modelBuilder.Entity<OrdenEmpleado>(entity =>
@@ -326,10 +336,14 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("reporte");
 
+            entity.HasIndex(e => e.FkIdOrden, "ORDEN_REPORTE");
+
             entity.Property(e => e.IdReporte)
-                .ValueGeneratedOnAdd()
                 .HasColumnType("int(11)")
                 .HasColumnName("ID_REPORTE");
+            entity.Property(e => e.FkIdOrden)
+                .HasColumnType("int(11)")
+                .HasColumnName("FK_ID_ORDEN");
             entity.Property(e => e.FkUsuario)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_USUARIO");
@@ -337,9 +351,8 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("OBSERVACION");
 
-            entity.HasOne(d => d.IdReporteNavigation).WithOne(p => p.Reporte)
-                .HasPrincipalKey<Orden>(p => p.FkIdReporte)
-                .HasForeignKey<Reporte>(d => d.IdReporte)
+            entity.HasOne(d => d.FkIdOrdenNavigation).WithMany(p => p.Reportes)
+                .HasForeignKey(d => d.FkIdOrden)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ORDEN_REPORTE");
         });

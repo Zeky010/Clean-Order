@@ -1,0 +1,61 @@
+@if (showCreateForm) {
+  <app-cliente-form
+    [isEditMode]="isEditMode"
+    (save)="onCreateSubmit($event)"
+    (canceled)="onCancelForm()"
+  ></app-cliente-form>
+}
+@if (showEditForm && selectedCliente) {
+  <app-cliente-form
+    [cliente]="selectedCliente"
+    [isEditMode]="isEditMode"
+    (save)="onEditSubmit($event)"
+    (canceled)="onCancelForm()"
+  ></app-cliente-form>
+}
+@else {
+<div class="entity-container">
+  <div class="header">
+    <h2>Lista de Clientes</h2>
+    <button class="btn-primary" (click)="crearCliente()">Nuevo Cliente</button>
+  </div>
+  <table class="entity-table">
+    <thead>
+      <tr>
+        <th>RUT</th>
+        <th>Razón Social</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (cliente of clientes; track cliente.Rut) {
+      <tr>
+        <td>{{ cliente.Rut }}-{{ cliente.DV }}</td>
+        <td>{{ cliente.RazonSocial }}</td>
+        <td>{{ cliente.Correo }}</td>
+        <td>{{ cliente.Telefono || 'N/A' }}</td>
+        <td>
+          <span [class]="cliente.Activo === 'S' ? 'status-active' : 'status-inactive'">
+            {{ cliente.Activo === 'S' ? "Activo" : "Inactivo" }}
+          </span>
+        </td>
+        <td>
+          <button class="btn-edit" (click)="editarCliente(cliente)">Editar</button>
+        </td>
+        <td>
+          <button>Detalles</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  @if (clientes.length === 0) {
+    <div class="no-data">No hay clientes registrados</div>
+  }
+</div>
+}
+

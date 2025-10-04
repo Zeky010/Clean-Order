@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GestionOT.Data.Entities;
+namespace CleanOrderAPI.Data.Entities;
 
 public partial class Reporte
 {
@@ -11,7 +11,9 @@ public partial class Reporte
 
     public int FkUsuario { get; set; }
 
-    public virtual Orden IdReporteNavigation { get; set; } = null!;
+    public int FkIdOrden { get; set; }
+
+    public virtual Orden FkIdOrdenNavigation { get; set; } = null!;
 
     public virtual ICollection<ImagenesReporte> ImagenesReportes { get; set; } = new List<ImagenesReporte>();
 }

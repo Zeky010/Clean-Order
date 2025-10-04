@@ -1,13 +1,11 @@
 ﻿using CleanOrderAPI.Models;
-using GestionOT.Data;
-using GestionOT.Data.Entities;
-using GestionOT.Models;
+using CleanOrderAPI.Data;
+using CleanOrderAPI.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GestionOT.Controllers
+namespace CleanOrderAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]

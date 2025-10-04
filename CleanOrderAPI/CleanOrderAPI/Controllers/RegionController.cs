@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GestionOT.Data;
-using GestionOT.Data.Entities;
+using CleanOrderAPI.Data;
+using CleanOrderAPI.Data.Entities;
 using CleanOrderAPI.Models;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CleanOrderAPI.Data;
+using CleanOrderAPI.Data.Entities;
+using CleanOrderAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GestionOT.Data;
-using GestionOT.Data.Entities;
-using GestionOT.Models;
 using System.Linq.Expressions;
 
 namespace CleanOrderAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "1")]
     public class EmpleadoController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
