@@ -72,10 +72,13 @@ namespace CleanOrderAPI.Controllers
             List<string> validationErrors = ValidateClienteModel(clienteModel);
             if (validationErrors.Any())
             {
-                return BadRequest(new { 
-                    Message = "Errores de validación encontrados.", 
-                    Errors = validationErrors 
-                });
+                return BadRequest("Errores de validacion en campos");
+                //Mejorar mensajes de error a futuro
+                //BadRequest(                                   
+                //new { 
+                //Message = "Errores de validación encontrados.", 
+                //Errors = validationErrors 
+                //});
             }
 
             if (!ModelState.IsValid)
@@ -93,11 +96,11 @@ namespace CleanOrderAPI.Controllers
             Cliente cliente = new Cliente
             {
                 RutCliente = clienteModel.Rut,
-                Dv = clienteModel.Dv,
+                Dv = clienteModel.Dv.ToUpper(),
                 RazonSocial = clienteModel.RazonSocial,
                 Correo = clienteModel.Correo,
                 Telefono = clienteModel.Telefono,
-                Activo = clienteModel.Activo
+                Activo = clienteModel.Activo.ToUpper()
             };
 
             _context.Clientes.Add(cliente);
@@ -206,11 +209,23 @@ namespace CleanOrderAPI.Controllers
             {
                 errors.Add("Dígito verificador (DV) debe ser un solo carácter.");
             }
-
+            else
+            {
+                // Check if DV is a digit (0-9) or the letter 'K' (case insensitive)
+                char dv = clienteModel.Dv.ToUpperInvariant()[0];
+                if (!char.IsDigit(dv) && dv != 'K')
+                {
+                    errors.Add("Dígito verificador (DV) debe ser un número (0-9) o la letra 'K'.");
+                }
+            }
             // Validate Razón Social
             if (string.IsNullOrWhiteSpace(clienteModel.RazonSocial))
             {
                 errors.Add("Razón Social es requerida.");
+            }
+            else if(clienteModel.RazonSocial.Length < 3)
+            {
+                errors.Add("Razón Social debe ser mayor a 2 caracteres.");
             }
             else if (clienteModel.RazonSocial.Length > 100)
             {
@@ -245,7 +260,7 @@ namespace CleanOrderAPI.Controllers
             {
                 errors.Add("Estado activo es requerido.");
             }
-            else if (clienteModel.Activo != "S" && clienteModel.Activo != "N")
+            else if (clienteModel.Activo.ToUpper() != "S" && clienteModel.Activo.ToUpper() != "N")
             {
                 errors.Add("Estado activo debe ser 'S' (Sí) o 'N' (No).");
             }

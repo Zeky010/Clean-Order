@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Cliente } from './clientes.types';
 import { ClientesService } from './clientes.service';
 import { ClienteFormComponent } from './cliente-form/cliente-form.component';
@@ -10,13 +10,14 @@ import { ClienteFormComponent } from './cliente-form/cliente-form.component';
   imports: [ClienteFormComponent] 
 })
 export class ClientesComponent implements OnInit {
-  private clientesService: ClientesService = Inject(ClientesService);
+  private clientesService = inject(ClientesService);  
   public clientes: Cliente[] = [];
+  public selectedCliente: Cliente | null = null;
+  loading = true;
+  error: string | null = null;
+
   showCreateForm = false;
   showEditForm = false;
-  public selectedCliente: Cliente | null = null;
-  public loading = true;
-  public error: string | null = null;
   isEditMode = false;
 
 
@@ -26,15 +27,32 @@ export class ClientesComponent implements OnInit {
   }
 
   loadClientes(): void {
-    // Implementar llamada al servicio
+    this.loading = true;
     this.clientesService.getClientes().subscribe({
       next: (clientes) => {
         this.clientes = clientes;
+        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading clientes:', error);
+        this.error = 'No se pudieron cargar los clientes';
+        this.loading = false;
       }
     });
+  }
+
+  crearCliente() {
+    this.closeForms();
+    this.isEditMode = false;
+    this.selectedCliente = null;
+    this.showCreateForm = true;
+  }
+
+  editarCliente(cliente: Cliente) {
+    this.closeForms();
+    this.selectedCliente = cliente;
+    this.isEditMode = true;
+    this.showEditForm = true;
   }
 
   onCreateSubmit(cliente: Cliente): void {
@@ -50,7 +68,7 @@ export class ClientesComponent implements OnInit {
 
   onEditSubmit(cliente: Cliente): void {
     if (!this.selectedCliente) return;    
-    this.clientesService.updateCliente(cliente.Rut,cliente).subscribe({
+    this.clientesService.updateCliente(cliente.rut,cliente).subscribe({
       next: () => {
         this.closeForms();
         this.loadClientes();
@@ -61,24 +79,11 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  crearCliente() {
-    this.selectedCliente = null;
-    this.isEditMode = false;
-
-  }
-
-  editarCliente(cliente: Cliente) {
-    this.selectedCliente = cliente;
-    this.isEditMode = true;
-  }
-
-
-
   closeForms() {
-    this.selectedCliente = null;
-    this.isEditMode = false;
     this.showCreateForm = false;
     this.showEditForm = false;
+    this.isEditMode = false;
+    this.selectedCliente = null;
   }
 
   onCancelForm() {

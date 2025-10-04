@@ -1,16 +1,16 @@
 export interface Cliente {
-  Rut: string;
-  DV: string;
-  RazonSocial: string;
-  Correo: string;
-  Telefono?: string;
-  Activo: string;
+  rut: string;
+  dv: string;
+  razonSocial: string;
+  correo: string;
+  telefono?: string;
+  activo: string;
 }
 
 export interface Documento {
-  IdDocumento: string;
-  TipoMime: string;
-  Archivo: string; //base64
-  FkRutCliente: string;
-  Activo: string;
+  idDocumento: string;
+  tipoMime: string;
+  archivo: string; //base64
+  fkRutCliente: string;
+  activo: string;
 }

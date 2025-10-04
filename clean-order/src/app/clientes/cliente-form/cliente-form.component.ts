@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-
 import { Cliente } from '../clientes.types';
 
 @Component({
   selector: 'app-cliente-form',
+  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './cliente-form.component.html',
   styleUrls: ['./cliente-form.component.css']
@@ -20,10 +20,10 @@ export class ClienteFormComponent implements OnChanges {
 
   constructor() {
     this.clienteForm = this.fb.group({
-      rut: ['', [Validators.required, Validators.pattern(/^\d{5,9}$/)]],
+      rut: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)]],
       dv: ['', [Validators.required, Validators.pattern(/^[0-9Kk]$/)]],
       razonSocial: ['', [Validators.required, Validators.minLength(3)]],
-      correo: ['', [Validators.email]],
+      correo: ['', [Validators.required,Validators.email]],
       telefono: ['', [Validators.pattern(/^(\+?56)?[0-9]{8,9}$/)]],
       activo: [true]
     });
@@ -33,12 +33,12 @@ export class ClienteFormComponent implements OnChanges {
     if (changes['cliente'] || changes['isEditMode']) {
       if (this.cliente) {
         this.clienteForm.patchValue({
-          rut: this.cliente.Rut,
-            dv: this.cliente.DV,
-          razonSocial: this.cliente.RazonSocial,
-          correo: this.cliente.Correo,
-          telefono: this.cliente.Telefono || '',
-          activo: this.cliente.Activo === 'S'
+          rut: this.cliente.rut,
+          dv: this.cliente.dv.toUpperCase(),
+          razonSocial: this.cliente.razonSocial,
+          correo: this.cliente.correo,
+          telefono: this.cliente.telefono || '',
+          activo: this.cliente.activo === 'S'
         });
       } else {
         this.clienteForm.reset({
@@ -68,12 +68,12 @@ export class ClienteFormComponent implements OnChanges {
     this.isSubmitting = true;
     const raw = this.clienteForm.getRawValue();
     const payload: Cliente = {
-      Rut: raw.rut,
-      DV: raw.dv.toUpperCase(),
-      RazonSocial: raw.razonSocial.trim(),
-      Correo: raw.correo || '',
-      Telefono: raw.telefono ? raw.telefono.trim() : undefined,
-      Activo: raw.activo ? 'S' : 'N'
+      rut: raw.rut.toUpperCase(),
+      dv: raw.dv.toUpperCase(),
+      razonSocial: raw.razonSocial.trim(),
+      correo: raw.correo || '',
+      telefono: raw.telefono ? raw.telefono.trim() : undefined,
+      activo: raw.activo ? 'S' : 'N'
     };
     this.save.emit(payload);
     this.isSubmitting = false;

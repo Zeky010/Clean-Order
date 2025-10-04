@@ -12,6 +12,8 @@
         type="text"
         id="rut" 
         formControlName="rut"
+        maxlength="8"
+        minlength="7"
         [readonly]="isEditMode"
         [class.readonly]="isEditMode"
         placeholder="Ej: 12345678">
@@ -30,6 +32,7 @@
         type="text" 
         id="dv" 
         formControlName="dv"
+        maxlength="1"
         [readonly]="isEditMode"
         [class.readonly]="isEditMode"
         placeholder="Ej: K">

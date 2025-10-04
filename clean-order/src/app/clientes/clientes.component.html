@@ -5,7 +5,7 @@
     (canceled)="onCancelForm()"
   ></app-cliente-form>
 }
-@if (showEditForm && selectedCliente) {
+@else if (showEditForm && selectedCliente) {
   <app-cliente-form
     [cliente]="selectedCliente"
     [isEditMode]="isEditMode"
@@ -32,15 +32,15 @@
       </tr>
     </thead>
     <tbody>
-      @for (cliente of clientes; track cliente.Rut) {
+      @for (cliente of clientes; track $index) {
       <tr>
-        <td>{{ cliente.Rut }}-{{ cliente.DV }}</td>
-        <td>{{ cliente.RazonSocial }}</td>
-        <td>{{ cliente.Correo }}</td>
-        <td>{{ cliente.Telefono || 'N/A' }}</td>
+        <td>{{ cliente.rut }}-{{ cliente.dv }}</td>
+        <td>{{ cliente.razonSocial }}</td>
+        <td>{{ cliente.correo }}</td>
+        <td>{{ cliente.telefono || 'N/A' }}</td>
         <td>
-          <span [class]="cliente.Activo === 'S' ? 'status-active' : 'status-inactive'">
-            {{ cliente.Activo === 'S' ? "Activo" : "Inactivo" }}
+          <span [class]="cliente.activo === 'S' ? 'status-active' : 'status-inactive'">
+            {{ cliente.activo === 'S' ? "Activo" : "Inactivo" }}
           </span>
         </td>
         <td>

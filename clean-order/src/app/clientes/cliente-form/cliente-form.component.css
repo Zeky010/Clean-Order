@@ -34,3 +34,19 @@
     width: 100%;
   }
 }
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+  
+.inline .activo-label {
+  margin: 0;
+  line-height: 1;
+}
+
+.inline input[type="checkbox"] {
+  margin: 0;
+}

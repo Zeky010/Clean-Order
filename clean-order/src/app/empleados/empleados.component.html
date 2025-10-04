@@ -6,24 +6,25 @@
     </button>
   </div>
 
-    <!-- Formulario Crear -->
+  <!-- Formulario Crear -->
   @if(showCreateForm) {
-    <app-empleado-form
-      (formSubmit)="onCreateSubmit($event)"
-      (formCancel)="onCancelForm()">
-    </app-empleado-form>
+  <app-empleado-form
+    (formSubmit)="onCreateSubmit($event)"
+    (formCancel)="onCancelForm()"
+  >
+  </app-empleado-form>
   }
 
   <!-- Formulario Editar -->
-  @if(showEditForm && selectedEmpleado) {
-    <app-empleado-form
-      [empleado]="selectedEmpleado"
-      (formSubmit)="onEditSubmit($event)"
-      (formCancel)="onCancelForm()">
-    </app-empleado-form>
-  }
-
-
+  @else if(showEditForm && selectedEmpleado) {
+  <app-empleado-form
+    [empleado]="selectedEmpleado"
+    (formSubmit)="onEditSubmit($event)"
+    (formCancel)="onCancelForm()"
+  >
+  </app-empleado-form>
+  } @else {
+  <!-- Tabla Empleados -->
   <table class="entity-table">
     <thead>
       <tr>
@@ -40,46 +41,41 @@
     </thead>
     <tbody>
       @for (empleado of empleados; track $index) {
-        <tr>
-          <td>{{ empleado.rut}}-{{empleado.dv}}</td>
-          <td>{{ empleado.nombre }}</td>
-          <td>{{ empleado.apellido }}</td>
-          <td>{{ empleado.direccion }}</td>
-          <td>{{ empleado.telefono }}</td>
-          <td>{{ empleado.nombreRegion }}</td>
-          <td>{{ empleado.nombreComuna }}</td>
-          <td>
-            <span [class]="empleado.activo === 'S' ? 'status-active' : 'status-inactive'">
-              {{ empleado.activo === 'S' ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-          <td>
-            <button class="btn-edit" (click)="editarEmpleado(empleado)">
-              Editar
-            </button>
-          </td>
-        </tr>
+      <tr>
+        <td>{{ empleado.rut }}-{{ empleado.dv }}</td>
+        <td>{{ empleado.nombre }}</td>
+        <td>{{ empleado.apellido }}</td>
+        <td>{{ empleado.direccion }}</td>
+        <td>{{ empleado.telefono }}</td>
+        <td>{{ empleado.nombreRegion }}</td>
+        <td>{{ empleado.nombreComuna }}</td>
+        <td>
+          <span
+            [class]="
+              empleado.activo === 'S' ? 'status-active' : 'status-inactive'
+            "
+          >
+            {{ empleado.activo === "S" ? "Activo" : "Inactivo" }}
+          </span>
+        </td>
+        <td>
+          <button class="btn-edit" (click)="editarEmpleado(empleado)">
+            Editar
+          </button>
+        </td>
+      </tr>
       }
     </tbody>
   </table>
-  
+
   @if(empleados.length === 0 && !loading) {
-    <div class="no-data">
-      No hay empleados registrados
-    </div>
-  }
-
-  @if(loading) {
-    <div class="loading">
-      Cargando empleados...
-    </div>
-  }
-
-  @if(error) {
-    <div class="error">
-      {{ error }}
-    </div>
-  }
-
-
+  <div class="no-data">No hay empleados registrados</div>
+  } @if(loading) {
+  <div class="loading">Cargando empleados...</div>
+  } @if(error) {
+  <div class="error">
+    {{ error }}
+  </div>
+  } }
 </div>
+

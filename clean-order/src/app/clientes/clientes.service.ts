@@ -8,14 +8,14 @@ import { Cliente } from './clientes.types';
 })
 export class ClientesService {
 
-    private apiUrl = 'https://localhost:7226/clientes';
+    private apiUrl = 'https://localhost:7226/cliente';
     private httpClient: HttpClient = inject(HttpClient);
 
     private httpOptions = {
         headers: new HttpHeaders({
             'Content-Type': 'application/json'
         })
-  };
+    };
     getClientes(): Observable<Cliente[]> {
         return this.httpClient.get<Cliente[]>(this.apiUrl);
     }

@@ -57,13 +57,13 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
     if (this.empleado) {
       this.empleadoForm.patchValue({
         rut: this.empleado.rut,
-        dv: this.empleado.dv,
+        dv: this.empleado.dv.toUpperCase(),
         nombre: this.empleado.nombre,
         apellido: this.empleado.apellido,
         direccion: this.empleado.direccion,
         telefono: this.empleado.telefono,
         idComuna: this.empleado.idComuna,
-        activo: this.empleado.activo // should already be 'S' or 'N'
+        activo: this.empleado.activo.toUpperCase() // should already be 'S' or 'N'
       });
     }
   }
@@ -77,13 +77,13 @@ export class EmpleadoFormComponent implements OnInit, OnChanges {
       const formValue = this.empleadoForm.getRawValue();
       const empleadoData: Empleado = {
         rut: formValue.rut,
-        dv: formValue.dv,
+        dv: formValue.dv.toUpperCase(),
         nombre: formValue.nombre.trim(),
         apellido: formValue.apellido.trim(),
         direccion: formValue.direccion.trim(),
         telefono: formValue.telefono.trim(),
         idComuna: Number(formValue.idComuna),
-        activo: formValue.activo
+        activo: formValue.activo.toUpperCase() // 'S' o 'N'
       };
       
       this.formSubmit.emit(empleadoData);

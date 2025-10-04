@@ -5,6 +5,7 @@ import { VehiculosComponent } from './vehiculos/vehiculos.component';
 import { AuthGuard } from './services/authguard.service';
 import { UsuarioComponent } from './usuarios/usuarios.component';
 import { EmpleadosComponent } from './empleados/empleados.component';
+import { ClientesComponent } from './clientes/clientes.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,7 +18,8 @@ export const routes: Routes = [
       { path: '', component: HomeComponent },
       { path: 'vehiculos', component: VehiculosComponent },
       { path: 'usuarios', component: UsuarioComponent },
-      { path: 'empleados', component: EmpleadosComponent }
+      { path: 'empleados', component: EmpleadosComponent },
+      { path: 'clientes', component: ClientesComponent }
     ]
   },
   { path: '**', redirectTo: '' }

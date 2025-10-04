@@ -8,15 +8,23 @@
     <div class="row-inline">
       <div class="form-group small">
         <label for="rut">RUT *</label>
-        <input id="rut" type="text" formControlName="rut" [readonly]="isEditMode" [class.readonly]="isEditMode" placeholder="12345678" />
+        <input id="rut" type="text" formControlName="rut" [readonly]="isEditMode" [class.readonly]="isEditMode" 
+        maxlength="8" minlength="7" placeholder="12345678" />
         @if(clienteForm.get('rut')?.touched && clienteForm.get('rut')?.invalid){
           <div class="error">
             @if(clienteForm.get('rut')?.errors?.['required']){
               <span>Obligatorio</span>
             }
-            @if(clienteForm.get('rut')?.errors?.['minlength']){
-              <span>Mínimo 5 dígitos</span>
+            @if (clienteForm.get('rut')?.errors?.['pattern']) {
+              <span>El RUT debe ser numérico</span>
             }
+            @if(clienteForm.get('rut')?.errors?.['minlength']){
+              <span>Rut mínimo debe tener 7 dígitos</span>
+            }
+            @if(clienteForm.get('rut')?.errors?.['maxlength']){
+              <span>Máximo 8 dígitos</span>
+            }
+
           </div>
         }
 
@@ -25,9 +33,16 @@
         <label for="dv">DV *</label>
         <input id="dv" type="text" maxlength="1" formControlName="dv" [readonly]="isEditMode" [class.readonly]="isEditMode" />
         @if (clienteForm.get('dv')?.touched && clienteForm.get('dv')?.invalid) {
-          <div class="error">
-            <span>DV inválido</span>
-          </div>
+          @if(clienteForm.get('dv')?.errors?.['required']) {
+            <div class="error">
+              <span>Digito Verificador Obligatorio</span>
+            </div>
+          }
+          @if(clienteForm.get('dv')?.errors?.['pattern']) {
+            <div class="error">
+              <span>Digito debe ser numero o K</span>
+            </div>
+          }
         }
       </div>
     </div>
@@ -61,21 +76,27 @@
 
     <div class="form-group">
       <label for="telefono">Teléfono</label>
-      <input id="telefono" type="tel" formControlName="telefono" placeholder="+569 1234 5678" />
+      <input id="telefono" type="tel" formControlName="telefono" placeholder="+56912345678" />
+      @if (clienteForm.get('telefono')?.touched && clienteForm.get('telefono')?.invalid) {
+        <div class="error">
+          @if (clienteForm.get('telefono')?.errors?.['pattern']) {
+            <span>Formato inválido. Ej: +56912345678 o 912345678</span>
+          }
+        </div>
+      }
     </div>
 
-    <div class="form-group inline">
-      <label>
-        <input type="checkbox" formControlName="activo" /> Activo
-      </label>
+    <div class="inline">
+      <label for="activo" class="activo-label">Activo</label>
+      <input id="activo" type="checkbox" formControlName="activo" /> 
     </div>
 
     <div class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
       <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid || isSubmitting">
         @if(isSubmitting){
-          <span *ngIf="isSubmitting" class="spinner"></span>
-        }       
+          <span class="spinner"></span>
+        }
         {{ isEditMode ? 'Actualizar' : 'Crear' }}
       </button>
     </div>
