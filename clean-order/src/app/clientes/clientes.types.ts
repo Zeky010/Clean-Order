@@ -6,11 +6,3 @@ export interface Cliente {
   telefono?: string;
   activo: string;
 }
-
-export interface Documento {
-  idDocumento: string;
-  tipoMime: string;
-  archivo: string; //base64
-  fkRutCliente: string;
-  activo: string;
-}

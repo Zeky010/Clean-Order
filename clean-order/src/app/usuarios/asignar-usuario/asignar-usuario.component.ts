@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./asignar-usuario.component.css', '../../shared/entity-table.css']
 })
 export class AsignarUsuarioComponent implements OnInit {
-  @Input() usuario!: Usuario;
+  @Input({ required: true }) usuario!: Usuario;
   @Output() assignComplete = new EventEmitter<void>();
   @Output() assignCancel = new EventEmitter<void>();
 

@@ -33,7 +33,7 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
   public selectedComunaId: number | null = null;
 
   private onChange: (value: number | null) => void = noop; //se implementa noop para eliminar alerta de fucnion vacia
-  private onTouched: () => void = noop; //se implementa noop para eliminar alerta de fucnion vacia
+  private onTouched: () => void = noop; //se implementa noop para eliminar alerta de funcion vacia
 
   ngOnInit(): void {
     this.loadRegions();

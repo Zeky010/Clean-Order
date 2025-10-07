@@ -13,6 +13,12 @@
     (canceled)="onCancelForm()"
   ></app-cliente-form>
 }
+@else if(showClienteDetalle && selectedCliente) {
+  <p>Detalle del Cliente</p>
+  <app-cliente-detalle [cliente]="selectedCliente" (canceled)="onCancelForm()"></app-cliente-detalle>
+}
+
+
 @else {
 <div class="entity-container">
   <div class="header">
@@ -26,9 +32,8 @@
         <th>Razón Social</th>
         <th>Correo</th>
         <th>Teléfono</th>
-        <th>Estado</th>
+        <th>Estados</th>
         <th>Acciones</th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -45,9 +50,7 @@
         </td>
         <td>
           <button class="btn-edit" (click)="editarCliente(cliente)">Editar</button>
-        </td>
-        <td>
-          <button>Detalles</button>
+          <button (click)="verDetalles(cliente)">Detalles</button>
         </td>
       </tr>
       }
@@ -58,4 +61,5 @@
   }
 </div>
 }
+
 

@@ -1,0 +1,59 @@
+<div class="cliente-card">
+  <h2 class="title">{{ cliente.razonSocial }}</h2>
+
+  <div class="meta">
+    <span class="rut">
+      <strong>RUT:</strong> {{ cliente.rut }}-{{ cliente.dv }}
+    </span>
+    <span class="estado" [class.activo]="cliente.activo === 'S'" [class.inactivo]="cliente.activo !== 'S'">
+      {{ cliente.activo === 'S' ? 'Activo' : 'Inactivo' }}
+    </span>
+  </div>
+
+  <div class="body">
+    <p><strong>Correo:</strong> <a [href]="'mailto:' + cliente.correo">{{ cliente.correo }}</a></p>
+    @if(cliente.telefono){
+        <strong>Teléfono:</strong> <a [href]="'tel:' + cliente.telefono">{{ cliente.telefono }}</a>
+    }
+  </div>
+
+  <!-- Lista de documentos -->
+  <div class="entity-container">
+    <div class="entity-header">
+      <h3>Documentos</h3>
+    </div>
+    @if(documentos.length > 0) {
+      <table class="entity-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Tamaño</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(documento of documentos; track documento.idDocumento) {
+            <tr>
+              <td>{{ documento.nombre }}</td>
+              <td>{{ documento.fechaSubida | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ documento.tipoMime }}</td>
+              <td>{{ formatBytes(documento.tamanoBytes) }}</td>
+              <td>
+                <button class="btn-edit" (click)="verDocumento(documento.idDocumento)">Ver</button>
+                <button class="btn-edit" (click)="descargarDocumento(documento.idDocumento)">Descargar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="no-data">No hay documentos para este cliente.</div>
+    }
+  </div>
+  <app-documento-upload [rutCliente]="cliente.rut"
+    (documentoSubido)="onDocumentoSubido($event)"
+    (canceled)="canceled.emit()"
+  ></app-documento-upload>
+</div>

@@ -18,33 +18,19 @@ public partial class ApplicationDbContext : DbContext
     }
 
     public virtual DbSet<Cliente> Clientes { get; set; }
-
     public virtual DbSet<Comuna> Comunas { get; set; }
-
     public virtual DbSet<Documento> Documentos { get; set; }
-
     public virtual DbSet<Empleado> Empleados { get; set; }
-
     public virtual DbSet<ImagenesReporte> ImagenesReportes { get; set; }
-
     public virtual DbSet<Orden> Ordens { get; set; }
-
     public virtual DbSet<OrdenEmpleado> OrdenEmpleados { get; set; }
-
     public virtual DbSet<OrdenEstado> OrdenEstados { get; set; }
-
     public virtual DbSet<Region> Regions { get; set; }
-
     public virtual DbSet<Reporte> Reportes { get; set; }
-
     public virtual DbSet<Rol> Rols { get; set; }
-
     public virtual DbSet<TipoCarga> TipoCargas { get; set; }
-
     public virtual DbSet<Usuario> Usuarios { get; set; }
-
     public virtual DbSet<Vehiculo> Vehiculos { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -114,19 +100,27 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.FkRutCliente, "DOCUMENTOS_CLIENTES");
 
             entity.Property(e => e.IdDocumento)
-                .HasMaxLength(10)
+                .HasColumnType("int(11)")
+                .ValueGeneratedOnAdd()
                 .HasColumnName("ID_DOCUMENTO");
-            entity.Property(e => e.Activo)
-                .HasMaxLength(1)
-                .IsFixedLength()
-                .HasColumnName("ACTIVO");
-            entity.Property(e => e.Archivo).HasColumnName("ARCHIVO");
-            entity.Property(e => e.FkRutCliente)
-                .HasMaxLength(10)
-                .HasColumnName("FK_RUT_CLIENTE");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .HasColumnName("NOMBRE");
+            entity.Property(e => e.FechaSubida)
+                .HasColumnType("datetime")
+                .HasColumnName("FECHA_SUBIDA");
             entity.Property(e => e.TipoMime)
                 .HasMaxLength(50)
                 .HasColumnName("TIPO_MIME");
+            entity.Property(e => e.Archivo)
+                .HasColumnType("LONGBLOB")
+                .HasColumnName("ARCHIVO");
+            entity.Property(e => e.TamanoBytes)
+                .HasColumnType("int(11)")
+                .HasColumnName("TAMANO_BYTES");
+            entity.Property(e => e.FkRutCliente)
+                .HasMaxLength(10)
+                .HasColumnName("FK_RUT_CLIENTE");
 
             entity.HasOne(d => d.FkRutClienteNavigation).WithMany(p => p.Documentos)
                 .HasForeignKey(d => d.FkRutCliente)
@@ -206,13 +200,9 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("orden");
 
             entity.HasIndex(e => e.Folio, "FOLIO").IsUnique();
-
             entity.HasIndex(e => e.FkRutClientes, "ORDENES_CLIENTES");
-
             entity.HasIndex(e => e.FkComuna, "ORDENES_COMUNA");
-
             entity.HasIndex(e => e.FkPatente, "ORDENES_VEHICULOS");
-
             entity.HasIndex(e => e.FkEstado, "ORDEN_ESTADO");
 
             entity.Property(e => e.IdOrden)
@@ -280,7 +270,6 @@ public partial class ApplicationDbContext : DbContext
                 .ToTable("orden_empleado");
 
             entity.HasIndex(e => e.FkRutEmpleado, "OxE_EMPLEADOS");
-
             entity.HasIndex(e => e.FkIdOrdenes, "OxE_ORDENES");
 
             entity.Property(e => e.FkIdOrdenes)
@@ -392,9 +381,7 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("usuario");
 
             entity.HasIndex(e => e.Correo, "CORREO").IsUnique();
-
             entity.HasIndex(e => e.FkRutEmpleado, "EMPLEADO_USUARIO");
-
             entity.HasIndex(e => e.FkIdRol, "USUARIO_ROL");
 
             entity.Property(e => e.IdUsuario)

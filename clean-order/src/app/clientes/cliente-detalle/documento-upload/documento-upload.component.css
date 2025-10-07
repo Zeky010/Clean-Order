@@ -1,0 +1,166 @@
+.documento-upload-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+.upload-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.upload-label i {
+  color: #007bff;
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-area {
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.upload-area:hover {
+  border-color: #0056b3;
+  background-color: #e3f2fd;
+}
+
+.upload-content i {
+  font-size: 48px;
+  color: #007bff;
+  margin-bottom: 16px;
+}
+
+.upload-content p {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.upload-content small {
+  color: #666;
+  font-size: 12px;
+}
+
+.file-info {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.file-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-details i {
+  font-size: 24px;
+  color: #28a745;
+}
+
+.file-meta {
+  flex: 1;
+}
+
+.file-meta h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.file-meta p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: #f8d7da;
+}
+
+.upload-progress {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.3s ease;
+}
+
+.upload-progress span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #007bff;
+  min-width: 35px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 14px;
+}
+
+.error-message i {
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .documento-upload-container {
+    max-width: 100%;
+  }
+  
+  .upload-area {
+    padding: 30px 15px;
+  }
+  
+  .upload-content i {
+    font-size: 36px;
+  }
+}

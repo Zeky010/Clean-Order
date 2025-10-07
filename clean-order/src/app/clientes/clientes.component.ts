@@ -2,12 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Cliente } from './clientes.types';
 import { ClientesService } from './clientes.service';
 import { ClienteFormComponent } from './cliente-form/cliente-form.component';
+import { ClienteDetalleComponent } from './cliente-detalle/cliente-detalle.component';
 
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css', '../shared/entity-table.css'],
-  imports: [ClienteFormComponent] 
+  imports: [ClienteFormComponent, ClienteDetalleComponent],
 })
 export class ClientesComponent implements OnInit {
   private clientesService = inject(ClientesService);  
@@ -19,8 +20,7 @@ export class ClientesComponent implements OnInit {
   showCreateForm = false;
   showEditForm = false;
   isEditMode = false;
-
-
+  showClienteDetalle = false;
 
   ngOnInit(): void {
     this.loadClientes();
@@ -79,19 +79,31 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  closeForms() {
-    this.showCreateForm = false;
-    this.showEditForm = false;
-    this.isEditMode = false;
-    this.selectedCliente = null;
-  }
-
   onCancelForm() {
     this.closeForms();
   }
 
+  closeForms() {
+    this.showCreateForm = false;
+    this.showEditForm = false;
+    this.isEditMode = false;
+    this.showClienteDetalle = false;
+    this.selectedCliente = null;
+  }
 
-    private handleMutationError(err: unknown, accion: string) {
+  // Método específico para cerrar solo el detalle
+  // closeDetalle() {
+  //   this.showClienteDetalle = false;
+  //   this.selectedCliente = null;
+  // }
+
+  verDetalles(cliente: Cliente) {
+    //this.closeForms();
+    this.selectedCliente = cliente;
+    this.showClienteDetalle = true; // Mostrar detalle
+  }
+
+  private handleMutationError(err: unknown, accion: string) {
     const status = (err as { status?: number })?.status;
     switch (status) {
       case 0:

@@ -1,0 +1,64 @@
+<div class="documento-upload-container">
+  <div class="upload-section">
+    <label for="documento-input" class="upload-label">
+      <i class="fas fa-cloud-upload-alt"></i>
+      Subir Documento *
+    </label>
+    <input
+      #fileInput
+      id="documento-input"
+      type="file"
+      class="file-input"
+      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+      (change)="onFileSelected($event)"
+      required
+    />
+    <div
+      class="upload-area"
+      role="button"
+      tabindex="0"
+      aria-label="Subir documento; presiona Enter para seleccionar un archivo"
+      (click)="fileInput.click()"      
+      (keydown.enter)="fileInput.click()"
+      (dragover)="onDragOver($event)"
+      (drop)="onDrop($event)"
+    >
+      <div class="upload-content">
+        <i class="fas fa-file-upload" aria-hidden="true"></i>
+        <p>Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+        <small>Formatos permitidos: PDF, DOC</small>
+      </div>
+    </div>
+  </div>
+
+  @if (selectedFile) {
+  <div class="file-info">
+    <div class="file-details">
+      <i class="fas fa-file"></i>
+      <div class="file-meta">
+        <h4>{{ selectedFile.name }}</h4>
+        <p>
+          {{ getFileSize(selectedFile.size) }} - {{ selectedFile.type }}
+        </p>
+      </div>
+      <button type="button" class="remove-btn" (click)="removeFile()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    @if(isUploading) {
+    <div class="upload-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+      </div>
+      <span>{{ uploadProgress }}%</span>
+    </div>
+    }
+  </div>
+  } @if(errorMessage) {
+  <div class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ errorMessage }}
+  </div>
+  }
+</div>
