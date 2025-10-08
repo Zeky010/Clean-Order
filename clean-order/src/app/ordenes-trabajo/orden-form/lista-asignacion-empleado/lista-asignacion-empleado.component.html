@@ -1,0 +1,31 @@
+<div class="empleados-wrapper">
+  <h3>Asignación de Empleados</h3>
+  <div class="info-hint" *ngIf="!fechaAgendada || !horasTrabajo">
+    Ingrese fecha y horas de trabajo para ver disponibilidad.
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando empleados disponibles...</div>
+
+  <div class="listas" *ngIf="!loading && fechaAgendada && horasTrabajo">
+    <div class="lista disponible">
+      <h4>Disponibles</h4>
+      <div *ngIf="disponibles.length === 0" class="empty">No hay empleados disponibles.</div>
+      <ul>
+        <li *ngFor="let emp of disponibles">
+          <span>{{ emp.nombre }} ({{ emp.rut }}-{{ emp.dv }})</span>
+          <button type="button" (click)="agregar(emp)" [disabled]="isEmpleadoSelected(emp.rut)">+</button>
+        </li>
+      </ul>
+    </div>
+    <div class="lista seleccionados">
+      <h4>Asignados</h4>
+      <div *ngIf="seleccionados.length === 0" class="empty">Sin empleados asignados.</div>
+      <ul>
+        <li *ngFor="let emp of seleccionados">
+          <span>{{ emp.nombre }} ({{ emp.rut }}-{{ emp.dv }})</span>
+          <button type="button" (click)="quitar(emp)">x</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

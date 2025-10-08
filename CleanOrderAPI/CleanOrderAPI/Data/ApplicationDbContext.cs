@@ -220,15 +220,15 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.FkComuna)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_COMUNA");
+            entity.Property(e => e.FechaFinalizado)
+                .HasColumnType("datetime")
+                .HasColumnName("FECHA_FINALIZADO");
             entity.Property(e => e.FkEstado)
                 .HasColumnType("int(11)")
                 .HasColumnName("FK_ESTADO");
             entity.Property(e => e.FkPatente)
                 .HasMaxLength(8)
                 .HasColumnName("FK_PATENTE");
-            entity.Property(e => e.FkRegion)
-                .HasColumnType("int(11)")
-                .HasColumnName("FK_REGION");
             entity.Property(e => e.FkRutClientes)
                 .HasMaxLength(10)
                 .HasColumnName("FK_RUT_CLIENTES");

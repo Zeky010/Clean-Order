@@ -35,4 +35,8 @@ export class ClientesService {
     deleteCliente(rut: string): Observable<void> {
         return this.httpClient.delete<void>(`${this.apiUrl}/${rut}`, this.httpOptions);
     }
+
+    getClientesActivos(): Observable<Cliente[]> {
+        return this.httpClient.get<Cliente[]>(`${this.apiUrl}/activos`);
+    }
 }

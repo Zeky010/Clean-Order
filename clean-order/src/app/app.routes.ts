@@ -6,6 +6,7 @@ import { AuthGuard } from './services/authguard.service';
 import { UsuarioComponent } from './usuarios/usuarios.component';
 import { EmpleadosComponent } from './empleados/empleados.component';
 import { ClientesComponent } from './clientes/clientes.component';
+import { OrdenesTrabajoComponent } from './ordenes-trabajo/ordenes-trabajo.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,7 +20,9 @@ export const routes: Routes = [
       { path: 'vehiculos', component: VehiculosComponent },
       { path: 'usuarios', component: UsuarioComponent },
       { path: 'empleados', component: EmpleadosComponent },
-      { path: 'clientes', component: ClientesComponent }
+      { path: 'clientes', component: ClientesComponent },
+      { path: 'ordenes-trabajo', component: OrdenesTrabajoComponent }
+
     ]
   },
   { path: '**', redirectTo: '' }

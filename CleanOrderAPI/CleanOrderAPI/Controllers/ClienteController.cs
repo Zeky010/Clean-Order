@@ -40,6 +40,25 @@ namespace CleanOrderAPI.Controllers
             return Ok(clientes);
         }
 
+        // GET: /Cliente/activos - solo clientes activos
+        [HttpGet("activos")]
+        public async Task<ActionResult<IEnumerable<ClienteModel>>> GetClientesActivos()
+        {
+            var activos = await _context.Clientes.AsNoTracking()
+                .Where(c => c.Activo == "S")
+                .Select(c => new ClienteModel
+                {
+                    Rut = c.RutCliente,
+                    Dv = c.Dv,
+                    RazonSocial = c.RazonSocial,
+                    Correo = c.Correo,
+                    Telefono = c.Telefono,
+                    Activo = c.Activo
+                })
+                .ToListAsync();
+            return Ok(activos);
+        }
+
         // GET: /Cliente/{rut}
         [HttpGet("{rut}")]
         public async Task<ActionResult<ClienteModel>> GetCliente(string rut)

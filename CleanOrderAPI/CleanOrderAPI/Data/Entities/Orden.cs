@@ -13,6 +13,8 @@ public partial class Orden
 
     public DateTime FechaAgendada { get; set; }
 
+    public DateTime? FechaFinalizado { get; set; }
+
     public string? Observacion { get; set; }
 
     public string Direccion { get; set; } = null!;
@@ -20,8 +22,6 @@ public partial class Orden
     public int Folio { get; set; }
 
     public int FkComuna { get; set; }
-
-    public int FkRegion { get; set; }
 
     public string FkRutClientes { get; set; } = null!;
 
