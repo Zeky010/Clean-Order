@@ -58,6 +58,11 @@ export class ClienteDetalleComponent implements OnInit {
       });
   }
 
+  onCancelar(): void {
+    this.canceled.emit();
+  }
+
+
   verDocumento(idDocumento: number): void {
     this.documentoService.getDocumento(idDocumento)
       .subscribe({

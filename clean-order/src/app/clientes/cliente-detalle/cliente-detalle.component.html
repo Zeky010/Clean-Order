@@ -1,6 +1,6 @@
 <div class="cliente-card">
   <h2 class="title">{{ cliente.razonSocial }}</h2>
-
+  
   <div class="meta">
     <span class="rut">
       <strong>RUT:</strong> {{ cliente.rut }}-{{ cliente.dv }}
@@ -15,6 +15,10 @@
     @if(cliente.telefono){
         <strong>Teléfono:</strong> <a [href]="'tel:' + cliente.telefono">{{ cliente.telefono }}</a>
     }
+  </div>
+
+  <div>
+    <button (click)="onCancelar()">Volver</button>
   </div>
 
   <!-- Lista de documentos -->
@@ -54,6 +58,6 @@
   </div>
   <app-documento-upload [rutCliente]="cliente.rut"
     (documentoSubido)="onDocumentoSubido($event)"
-    (canceled)="canceled.emit()"
+    (canceled)="onCancelar()"
   ></app-documento-upload>
 </div>
