@@ -13,7 +13,7 @@ public partial class Orden
 
     public DateTime FechaAgendada { get; set; }
 
-    public DateTime? FechaFinalizado { get; set; }
+    public DateTime FechaFinalizado { get; set; }
 
     public string? Observacion { get; set; }
 

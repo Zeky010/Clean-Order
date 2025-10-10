@@ -2,29 +2,27 @@ import { Component, OnInit, Input, Output, EventEmitter, inject, OnChanges, Simp
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { OrdenTrabajo } from '../ordenes-trabajo.types';
-import { OrdenForm, ordenEstado, empleadoAsignar } from './orden-form.type';
+import { OrdenForm, empleadoAsignar } from './orden-form.type';
 import { OrdenesTrabajoService } from '../ordenes-trabajo.service';
 import { ComunaRegionSelectorComponent } from '../../comuna-region/comuna-region-selector.component';
 import { ListaAsignacionEmpleadoComponent } from './lista-asignacion-empleado/lista-asignacion-empleado.component';
 import { ClientesService } from '../../clientes/clientes.service';
 import { Cliente } from '../../clientes/clientes.types';
-import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-orden-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ComunaRegionSelectorComponent, ListaAsignacionEmpleadoComponent],
   templateUrl: './orden-form.component.html',
-  styleUrls: ['./orden-form.component.css']
+  styleUrls: ['./orden-form.component.css', '../../shared/forms.css']
 })
 export class OrdenFormComponent implements OnInit, OnChanges {
   @Input() orden: OrdenTrabajo | null = null;
-  @Input() isEditMode = false;
+  @Input() isEditMode = false; // no se usara, solose 
   @Output() submitForm = new EventEmitter<OrdenForm>();
   @Output() cancelForm = new EventEmitter<void>();
 
   ordenForm: FormGroup;
-  estados: ordenEstado[] = [];
   loading = false;
   error: string | null = null;
 
@@ -33,50 +31,30 @@ export class OrdenFormComponent implements OnInit, OnChanges {
   private clientesService = inject(ClientesService);
   selectedEmpleados: empleadoAsignar[] = [];
   clientesActivos: Cliente[] = [];
+  empleadosSeleccionadosTouched = false;
+  empleadosSeleccionadosError = false;
 
   constructor() {
-    this.ordenForm = this.createForm();
+    this.ordenForm = this.fb.group({
+      folio: [null, [Validators.required, Validators.min(1), Validators.pattern(/^[1-9]\d*$/)]], // ahora numérico entero positivo
+      horasTrabajo: [1, [Validators.required, Validators.min(1), Validators.pattern(/^[1-9]\d*$/)]],
+      fechaAgendada: ['', Validators.required],
+      observaciones: ['', Validators.maxLength(500)],
+      direccion: ['', [Validators.required, Validators.maxLength(200)]],
+      idComuna: [{ value: null, disabled: this.loading }, Validators.required],
+      rutCliente: [null, Validators.required],
+      idEstado: [1, Validators.required] // Forzar estado "1" (Agendado) por defecto al crear ordenes
+    });
   }
 
   ngOnInit(): void {
-    this.loadEstados();
     this.loadClientesActivos();
-    this.addFolioAsyncValidation();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['orden'] && this.orden && this.isEditMode) {
       this.populateForm(this.orden);
     }
-  }
-
-  private createForm(): FormGroup {
-    return this.fb.group({
-      folio: [null, [Validators.required, Validators.min(1), Validators.pattern(/^[1-9]\d*$/)]], // ahora numérico entero positivo
-      horasTrabajo: [1, [Validators.required, Validators.min(1), Validators.pattern(/^[1-9]\d*$/)]],
-      fechaAgendada: ['', Validators.required],
-      observaciones: ['', Validators.maxLength(500)],
-      direccion: ['', [Validators.required, Validators.maxLength(200)]],
-      idComuna: [null, Validators.required],
-      rutCliente: [null, Validators.required],
-      idEstado: [null, Validators.required]
-    });
-  }
-
-  private loadEstados(): void {
-    this.ordenesService.getEstados().subscribe({
-      next: (estados) => {
-        this.estados = estados;
-        // Si no estamos en modo edición, seleccionar el primer estado por defecto
-        if (!this.isEditMode && estados.length > 0) {
-          this.ordenForm.patchValue({ idEstado: estados[0].id });
-        }
-      },
-      error: (error) => {
-        console.error('Error loading estados:', error);
-        this.error = 'Error al cargar los estados';
-      }
-    });
   }
 
   private loadClientesActivos(): void {
@@ -99,38 +77,55 @@ export class OrdenFormComponent implements OnInit, OnChanges {
       direccion: orden.direccion,
       idComuna: orden.comuna.id,
       rutCliente: orden.idCliente,
-      idEstado: orden.idEstado
+      idEstado: 1 // Forzar "Agendado" siempre al hacer patchValue
     });
     // Si al editar se quiere precargar empleados, se podría asignar aquí (si vienen en la orden).
   }
 
-  private addFolioAsyncValidation(): void {
-    const ctrl = this.ordenForm.get('folio');
+  // Validación adicional al perder el foco del input de folio
+  onFolioBlur(): void {
+    const ctrl = this.folio;
     if (!ctrl) return;
-    ctrl.valueChanges.pipe(
-      debounceTime(400),
-      distinctUntilChanged(),
-      switchMap(value => {
-        if (this.isEditMode) return of(null);
-        const num = Number(value);
-        if (!value || isNaN(num) || num <= 0 || ctrl.hasError('required') || ctrl.hasError('min') || ctrl.hasError('pattern')) {
-          return of(null);
-        }
-        return this.ordenesService.folioExiste(num);
-      })
-    ).subscribe(existe => {
-      if (existe) {
+
+    ctrl.markAsTouched();
+
+    if (this.isEditMode) return;
+
+    const value = ctrl.value;
+    const num = Number(value);
+
+    // Si hay errores de validación síncronos o el valor no es válido, no consultar backend.
+    if (!value || isNaN(num) || num <= 0 || ctrl.hasError('required') || ctrl.hasError('min') || ctrl.hasError('pattern')) {
+      // Quitar error de duplicado si quedó seteado previamente
+      if (ctrl.errors && ctrl.errors['folioDuplicado']) {
+        const { ...others } = ctrl.errors;
+        ctrl.setErrors(Object.keys(others).length ? others : null);
+      }
+      return;
+    }
+
+    this.ordenesService.folioExiste(num).subscribe(resp => {
+      const duplicado = resp !== -1;
+      if (duplicado) {
         const errs = ctrl.errors || {};
         errs['folioDuplicado'] = true;
         ctrl.setErrors(errs);
       } else if (ctrl.errors) {
-        const { folioDuplicado, ...others } = ctrl.errors;
+        const {...others } = ctrl.errors;
         ctrl.setErrors(Object.keys(others).length ? others : null);
       }
     });
   }
 
   onSubmit(): void {
+    this.empleadosSeleccionadosTouched = true;
+    // Validar que exista al menos un empleado seleccionado solo al crear
+    if (!this.isEditMode && this.selectedEmpleados.length === 0) {
+      this.empleadosSeleccionadosError = true;
+      return;
+    } else {
+      this.empleadosSeleccionadosError = false;
+    }
     if (this.ordenForm.valid) {
       const formValue = this.ordenForm.value;
       const ordenData: OrdenForm = {
@@ -152,10 +147,10 @@ export class OrdenFormComponent implements OnInit, OnChanges {
 
   onReset(): void {
     this.ordenForm.reset();
-    if (!this.isEditMode && this.estados.length > 0) {
-      this.ordenForm.patchValue({ idEstado: this.estados[0].id });
-    }
+    this.ordenForm.patchValue({ idEstado: 1 }); // Forzar "Agendado" siempre al hacer patchValue
     this.selectedEmpleados = [];
+    this.empleadosSeleccionadosError = false;
+    this.empleadosSeleccionadosTouched = false;
   }
 
   private markFormGroupTouched(): void {
@@ -167,6 +162,10 @@ export class OrdenFormComponent implements OnInit, OnChanges {
 
   onEmpleadosSeleccionados(lista: empleadoAsignar[]): void {
     this.selectedEmpleados = lista;
+    // Limpiar error si ahora hay alguno seleccionado
+    if (this.selectedEmpleados.length > 0) {
+      this.empleadosSeleccionadosError = false;
+    }
   }
 
   // Getters para facilitar el acceso a los controles en el template
@@ -190,6 +189,14 @@ export class OrdenFormComponent implements OnInit, OnChanges {
       }
       if (controlName === 'folio' && control.errors['folioDuplicado']) return 'folio ya existe';
       if (control.errors['maxlength']) return `${controlName} excede la longitud máxima`;
+    }
+    return '';
+  }
+
+  // Mensaje de error específico para la selección de empleados (para usar en el template)
+  getEmpleadosSeleccionadosErrorMessage(): string {
+    if (this.empleadosSeleccionadosTouched && this.empleadosSeleccionadosError) {
+      return 'Debe seleccionar al menos un empleado';
     }
     return '';
   }

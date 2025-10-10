@@ -4,7 +4,8 @@ using CleanOrderAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.IdentityModel.Tokens;
 namespace CleanOrderAPI.Controllers
 {
     [Route("ordenes-trabajo")] // Base path expected by Angular service
@@ -28,7 +29,7 @@ namespace CleanOrderAPI.Controllers
             Orden? existeEntity = await _context.Ordens.AsNoTracking().FirstOrDefaultAsync(o => o.Folio == folioNum);
 
             if (existeEntity is null)
-                return Ok(string.Empty);
+                return Ok(-1);
             else
                 return Ok(existeEntity.Folio);
 
@@ -49,6 +50,7 @@ namespace CleanOrderAPI.Controllers
                     o.HorasTrabajo,
                     o.FechaRegistro,
                     o.FechaAgendada,
+                    o.FechaFinalizado,
                     o.Observacion,
                     o.Direccion,
                     o.Folio,
@@ -67,6 +69,7 @@ namespace CleanOrderAPI.Controllers
                 HorasTrabajo = o.HorasTrabajo,
                 FechaRegistro = o.FechaRegistro,
                 FechaAgendada = o.FechaAgendada,
+                FechaFinalizado = o.FechaFinalizado,
                 Observaciones = o.Observacion ?? string.Empty,
                 Direccion = o.Direccion,
                 Folio = o.Folio.ToString(),
@@ -96,6 +99,7 @@ namespace CleanOrderAPI.Controllers
                     o.HorasTrabajo,
                     o.FechaRegistro,
                     o.FechaAgendada,
+                    o.FechaFinalizado,
                     o.Observacion,
                     o.Direccion,
                     o.Folio,
@@ -160,6 +164,7 @@ namespace CleanOrderAPI.Controllers
                     o.HorasTrabajo,
                     o.FechaRegistro,
                     o.FechaAgendada,
+                    o.FechaFinalizado,
                     o.Observacion,
                     o.Direccion,
                     o.Folio,
@@ -178,6 +183,7 @@ namespace CleanOrderAPI.Controllers
                 HorasTrabajo = o.HorasTrabajo,
                 FechaRegistro = o.FechaRegistro,
                 FechaAgendada = o.FechaAgendada,
+                FechaFinalizado = o.FechaFinalizado,
                 Observaciones = o.Observacion ?? string.Empty,
                 Direccion = o.Direccion,
                 Folio = o.Folio.ToString(),
@@ -195,15 +201,36 @@ namespace CleanOrderAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<OrdenTrabajoModel>> Create([FromBody] OrdenForm form)
         {
+            if (form == null)
+                return BadRequest("Datos inválidos");
+
+            // Debe tener empleados asignados
+            if (form.EmpleadoAsignar == null || !form.EmpleadoAsignar.Any())
+                return BadRequest("La orden debe tener al menos un empleado asignado.");
+
+            // Verificar RUTs antes de iniciar la operación (pre-validación)
+            List<string> rutsSolicitados = form.EmpleadoAsignar
+                    .Select(e => (e.Rut ?? string.Empty).Trim())
+                    .Where(r => !string.IsNullOrWhiteSpace(r))
+                    .Distinct()
+                    .ToList();
+
+            if (rutsSolicitados.Count == 0)
+                return BadRequest("La orden no tiene empleados válidos para asignar.");
+
+            List<string> rutsExistentes = await _context.Empleados
+                    .Where(e => rutsSolicitados.Contains(e.RutEmpleado))
+                    .Select(e => e.RutEmpleado)
+                    .ToListAsync();
+
+            List<string> rutsFaltantes = rutsSolicitados.Except(rutsExistentes).ToList();
+            if (rutsFaltantes.Any())
+                return BadRequest($"Los siguientes RUTs no existen: {string.Join(", ", rutsFaltantes)}");
+
+            await using IDbContextTransaction tx = await _context.Database.BeginTransactionAsync();
             try
             {
-                if (form == null)
-                    return BadRequest("Datos inválidos");
-
-                // Generar folio simple (ejemplo) - idealmente usar secuencia/otra lógica
-                //int folio = await _context.Ordens.MaxAsync(o => (int?)o.Folio) + 1 ?? 1;
-
-                var entity = new Orden
+                Orden entity = new Orden
                 {
                     HorasTrabajo = form.HorasTrabajo,
                     FechaRegistro = form.FechaRegistro == default ? DateTime.UtcNow : form.FechaRegistro,
@@ -215,34 +242,29 @@ namespace CleanOrderAPI.Controllers
                     FkComuna = form.IdComuna,
                     FkEstado = form.IdEstado,
                     FkRutClientes = form.RutCliente.ToString(),
-                    FkPatente = _context.Vehiculos.Select(v => v.Patente).FirstOrDefault() ?? "00000000" // placeholder
+                    FkPatente = "pat-tent" // placeholder
                 };
 
                 _context.Ordens.Add(entity);
-                await _context.SaveChangesAsync();
-                entity = await _context.Ordens.FirstAsync(o => o.Folio == entity.Folio);
+                await _context.SaveChangesAsync(); // IdOrden queda disponible aquí
 
-                // Asignar empleados si vienen
-                if (form.EmpleadoAsignar != null && form.EmpleadoAsignar.Any())
+                // Insertar asignaciones (ya validadas)
+                IEnumerable<OrdenEmpleado> asignaciones = rutsExistentes.Select(rut => new OrdenEmpleado
                 {
-                    foreach (var emp in form.EmpleadoAsignar)
-                    {
-                        if (await _context.Empleados.AnyAsync(e => e.RutEmpleado == emp.Rut))
-                        {
-                            _context.OrdenEmpleados.Add(new OrdenEmpleado
-                            {
-                                FkIdOrdenes = entity.IdOrden,
-                                FkRutEmpleado = emp.Rut
-                            });
-                        }
-                    }
-                    await _context.SaveChangesAsync();
-                }
+                    FkIdOrdenes = entity.IdOrden,
+                    FkRutEmpleado = rut
+                });
+
+                await _context.OrdenEmpleados.AddRangeAsync(asignaciones);
+                await _context.SaveChangesAsync();
+
+                await tx.CommitAsync();
 
                 return CreatedAtAction(nameof(GetAll), new { id = entity.IdOrden }, await ProjectOrden(entity.IdOrden));
             }
             catch (Exception ex)
             {
+                await tx.RollbackAsync();
                 Console.WriteLine(ex.Message);
                 throw;
             }
@@ -294,6 +316,40 @@ namespace CleanOrderAPI.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        // PATCH: /ordenes-trabajo/suspender/{id}
+        [HttpPatch("suspender/{id:int}")]
+        public async Task<ActionResult<OrdenTrabajoModel>> Suspender(int id)
+        {
+            Orden? entity = await _context.Ordens.FindAsync(id);
+            if (entity == null) return NotFound();
+
+            if (entity.FkEstado != 1)
+                return Conflict("Order debe estar en estado 1 de agendada");
+
+            await using IDbContextTransaction tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Cambia a estado 4
+                entity.FkEstado = 4;
+                await _context.SaveChangesAsync();
+
+                // Elimina asignaciones de empleados relacionadas a la orden
+                await _context.OrdenEmpleados
+                    .Where(oe => oe.FkIdOrdenes == id)
+                    .ExecuteDeleteAsync();
+
+                await tx.CommitAsync();
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+
+            return await ProjectOrden(id);
+        }
+
 
         // PATCH: /ordenes-trabajo/{id}/estado
         [HttpPatch("{id:int}/estado")]
@@ -349,8 +405,7 @@ namespace CleanOrderAPI.Controllers
                 {
                     Rut = e.RutEmpleado,
                     Dv = e.Dv,
-                    Nombre = e.Nombre + " " + e.Apellido,
-                    Disponible = true
+                    Nombre = e.Nombre + " " + e.Apellido
                 })
                 .ToListAsync();
 

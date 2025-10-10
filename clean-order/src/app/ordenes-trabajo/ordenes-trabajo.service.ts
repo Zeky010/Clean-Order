@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, map } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { OrdenTrabajo } from './ordenes-trabajo.types';
 import { ordenEstado, OrdenForm, empleadoAsignar } from './orden-form/orden-form.type';
 
@@ -72,9 +72,17 @@ export class OrdenesTrabajoService {
     return this.httpClient.patch<OrdenTrabajo>(`${this.apiUrl}/${idOrden}/reagendar`, { fechaAgendada: nuevaFecha }, this.httpOptions);
   }
 
-  folioExiste(folio: number): Observable<boolean> {
-    if (!folio) return of(false);
-    return this.httpClient.get<string>(`${this.apiUrl}/folio/${folio}`)
-      .pipe(map(resp => !!resp && resp.trim() !== ''));
+  folioExiste(folio: number): Observable<number> {
+    if (!folio) return of(-1);
+    return this.httpClient.get<number>(`${this.apiUrl}/folio/${folio}`);
+  }
+
+  // Suspender orden (PATCH /suspender/{id})
+  suspenderOrden(id: number): Observable<OrdenTrabajo> {
+    return this.httpClient.patch<OrdenTrabajo>(
+      `${this.apiUrl}/suspender/${id}`,
+      {},
+      this.httpOptions
+    );
   }
 }

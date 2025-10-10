@@ -1,13 +1,13 @@
 <div class="form-container">
   <div class="form-header">
-    <h2>{{ isEditMode ? 'Editar' : 'Crear' }} Orden de Trabajo</h2>
+    <h2>{{ isEditMode ? "Editar" : "Crear" }} Orden de Trabajo</h2>
   </div>
 
-  <form [formGroup]="ordenForm" (ngSubmit)="onSubmit()" class="orden-form">
+  <form [formGroup]="ordenForm" (ngSubmit)="onSubmit()" class="form-body">
     <div class="form-row">
       <div class="form-group">
         <label for="folio">Folio *</label>
-        <input 
+        <input
           type="number"
           id="folio"
           formControlName="folio"
@@ -16,58 +16,32 @@
           placeholder="1"
           min="1"
           step="1"
-          inputmode="numeric">
+          inputmode="numeric"
+          (blur)="onFolioBlur()"
+        />
         <div class="error-message" *ngIf="folio?.invalid && folio?.touched">
-          {{ getErrorMessage('folio') }}
+          {{ getErrorMessage("folio") }}
         </div>
       </div>
 
       <div class="form-group">
         <label for="horasTrabajo">Horas de Trabajo *</label>
-        <input 
-          type="number" 
-          id="horasTrabajo" 
+        <input
+          type="number"
+          id="horasTrabajo"
           formControlName="horasTrabajo"
           class="form-control"
           [class.error]="horasTrabajo?.invalid && horasTrabajo?.touched"
           placeholder="1"
           step="1"
           min="1"
-          inputmode="numeric">
-        <div class="error-message" *ngIf="horasTrabajo?.invalid && horasTrabajo?.touched">
-          {{ getErrorMessage('horasTrabajo') }}
-        </div>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="fechaAgendada">Fecha Agendada *</label>
-        <input 
-          type="datetime-local" 
-          id="fechaAgendada" 
-          formControlName="fechaAgendada"
-          class="form-control"
-          [class.error]="fechaAgendada?.invalid && fechaAgendada?.touched">
-        <div class="error-message" *ngIf="fechaAgendada?.invalid && fechaAgendada?.touched">
-          {{ getErrorMessage('fechaAgendada') }}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="idEstado">Estado *</label>
-        <select 
-          id="idEstado" 
-          formControlName="idEstado"
-          class="form-control"
-          [class.error]="idEstado?.invalid && idEstado?.touched">
-          <option value="">Seleccione un estado</option>
-          <option *ngFor="let estado of estados" [value]="estado.id">
-            {{ estado.nombre }}
-          </option>
-        </select>
-        <div class="error-message" *ngIf="idEstado?.invalid && idEstado?.touched">
-          {{ getErrorMessage('idEstado') }}
+          inputmode="numeric"
+        />
+        <div
+          class="error-message"
+          *ngIf="horasTrabajo?.invalid && horasTrabajo?.touched"
+        >
+          {{ getErrorMessage("horasTrabajo") }}
         </div>
       </div>
     </div>
@@ -79,42 +53,67 @@
           id="rutCliente"
           formControlName="rutCliente"
           class="form-control"
-          [class.error]="rutCliente?.invalid && rutCliente?.touched">
+          [class.error]="rutCliente?.invalid && rutCliente?.touched"
+        >
           <option value="">Seleccione cliente</option>
-          <option *ngFor="let c of clientesActivos" [value]="(c.rut)">
-            {{ (c.razonSocial)}} {{(c.rut)}} - {{(c.dv)}}
+          <option *ngFor="let c of clientesActivos" [value]="c.rut">
+            {{ c.razonSocial }} {{ c.rut }} - {{ c.dv }}
           </option>
         </select>
-        <div class="error-message" *ngIf="rutCliente?.invalid && rutCliente?.touched">
-          {{ getErrorMessage('rutCliente') }}
+        <div
+          class="error-message"
+          *ngIf="rutCliente?.invalid && rutCliente?.touched"
+        >
+          {{ getErrorMessage("rutCliente") }}
         </div>
       </div>
 
-      <div class="form-group comuna-selector">
-        <label for="idComuna">Comuna y Región *</label>
-        <app-comuna-region-selector
-          id="idComuna"
-          formControlName="idComuna"
-          [disabled]="loading">
-        </app-comuna-region-selector>
-        <div class="error-message" *ngIf="idComuna?.invalid && idComuna?.touched">
-          {{ getErrorMessage('idComuna') }}
+      <div class="form-group">
+        <label for="fechaAgendada">Fecha Agendada *</label>
+        <input
+          type="datetime-local"
+          id="fechaAgendada"
+          formControlName="fechaAgendada"
+          class="form-control"
+          [class.error]="fechaAgendada?.invalid && fechaAgendada?.touched"
+        />
+        <div
+          class="error-message"
+          *ngIf="fechaAgendada?.invalid && fechaAgendada?.touched"
+        >
+          {{ getErrorMessage("fechaAgendada") }}
         </div>
       </div>
     </div>
-
+    <div class="form-row">
+        <div class="form-group comuna-selector">
+        <label for="idComuna">Comuna y Región *</label>
+        <app-comuna-region-selector id="idComuna" formControlName="idComuna">
+        </app-comuna-region-selector>
+        <div
+          class="error-message"
+          *ngIf="idComuna?.invalid && idComuna?.touched"
+        >
+          {{ getErrorMessage("idComuna") }}
+        </div>
+      </div>
+    </div>
     <div class="form-row">
       <div class="form-group full-width">
         <label for="direccion">Dirección *</label>
-        <input 
-          type="text" 
-          id="direccion" 
+        <input
+          type="text"
+          id="direccion"
           formControlName="direccion"
           class="form-control"
           [class.error]="direccion?.invalid && direccion?.touched"
-          placeholder="Ingrese la dirección completa">
-        <div class="error-message" *ngIf="direccion?.invalid && direccion?.touched">
-          {{ getErrorMessage('direccion') }}
+          placeholder="Ingrese la dirección completa"
+        />
+        <div
+          class="error-message"
+          *ngIf="direccion?.invalid && direccion?.touched"
+        >
+          {{ getErrorMessage("direccion") }}
         </div>
       </div>
     </div>
@@ -122,16 +121,20 @@
     <div class="form-row">
       <div class="form-group full-width">
         <label for="observaciones">Observaciones</label>
-        <textarea 
-          id="observaciones" 
+        <textarea
+          id="observaciones"
           formControlName="observaciones"
           class="form-control"
           [class.error]="observaciones?.invalid && observaciones?.touched"
           placeholder="Observaciones adicionales (opcional)"
-          rows="4">
+          rows="4"
+        >
         </textarea>
-        <div class="error-message" *ngIf="observaciones?.invalid && observaciones?.touched">
-          {{ getErrorMessage('observaciones') }}
+        <div
+          class="error-message"
+          *ngIf="observaciones?.invalid && observaciones?.touched"
+        >
+          {{ getErrorMessage("observaciones") }}
         </div>
       </div>
     </div>
@@ -140,9 +143,10 @@
       <div class="form-group full-width">
         <app-lista-asignacion-empleado
           [fechaAgendada]="fechaAgendada?.value"
-            [horasTrabajo]="horasTrabajo?.value"
+          [horasTrabajo]="horasTrabajo?.value"
           [preseleccion]="[]"
-          (empleadosSeleccionChange)="onEmpleadosSeleccionados($event)">
+          (empleadosSeleccionChange)="onEmpleadosSeleccionados($event)"
+        >
         </app-lista-asignacion-empleado>
       </div>
     </div>
@@ -151,11 +155,20 @@
       <button type="button" class="btn btn-secondary" (click)="onCancel()">
         Cancelar
       </button>
-      <button type="button" class="btn btn-outline" (click)="onReset()" *ngIf="!isEditMode">
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="onReset()"
+        *ngIf="!isEditMode"
+      >
         Limpiar
       </button>
-      <button type="submit" class="btn btn-primary" [disabled]="ordenForm.invalid || loading">
-        {{ isEditMode ? 'Actualizar' : 'Crear' }} Orden
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="ordenForm.invalid || loading"
+      >
+        {{ isEditMode ? "Actualizar" : "Crear" }} Orden
       </button>
     </div>
   </form>
@@ -164,3 +177,4 @@
     {{ error }}
   </div>
 </div>
+

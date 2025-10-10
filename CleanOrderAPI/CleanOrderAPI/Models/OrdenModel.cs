@@ -23,7 +23,6 @@ namespace CleanOrderAPI.Models
         public string Rut { get; set; } = string.Empty;
         public string Dv { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
-        public bool Disponible { get; set; }
     }
 
     // OrdenTrabajo TS (usa ComunaModel y RegionModel ya definidos en ComunaRegionModel.cs)
@@ -33,6 +32,7 @@ namespace CleanOrderAPI.Models
         public int HorasTrabajo { get; set; }
         public DateTime FechaRegistro { get; set; }
         public DateTime FechaAgendada { get; set; }
+        public DateTime FechaFinalizado { get; set; }
         public string Observaciones { get; set; } = string.Empty;
         public string Direccion { get; set; } = string.Empty;
         public string Folio { get; set; } = string.Empty;

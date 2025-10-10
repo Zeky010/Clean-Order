@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { DatePipe, NgIf, NgFor } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { OrdenTrabajo } from './ordenes-trabajo.types';
 import { OrdenesTrabajoService } from './ordenes-trabajo.service';
 import { OrdenFormComponent } from './orden-form/orden-form.component';
@@ -9,8 +9,8 @@ import { OrdenForm } from './orden-form/orden-form.type';
   selector: 'app-ordenes-trabajo',
   standalone: true,
   templateUrl: './ordenes-trabajo.component.html',
-  styleUrls: ['./ordenes-trabajo.component.css', '../shared/entity-table.css'],
-  imports: [DatePipe, OrdenFormComponent, NgIf, NgFor]
+  styleUrls: ['./ordenes-trabajo.component.css', '../shared/entity-table.css', '../shared/forms.css'],
+  imports: [DatePipe, OrdenFormComponent]
 })
 export class OrdenesTrabajoComponent implements OnInit {
   ordenesTrabajos: OrdenTrabajo[] = [];
@@ -95,15 +95,19 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   // Método para eliminar orden (si lo necesitas)
-  eliminarOrden(orden: OrdenTrabajo): void {
-    if (confirm(`¿Está seguro de eliminar la orden ${orden.folio}?`)) {
-      this.ordenesTrabajoService.deleteOrdenTrabajo(orden.id).subscribe({
+  suspenderOrden(orden: OrdenTrabajo): void {
+    if (!this.canSuspender(orden)) {
+      alert('Solo se puede suspender una orden en estado Agendada.');
+      return;
+    }
+    if (confirm(`¿Está seguro de suspender la orden ${orden.folio}?`)) {
+      this.ordenesTrabajoService.suspenderOrden(orden.id).subscribe({
         next: () => {
-          console.log('Orden eliminada exitosamente');
+          console.log('Orden suspendida exitosamente');
           this.loadOrdenesTrabajo();
         },
         error: (error) => {
-          this.handleError(error, 'eliminar');
+          this.handleError(error, 'suspender');
         }
       });
     }
@@ -202,6 +206,12 @@ export class OrdenesTrabajoComponent implements OnInit {
     }
   }
 
+  // Método helper para saber si la orden está en estado 1 (agendada)
+  canSuspender(orden: OrdenTrabajo): boolean {
+    
+    return orden.idEstado === 1;
+  }
+
   private handleError(error: unknown, accion: string): void {
     const status = (error as { status?: number })?.status;
     switch (status) {
@@ -210,6 +220,9 @@ export class OrdenesTrabajoComponent implements OnInit {
         break;
       case 400:
         alert(`Datos inválidos al ${accion}.`);
+        break;
+      case 401:
+        alert('No autorizado. Por favor, inicie sesión.');
         break;
       case 404:
         alert('Orden de trabajo no encontrada.');

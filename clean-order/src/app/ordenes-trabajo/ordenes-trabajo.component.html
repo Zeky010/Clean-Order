@@ -1,65 +1,75 @@
 <div class="ordenes-wrapper">
-
-  <div class="toolbar">
+  <div>
     <h2>Órdenes de Trabajo</h2>
-    <button class="btn btn-primary" (click)="crearOrdenTrabajo()" *ngIf="!showCreateForm && !showEditForm">
+    @if (!showCreateForm) {
+    <button class="btn btn-primary" (click)="crearOrdenTrabajo()">
       Nueva Orden
     </button>
-    <button class="btn btn-secondary" (click)="closeForms()" *ngIf="showCreateForm || showEditForm">
-      Cerrar formulario
-    </button>
+    }
   </div>
 
-  <div *ngIf="loading">Cargando...</div>
-  <div *ngIf="error" class="error-alert">{{ error }}</div>
+  @if (loading) {
+  <div>Cargando...</div>
+  } @if (error) {
+  <div class="error-alert">{{ error }}</div>
+  }
 
   <!-- Listado -->
-  <table class="entity-table" *ngIf="!loading && !showCreateForm && !showEditForm">
+  @if (!loading && !showCreateForm) {
+  <table class="entity-table">
     <thead>
       <tr>
         <th>Folio</th>
         <th>Cliente</th>
         <th>Estado</th>
         <th>Fecha Agendada</th>
+        <th>Fecha de Termino</th>
         <th>Horas</th>
         <th>Dirección</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let o of ordenesTrabajos">
-        <td>{{ o.folio }}</td>
-        <td>{{ o.cliente }}</td>
-        <td><span [class]="getEstadoClass(o.estado)">{{ o.estado }}</span></td>
-        <td>{{ o.fechaAgendada | date:'short' }}</td>
-        <td>{{ o.horasTrabajo }}</td>
-        <td>{{ o.direccion }}</td>
-        <td class="actions">
-          <button class="btn btn-small" (click)="editarOrden(o)">Editar</button>
-          <button class="btn btn-small btn-danger" (click)="eliminarOrden(o)">Eliminar</button>
-        </td>
-      </tr>
-      <tr *ngIf="ordenesTrabajos.length === 0">
+      @if (ordenesTrabajos.length === 0) {
+      <tr>
         <td colspan="7">Sin registros.</td>
       </tr>
+      } 
+      @else { 
+        @for (o of ordenesTrabajos; track $index) {
+          <tr>
+            <td>{{ o.folio }}</td>
+            <td>{{ o.cliente }}</td>
+            <td>
+              <span [class]="getEstadoClass(o.estado)">{{ o.estado }}</span>
+            </td>
+            <td>{{ o.fechaAgendada | date : "medium" }}</td>
+            <td>{{ o.fechaFinalizado | date : "medium" }}</td>
+            <td>{{ o.horasTrabajo }}</td>
+            <td>{{ o.direccion }}</td>
+            <td class="actions">
+              @if (canSuspender(o)) {
+                <button class="btn btn-small btn-danger" (click)="suspenderOrden(o)">
+                  Suspender
+                </button>
+              }
+
+            </td>
+          </tr>
+        } 
+      }
     </tbody>
   </table>
+  }
 
   <!-- Formulario Crear -->
+
+  @if (showCreateForm) {
   <app-orden-form
-    *ngIf="showCreateForm"
     [isEditMode]="false"
     (submitForm)="onCreateSubmit($event)"
-    (cancelForm)="onCancelForm()">
+    (cancelForm)="onCancelForm()"
+  >
   </app-orden-form>
-
-  <!-- Formulario Editar -->
-  <app-orden-form
-    *ngIf="showEditForm && selectedOrden"
-    [isEditMode]="true"
-    [orden]="selectedOrden"
-    (submitForm)="onEditSubmit($event)"
-    (cancelForm)="onCancelForm()">
-  </app-orden-form>
-
+  }
 </div>

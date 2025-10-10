@@ -263,11 +263,12 @@ public partial class ApplicationDbContext : DbContext
                 .HasConstraintName("ORDENES_CLIENTES");
         });
 
+        // FIX: configure composite key for the join table so EF Core can track/add/remove rows
         modelBuilder.Entity<OrdenEmpleado>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("orden_empleado");
+            entity.ToTable("orden_empleado");
+
+            entity.HasKey(e => new { e.FkIdOrdenes, e.FkRutEmpleado }).HasName("PK_orden_empleado");
 
             entity.HasIndex(e => e.FkRutEmpleado, "OxE_EMPLEADOS");
             entity.HasIndex(e => e.FkIdOrdenes, "OxE_ORDENES");

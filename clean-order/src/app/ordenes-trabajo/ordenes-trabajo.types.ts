@@ -5,6 +5,7 @@ export interface OrdenTrabajo {
   horasTrabajo: number;
   fechaRegistro: Date;
   fechaAgendada: Date;
+  fechaFinalizado: Date;
   observaciones: string;
   direccion: string;
   folio: number;

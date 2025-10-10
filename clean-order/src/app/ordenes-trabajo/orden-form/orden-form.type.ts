@@ -15,7 +15,6 @@ export interface empleadoAsignar {
   rut: string;
   dv: string;
   nombre: string;
-  disponible: boolean;
 }
 
 export interface ordenEstado {
