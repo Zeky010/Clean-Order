@@ -22,6 +22,18 @@ export class ClientesComponent implements OnInit {
   isEditMode = false;
   showClienteDetalle = false;
 
+  // Filtro por nombre/razón social
+  filterText = '';
+
+  // Lista filtrada (insensible a mayúsculas/minúsculas)
+  get filteredClientes(): Cliente[] {
+    const q = this.filterText.trim().toLowerCase();
+    if (!q) return this.clientes;
+    return this.clientes.filter(c =>
+      (c.razonSocial ?? '').toLowerCase().includes(q)
+    );
+  }
+
   ngOnInit(): void {
     this.loadClientes();
   }
@@ -101,6 +113,14 @@ export class ClientesComponent implements OnInit {
     //this.closeForms();
     this.selectedCliente = cliente;
     this.showClienteDetalle = true; // Mostrar detalle
+  }
+
+  onFilter(event: Event) {
+    this.filterText = (event.target as HTMLInputElement).value;
+  }
+
+  clearFilter() {
+    this.filterText = '';
   }
 
   private handleMutationError(err: unknown, accion: string) {

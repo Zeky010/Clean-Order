@@ -264,13 +264,16 @@ namespace CleanOrderAPI.Controllers
             // Validate Telefono (optional field)
             if (!string.IsNullOrWhiteSpace(clienteModel.Telefono))
             {
-                if (clienteModel.Telefono.Length < 8 || clienteModel.Telefono.Length > 15)
+                string phoneRaw = clienteModel.Telefono.Trim();
+                string digitsOnly = phoneRaw.StartsWith("+") ? phoneRaw[1..] : phoneRaw;
+
+                if (digitsOnly.Length < 8 || digitsOnly.Length > 15)
                 {
-                    errors.Add("Teléfono debe tener entre 8 y 15 dígitos.");
+                    errors.Add("Teléfono debe tener entre 8 y 15 dígitos (puede iniciar con '+').");
                 }
-                if (!clienteModel.Telefono.All(char.IsDigit))
+                if (!digitsOnly.All(char.IsDigit))
                 {
-                    errors.Add("Teléfono debe contener solo números.");
+                    errors.Add("Teléfono debe contener solo números (puede iniciar con '+').");
                 }
             }
 

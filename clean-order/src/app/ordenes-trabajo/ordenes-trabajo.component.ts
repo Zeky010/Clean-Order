@@ -9,7 +9,8 @@ import { OrdenForm } from './orden-form/orden-form.type';
   selector: 'app-ordenes-trabajo',
   standalone: true,
   templateUrl: './ordenes-trabajo.component.html',
-  styleUrls: ['./ordenes-trabajo.component.css', '../shared/entity-table.css', '../shared/forms.css'],
+  styleUrls: ['./ordenes-trabajo.component.css', '../shared/entity-table.css', 
+              '../shared/forms.css', '../shared/buttons.css'],
   imports: [DatePipe, OrdenFormComponent]
 })
 export class OrdenesTrabajoComponent implements OnInit {

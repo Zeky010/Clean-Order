@@ -14,7 +14,7 @@ import { Cliente } from '../../clientes/clientes.types';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ComunaRegionSelectorComponent, ListaAsignacionEmpleadoComponent],
   templateUrl: './orden-form.component.html',
-  styleUrls: ['./orden-form.component.css', '../../shared/forms.css']
+  styleUrls: ['./orden-form.component.css', '../../shared/forms.css', '../../shared/buttons.css']
 })
 export class OrdenFormComponent implements OnInit, OnChanges {
   @Input() orden: OrdenTrabajo | null = null;
@@ -33,6 +33,50 @@ export class OrdenFormComponent implements OnInit, OnChanges {
   clientesActivos: Cliente[] = [];
   empleadosSeleccionadosTouched = false;
   empleadosSeleccionadosError = false;
+
+  // Etiquetas legibles por campo
+  readonly fieldLabels: Record<string, string> = {
+    folio: 'Folio',
+    horasTrabajo: 'Horas de Trabajo',
+    fechaAgendada: 'Fecha Agendada',
+    direccion: 'Dirección',
+    idComuna: 'Comuna y Región',
+    rutCliente: 'Cliente',
+    observaciones: 'Observaciones',
+    idEstado: 'Estado'
+  };
+
+  // Mensajes personalizados por campo y por validador
+  // Edite aquí para cambiar los textos.
+  readonly customMessages: Record<string, Record<string, string>> = {
+    folio: {
+      required: 'El Folio es obligatorio.',
+      pattern: 'El Folio debe ser un número entero positivo.',
+      min: 'El Folio debe ser mayor o igual a 1.',
+      folioDuplicado: 'El Folio ya existe.'
+    },
+    horasTrabajo: {
+      required: 'Las horas de trabajo son obligatorias.',
+      pattern: 'Horas de trabajo debe ser un entero positivo.',
+      min: 'Horas de trabajo debe ser ≥ 1.'
+    },
+    fechaAgendada: {
+      required: 'Debe seleccionar una fecha y hora.'
+    },
+    direccion: {
+      required: 'La dirección es obligatoria.',
+      maxlength: 'La dirección supera la longitud máxima permitida.'
+    },
+    idComuna: {
+      required: 'Debe seleccionar una comuna.'
+    },
+    rutCliente: {
+      required: 'Debe seleccionar un cliente.'
+    },
+    observaciones: {
+      maxlength: 'Las observaciones superan la longitud máxima permitida.'
+    }
+  };
 
   constructor() {
     this.ordenForm = this.fb.group({
@@ -181,14 +225,27 @@ export class OrdenFormComponent implements OnInit, OnChanges {
   // Método helper para obtener errores
   getErrorMessage(controlName: string): string {
     const control = this.ordenForm.get(controlName);
-    if (control?.errors && control?.touched) {
-      if (control.errors['required']) return `${controlName} es requerido`;
-      if (controlName === 'horasTrabajo' || controlName === 'folio') {
-        if (control.errors['min']) return `${controlName} debe ser >= 1`;
-        if (control.errors['pattern']) return `${controlName} debe ser un número entero positivo`;
-      }
-      if (controlName === 'folio' && control.errors['folioDuplicado']) return 'folio ya existe';
-      if (control.errors['maxlength']) return `${controlName} excede la longitud máxima`;
+    if (!control || !control.errors || !control.touched) return '';
+
+    const label = this.fieldLabels[controlName] ?? controlName;
+    const msgs = this.customMessages[controlName] ?? {};
+
+    if (control.errors['required']) {
+      return msgs['required'] ?? `${label} es requerido`;
+    }
+    if (control.errors['min']) {
+      const min = control.errors['min']?.min ?? 1;
+      return msgs['min'] ?? `${label} debe ser ≥ ${min}`;
+    }
+    if (control.errors['pattern']) {
+      return msgs['pattern'] ?? `${label} tiene un formato inválido`;
+    }
+    if (control.errors['maxlength']) {
+      const max = control.errors['maxlength']?.requiredLength;
+      return msgs['maxlength'] ?? `${label} excede la longitud máxima${max ? ` (${max})` : ''}`;
+    }
+    if (control.errors['folioDuplicado']) {
+      return msgs['folioDuplicado'] ?? 'El Folio ya existe';
     }
     return '';
   }

@@ -1,0 +1,98 @@
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #4CAF50;
+  border: 1px solid #4CAF50;
+}
+
+.btn-outline:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Botón de eliminación (destructivo) */
+.btn-danger {
+  background-color: #e53935;
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.btn-danger:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2);
+}
+
+/* Variante contorno para eliminar */
+.btn-outline-danger {
+  background-color: transparent;
+  color: #e53935;
+  border: 1px solid #e53935;
+}
+
+.btn-outline-danger:hover:not(:disabled) {
+  background-color: #e53935;
+  color: #fff;
+}
+
+/* Tamaño pequeño para botones */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 3px;
+  min-height: 32px;
+  gap: 6px;
+}
+
+/* Iconos dentro de botones pequeños */
+.btn-small .icon,
+.btn-small svg,
+.btn-small i {
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {  
+  .btn {
+    width: 100%;
+  }
+}

@@ -23,7 +23,19 @@
 <div class="entity-container">
   <div class="header">
     <h2>Lista de Clientes</h2>
-    <button class="btn-primary" (click)="crearCliente()">Nuevo Cliente</button>
+    <div class="actions" style="display:flex; gap:8px; align-items:center;">
+      <input
+        type="text"
+        placeholder="Buscar por nombre / razón social"
+        [value]="filterText"
+        (input)="onFilter($event)"
+        style="padding:6px 8px; min-width:280px;"
+      />
+      @if (filterText) {
+        <button class="btn-secondary" (click)="clearFilter()">Limpiar</button>
+      }
+      <button class="btn-primary" (click)="crearCliente()">Nuevo Cliente</button>
+    </div>
   </div>
   <table class="entity-table">
     <thead>
@@ -37,7 +49,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (cliente of clientes; track $index) {
+      @for (cliente of filteredClientes; track $index) {
       <tr>
         <td>{{ cliente.rut }}-{{ cliente.dv }}</td>
         <td>{{ cliente.razonSocial }}</td>
@@ -58,6 +70,9 @@
   </table>
   @if (clientes.length === 0) {
     <div class="no-data">No hay clientes registrados</div>
+  }
+  @else if (filteredClientes.length === 0) {
+    <div class="no-data">No hay resultados para "{{ filterText }}"</div>
   }
 </div>
 }

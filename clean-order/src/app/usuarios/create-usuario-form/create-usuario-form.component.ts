@@ -9,7 +9,7 @@ import { Rol } from '../roles.types';
   selector: 'app-create-usuario-form',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-usuario-form.component.html',
-  styleUrl: './create-usuario-form.component.css'
+  styleUrls: ['./create-usuario-form.component.css', '../../shared/forms.css'],
 })
 export class CreateUsuarioFormComponent implements OnInit {
   @Output() formSubmit = new EventEmitter<UsuarioCreation>();
