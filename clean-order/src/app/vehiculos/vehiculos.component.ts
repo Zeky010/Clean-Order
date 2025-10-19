@@ -1,22 +1,32 @@
-import { Component } from '@angular/core';
-import { Vehiculo } from './vehiculo.types';
-import { VehiculoForm } from "./vehiculo-form/vehiculo-form.component";
+import { Component, inject, OnInit } from '@angular/core';
+import { vehiculo } from './vehiculo.types';
+import { VehiculoForm } from './vehiculo-form/vehiculo-form.component';
+import { VehiculoService } from './vehiculo.service';
 
 @Component({
   selector: 'app-vehiculos',
   imports: [VehiculoForm],
   templateUrl: './vehiculos.component.html',
-  styleUrls: ['./vehiculos.component.css']
+  styleUrls: [
+    './vehiculos.component.css',
+    '../shared/styles/entity-table.css',
+    '../shared/styles/buttons.css',
+  ],
 })
-export class VehiculosComponent {
-  vehiculos: Vehiculo[] = [
-    { patente: 'ABC123', capacidad: 5, tipo: 'Camioneta', idTipo: 1 },
-    { patente: 'XYZ789', capacidad: 2, tipo: 'Sedan', idTipo: 2 },
-    { patente: 'JKL456', capacidad: 4, tipo: 'SUV', idTipo: 3 }
-  ];
-  agregarVehiculo(nuevoVehiculo: Vehiculo) {
+export class VehiculosComponent implements OnInit {
+  private readonly vehiculoService = inject(VehiculoService);
+  vehiculos: vehiculo[] = [];
+  ngOnInit() {
+    this.vehiculoService.listar().subscribe({
+      next: (data) => {
+        this.vehiculos = data;
+      },
+      error: (err) => console.error('Error cargando vehículos', err),
+    });
+  }
+
+  agregarVehiculo(nuevoVehiculo: vehiculo) {
     this.vehiculos.push(nuevoVehiculo);
     console.log('Vehículo agregado:', nuevoVehiculo);
   }
-
 }
