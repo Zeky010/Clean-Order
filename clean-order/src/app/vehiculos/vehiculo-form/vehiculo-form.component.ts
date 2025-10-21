@@ -1,7 +1,6 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, OnInit, Input } from '@angular/core';
 import { vehiculo, tipoCarga } from '../vehiculo.types';
 import { FormsModule } from '@angular/forms';
-import { VehiculoService } from '../vehiculo.service';
 import { TipoCargaService } from './tipo-carga.service';
 
 @Component({
@@ -12,12 +11,37 @@ import { TipoCargaService } from './tipo-carga.service';
     '../../shared/styles/buttons.css',
     '../../shared/styles/forms.css'
   ],
-  imports: [FormsModule],
+  imports: [ FormsModule],
 })
-export class VehiculoForm {
-  @Output() vehiculoCreado = new EventEmitter<vehiculo>();
+export class VehiculoForm implements OnInit {
+  // Campo de respaldo para el @Input vehiculo
+  private _vehiculo?: vehiculo;
+
+  @Input() set vehiculo(value: vehiculo | undefined) {
+    this._vehiculo = value;
+    if (value) {
+      this.nuevoVehiculo = { ...value };
+      this.selectedTipoCargaId = value.tipoCarga?.id ?? null;
+      this.activoChecked = value.activo === 'S';
+    } else {
+      this.nuevoVehiculo = {
+        patente: '',
+        capacidad: 0,
+        activo: 'S',
+        tipoCarga: { id: 0, nombreCarga: '' }
+      };
+      this.selectedTipoCargaId = null;
+      this.activoChecked = true;
+    }
+  }
+  get vehiculo(): vehiculo | undefined {
+    return this._vehiculo;
+  }
+
+  @Output() formSubmit = new EventEmitter<vehiculo>();
+  @Output() formCancel = new EventEmitter<void>();
+
   private readonly tipoCargaService = inject(TipoCargaService);
-  private readonly vehiculoService = inject(VehiculoService);
 
   tiposCarga: tipoCarga[] = [];
   // Modelo del formulario
@@ -25,51 +49,47 @@ export class VehiculoForm {
     patente: '',
     capacidad: 0,
     activo: 'S',
-    TipoCarga: { id: 0, nombreCarga: '' }
+    tipoCarga: { id: 0, nombreCarga: '' }
   };
   selectedTipoCargaId: number | null = null;
+  activoChecked = true;
+
+  get isEditMode() {
+    return !!this.vehiculo;
+  }
 
   ngOnInit() {
     this.tipoCargaService.listar().subscribe({
       next: (data) => {
         this.tiposCarga = data;
-        // Selección por defecto
-        if (!this.selectedTipoCargaId && this.tiposCarga.length) {
-          this.selectedTipoCargaId = this.tiposCarga[0].id;
-        }
+        // No autoseleccionar: forzar que el usuario elija
+        // if (!this.isEditMode && !this.selectedTipoCargaId && this.tiposCarga.length) {
+        //   this.selectedTipoCargaId = this.tiposCarga[0].id;
+        // }
       },
       error: (err) => console.error('Error cargando tipos de carga', err),
     });
-  } 
+  }
 
   crearVehiculo() {
-    // Mapear el id seleccionado al objeto TipoCarga
     const tipo = this.tiposCarga.find(t => t.id === this.selectedTipoCargaId!);
     if (!tipo) {
       console.error('Tipo de carga no seleccionado');
       return;
     }
 
-    const payload: vehiculo = {
-      patente: this.nuevoVehiculo.patente.trim(),
-      capacidad: this.nuevoVehiculo.capacidad,
-      activo: this.nuevoVehiculo.activo,
-      TipoCarga: tipo
-    };
+    const patente = this.isEditMode ? (this.vehiculo?.patente ?? '') : this.nuevoVehiculo.patente.trim();
 
-    this.vehiculoService.crear(payload).subscribe({
-      next: (created) => {
-        this.vehiculoCreado.emit(created);
-        // Reset del formulario
-        this.nuevoVehiculo = {
-          patente: '',
-          capacidad: 0,
-          activo: 'S',
-          TipoCarga: { id: 0, nombreCarga: '' }
-        };
-        this.selectedTipoCargaId = this.tiposCarga.length ? this.tiposCarga[0].id : null;
-      },
-      error: (err) => console.error('Error creando vehículo', err),
-    });
+    const payload: vehiculo = {
+      patente,
+      capacidad: this.nuevoVehiculo.capacidad,
+      activo: this.activoChecked ? 'S' : 'N',
+      tipoCarga: tipo
+    };
+    this.formSubmit.emit(payload);
+  }
+
+  cancelar() {
+    this.formCancel.emit();
   }
 }

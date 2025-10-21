@@ -10,8 +10,8 @@ import { AsignarUsuarioComponent } from './asignar-usuario/asignar-usuario.compo
   selector: 'app-usuarios',
   imports: [CommonModule, CreateUsuarioFormComponent, UpdateUsuarioComponent, AsignarUsuarioComponent],
   templateUrl: './usuarios.component.html',
-  styleUrls: ['./usuarios.component.css', '../shared/entity-table.css'
-              , '../shared/buttons.css'] 
+  styleUrls: ['./usuarios.component.css', '../shared/styles/entity-table.css'
+              , '../shared/styles/buttons.css'] 
 })
 export class UsuarioComponent implements OnInit {
   private usuarioService = inject(UsuarioService);

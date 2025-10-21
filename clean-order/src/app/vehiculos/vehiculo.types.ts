@@ -2,7 +2,7 @@ export interface vehiculo {
     patente: string;
     capacidad: number;
     activo: string;
-    TipoCarga: tipoCarga;
+    tipoCarga: tipoCarga;
 }
 
 

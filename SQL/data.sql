@@ -21,3 +21,9 @@ INSERT INTO `gestion-ot`.orden_estado (NOMBRE) VALUES
 	 ('EN PROCESO'),
 	 ('REALIZADO'),
 	 ('SUSPENDIDO');
+	 
+INSERT INTO `gestion-ot`.tipo_carga (NOMBRE_CARGA) VALUES
+	 ('RILES'),
+	 ('AGUAS GRASAS'),
+	 ('AGUAS SERVIDAS'),
+	 ('RESPEL');

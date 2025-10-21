@@ -9,7 +9,7 @@ import { DocumentoUploadComponent } from "./documento-upload/documento-upload.co
 @Component({
   selector: 'app-cliente-detalle',
   templateUrl: './cliente-detalle.component.html',
-  styleUrls: ['./cliente-detalle.component.css', "../../shared/entity-table.css"],
+  styleUrls: ['./cliente-detalle.component.css', "../../shared/styles/entity-table.css"],
   imports: [DocumentoUploadComponent, DatePipe]
 })
 export class ClienteDetalleComponent implements OnInit {
