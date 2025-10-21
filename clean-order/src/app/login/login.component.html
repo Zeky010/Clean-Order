@@ -1,19 +1,86 @@
-<div class="login-container">
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+<h1 class="brand">CLEAN ORDER</h1>
+
+<div class="login-container" role="region" aria-labelledby="login-title">
+  <h2 id="login-title" class="title">Iniciar sesión</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+    <!-- Correo -->
     <label for="correo">Correo</label>
-    <input id="correo" formControlName="correo" type="email" autocomplete="email" inputmode="email" />
+    <input
+      id="correo"
+      name="email"
+      formControlName="correo"
+      type="email"
+      autocomplete="email"
+      inputmode="email"
+      spellcheck="false"
+      [attr.aria-invalid]="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched"
+      aria-describedby="correo-error"
+    />
     @if (loginForm.get('correo')?.touched && loginForm.get('correo')?.errors) {
-      <div class="error">
+      <div id="correo-error" class="error" aria-live="polite">
         @if (loginForm.get('correo')?.errors?.['required']) { Correo es requerido. }
         @if (loginForm.get('correo')?.errors?.['email']) { Formato de correo inválido. }
       </div>
+    } @else {
+      <div class="error" aria-live="polite"></div>
     }
 
+    <!-- Contraseña -->
     <label for="password">Contraseña</label>
-    <input id="password" formControlName="password" type="password" autocomplete="current-password" />
+    <div class="password-field">
+      <input
+        id="password"
+        name="current-password"
+        #pwd
+        formControlName="password"
+        type="password"
+        autocomplete="current-password"
+        [attr.aria-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        aria-describedby="password-error"
+      />
+      <button
+        type="button"
+        class="toggle-visibility"
+        (click)="pwd.type = (pwd.type === 'password' ? 'text' : 'password'); pwd.focus()"
+        [attr.aria-pressed]="pwd.type === 'text'"
+        [attr.aria-label]="pwd.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+      >
+        @if (pwd.type === 'password') {
+          <!-- ojo -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M1.5 12s3.5-7 10.5-7 10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="2" fill="none"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+          </svg>
+        } @else {
+          <!-- ojo tachado -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 3l18 18" stroke="currentColor" stroke-width="2"/>
+            <path d="M1.5 12s3.5-7 10.5-7c-2.1 0-3.9.5-5.4 1.3M22.5 12s-3.5 7-10.5 7c-2.1 0-3.9-.5-5.4-1.3" stroke="currentColor" stroke-width="2" fill="none"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+          </svg>
+        }
+      </button>
+    </div>
     @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-      <div class="error">Contraseña es requerida.</div>
+      <div id="password-error" class="error" aria-live="polite">Contraseña es requerida.</div>
+    } @else {
+      <div class="error" aria-live="polite"></div>
     }
-    <button type="submit" [disabled]="loginForm.invalid">Login</button>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="submit-button"
+      [class.is-loading]="loading"
+      [disabled]="loginForm.invalid || loading"
+    >
+      @if (!loading) { Entrar } @else { Autenticando… }
+    </button>
+
+    <!-- Error general de autenticación (opcional si seteas form.setErrors) -->
+    @if (loginForm.errors?.['auth']) {
+      <div class="error" aria-live="polite">Correo o contraseña inválidos.</div>
+    }
   </form>
 </div>

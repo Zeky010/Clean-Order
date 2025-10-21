@@ -1,16 +1,30 @@
-<div class="content-center">
-  <div class="card-container">
-    <div class="card">
-        <h3>Card Title 1</h3>
-        <p>Card content goes here.</p>
+<div class="layout">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">CLEAN_ORDER</div>
+
+    <div class="user-info">
+      <span class="user-name">{{ displayName }}</span>
+      <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
     </div>
-    <div class="card">
-        <h3>Card Title 2</h3>
-        <p>Card content goes here.</p>
-    </div>
-    <div class="card">
-        <h3>Card Title 3</h3>
-        <p>Card content goes here.</p>
-    </div>
-  </div>
+  </header>
+
+  <!-- SIDE MENU -->
+  <aside class="side-menu">
+    <nav>
+      <ul>
+        <li><a routerLink="/"                routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a></li>
+        <li><a routerLink="/ordenes-trabajo" routerLinkActive="active">Órdenes de Trabajo</a></li>
+        <li><a routerLink="/vehiculos"       routerLinkActive="active">Vehículos</a></li>
+        <li><a routerLink="/usuarios"        routerLinkActive="active">Usuarios</a></li>
+        <li><a routerLink="/empleados"       routerLinkActive="active">Empleados</a></li>
+        <li><a routerLink="/clientes"        routerLinkActive="active">Clientes</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- CONTENIDO VARIABLE (hijos) -->
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
 </div>
