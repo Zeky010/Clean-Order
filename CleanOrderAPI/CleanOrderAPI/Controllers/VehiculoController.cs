@@ -1,9 +1,10 @@
 ﻿using CleanOrderAPI.Data;
 using CleanOrderAPI.Data.Entities;
+using CleanOrderAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CleanOrderAPI.Models;
+using System.Runtime.Intrinsics.Arm;
 
 
 namespace CleanOrderAPI.Controllers
@@ -20,7 +21,7 @@ namespace CleanOrderAPI.Controllers
             _context = context;
         }
 
-        // GET: /api/vehiculos
+        // GET: /vehiculos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VehiculoModel>>> Listar()
         {
@@ -32,8 +33,27 @@ namespace CleanOrderAPI.Controllers
             var result = vehiculos.Select(MapToModel).ToList();
             return Ok(result);
         }
+        [HttpPost("disponibles")]
+        public async Task<ActionResult<IEnumerable<VehiculoModel>>> Disponibles([FromBody] DisponibilidadRequest request)
+        {
+            DateTime inicio = request.FechaAgendada;
+            DateTime fin = inicio.AddHours(request.HorasTrabajo);
+            List<string> ocupados = await (from o in _context.Ordens
+                                  where o.FechaAgendada < fin
+                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio
+                                  join v in _context.Vehiculos on o.FkPatente equals v.Patente
+                                              select v.Patente)
+                                 .Distinct()
+                                 .ToListAsync();
+            List<Vehiculo> vehiculos = await _context.Vehiculos.AsNoTracking()
+                .Include(v => v.FkTipoNavigation)
+                .Where(v => !ocupados.Contains(v.Patente) && v.Activo.Equals("S"))
+                .ToListAsync();
+            List<VehiculoModel> result = vehiculos.Select(MapToModel).ToList();
+            return Ok(result);
+        }
 
-        // GET: /api/vehiculos/{patente}
+        // GET: /vehiculos/{patente}
         [HttpGet("{patente}")]
         public async Task<ActionResult<VehiculoModel>> Obtener([FromRoute] string patente)
         {
@@ -105,8 +125,8 @@ namespace CleanOrderAPI.Controllers
                 return NotFound($"Vehiculo con patente '{patente}' no existe.");
 
             // Apply partial updates
-            if (request.Capacidad.HasValue)
-                vehiculo.Capacidad = request.Capacidad.Value;
+            /*if (request.Capacidad.HasValue)
+                vehiculo.Capacidad = request.Capacidad.Value;*/
 
             if (request.Activo is not null)
                 vehiculo.Activo = request.Activo;
@@ -152,9 +172,7 @@ namespace CleanOrderAPI.Controllers
                 Patente = v.Patente,
                 Capacidad = v.Capacidad,
                 Activo = v.Activo,
-                TipoCarga = v.FkTipoNavigation is null
-                    ? null
-                    : new TipoCargaModel
+                TipoCarga = new TipoCargaModel
                     {
                         Id = v.FkTipoNavigation.TipoCargaCodigo,
                         NombreCarga = v.FkTipoNavigation.NombreCarga

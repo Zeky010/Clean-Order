@@ -20,8 +20,10 @@ import { OrdenForm, empleadoAsignar } from './orden-form.type';
 import { OrdenesTrabajoService } from '../ordenes-trabajo.service';
 import { ComunaRegionSelectorComponent } from '../../comuna-region/comuna-region-selector.component';
 import { ListaAsignacionEmpleadoComponent } from './lista-asignacion-empleado/lista-asignacion-empleado.component';
+import { ListaAsignacionVehiculoComponent } from './lista-asignacion-vehiculo/lista-asignacion-vehiculo.component';
 import { ClientesService } from '../../clientes/clientes.service';
 import { Cliente } from '../../clientes/clientes.types';
+import { vehiculo } from '../../vehiculos/vehiculo.types';
 
 @Component({
   selector: 'app-orden-form',
@@ -31,6 +33,7 @@ import { Cliente } from '../../clientes/clientes.types';
     ReactiveFormsModule,
     ComunaRegionSelectorComponent,
     ListaAsignacionEmpleadoComponent,
+    ListaAsignacionVehiculoComponent,
   ],
   templateUrl: './orden-form.component.html',
   styleUrls: [
@@ -53,11 +56,15 @@ export class OrdenFormComponent implements OnInit, OnChanges {
   private ordenesService = inject(OrdenesTrabajoService);
   private clientesService = inject(ClientesService);
   selectedEmpleados: empleadoAsignar[] = [];
+  selectedVehiculo: vehiculo | null = null;
   clientesActivos: Cliente[] = [];
   empleadosSeleccionadosTouched = false;
   empleadosSeleccionadosError = false;
+  
+  vehiculoSeleccionadoTouched = false;
+  vehiculoSeleccionadoError = false;
 
-  // Etiquetas legibles por campo
+  // Etiquetas de formulario
   readonly fieldLabels: Record<string, string> = {
     folio: 'Folio',
     horasTrabajo: 'Horas de Trabajo',
@@ -208,6 +215,15 @@ export class OrdenFormComponent implements OnInit, OnChanges {
 
   onSubmit(): void {
     this.empleadosSeleccionadosTouched = true;
+    // Validación de vehículo: requerido siempre
+    this.vehiculoSeleccionadoTouched = true;
+    if (!this.selectedVehiculo) {
+      this.vehiculoSeleccionadoError = true;
+      return;
+    } else {
+      this.vehiculoSeleccionadoError = false;
+    }
+
     // Validar que exista al menos un empleado seleccionado solo al crear
     if (!this.isEditMode && this.selectedEmpleados.length === 0) {
       this.empleadosSeleccionadosError = true;
@@ -215,6 +231,7 @@ export class OrdenFormComponent implements OnInit, OnChanges {
     } else {
       this.empleadosSeleccionadosError = false;
     }
+
     if (this.ordenForm.valid) {
       const formValue = this.ordenForm.value;
       const ordenData: OrdenForm = {
@@ -223,6 +240,7 @@ export class OrdenFormComponent implements OnInit, OnChanges {
         fechaRegistro: new Date(),
         fechaAgendada: new Date(formValue.fechaAgendada),
         empleadoAsignar: this.selectedEmpleados,
+        vehiculoAsignado: this.selectedVehiculo!.patente,
       };
       this.submitForm.emit(ordenData);
     } else {
@@ -238,8 +256,12 @@ export class OrdenFormComponent implements OnInit, OnChanges {
     this.ordenForm.reset();
     this.ordenForm.patchValue({ idEstado: 1 }); // Forzar "Agendado" siempre al hacer patchValue
     this.selectedEmpleados = [];
+    this.selectedVehiculo = null;
     this.empleadosSeleccionadosError = false;
     this.empleadosSeleccionadosTouched = false;
+    // Limpiar flags de vehículo
+    this.vehiculoSeleccionadoError = false;
+    this.vehiculoSeleccionadoTouched = false;
   }
 
   private markFormGroupTouched(): void {
@@ -254,6 +276,14 @@ export class OrdenFormComponent implements OnInit, OnChanges {
     // Limpiar error si ahora hay alguno seleccionado
     if (this.selectedEmpleados.length > 0) {
       this.empleadosSeleccionadosError = false;
+    }
+  }
+
+  // Manejar cambio de vehículo para limpiar errores cuando corresponda
+  onVehiculoSeleccionadoChange(v: vehiculo | null): void {
+    this.selectedVehiculo = v;
+    if (v) {
+      this.vehiculoSeleccionadoError = false;
     }
   }
 
@@ -321,6 +351,14 @@ export class OrdenFormComponent implements OnInit, OnChanges {
       this.empleadosSeleccionadosError
     ) {
       return 'Debe seleccionar al menos un empleado';
+    }
+    return '';
+  }
+
+  // Mensaje de error específico para la selección de vehículo
+  getVehiculoSeleccionadoErrorMessage(): string {
+    if (this.vehiculoSeleccionadoTouched && this.vehiculoSeleccionadoError) {
+      return 'Debe seleccionar un vehículo';
     }
     return '';
   }

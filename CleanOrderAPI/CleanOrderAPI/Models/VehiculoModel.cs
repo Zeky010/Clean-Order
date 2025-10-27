@@ -6,29 +6,29 @@ namespace CleanOrderAPI.Models
     public class VehiculoModel
     {
         [JsonPropertyName("patente")]
-        public string? Patente { get; set; }
+        public required string Patente { get; set; }
 
         [JsonPropertyName("capacidad")]
         public int Capacidad { get; set; }
 
         [JsonPropertyName("activo")]
-        public string? Activo { get; set; }
+        public required string Activo { get; set; }
 
         [JsonPropertyName("tipoCarga")]
-        public TipoCargaModel? TipoCarga { get; set; }
+        public required TipoCargaModel TipoCarga { get; set; }
         
     }
 
     public sealed class VehiculoUpdateRequest
     {
         [JsonPropertyName("capacidad")]
-        public int? Capacidad { get; set; }
+        public required int Capacidad { get; set; }
 
         [JsonPropertyName("activo")]
-        public string? Activo { get; set; }
+        public required string Activo { get; set; }
 
         [JsonPropertyName("TipoCarga")]
-        public TipoCargaUpdate? TipoCarga { get; set; }
+        public required TipoCargaUpdate TipoCarga { get; set; }
     }
 
     public sealed class TipoCargaUpdate
