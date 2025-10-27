@@ -40,7 +40,8 @@ namespace CleanOrderAPI.Controllers
             DateTime fin = inicio.AddHours(request.HorasTrabajo);
             List<string> ocupados = await (from o in _context.Ordens
                                   where o.FechaAgendada < fin
-                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio
+                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio && 
+                                     (o.FkEstado == 1 || o.FkEstado == 2) //Estado agednado o en proceso 
                                   join v in _context.Vehiculos on o.FkPatente equals v.Patente
                                               select v.Patente)
                                  .Distinct()

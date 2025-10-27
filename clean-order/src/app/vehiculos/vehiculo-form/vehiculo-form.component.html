@@ -1,4 +1,3 @@
-
 <div class="form-container">
   <div class="form-header">
     <h2>{{ isEditMode ? "Editar" : "Crear" }} Vehículo</h2>
@@ -14,10 +13,12 @@
           class="form-control"
           [readOnly]="isEditMode"
           [(ngModel)]="nuevoVehiculo.patente"
+          (ngModelChange)="onPatenteChange($event)"
           required
           minlength="4"
           maxlength="8"
           #patenteCtrl="ngModel"
+          style="text-transform:uppercase;"
         />
         @if(patenteCtrl.invalid && (patenteCtrl.dirty || patenteCtrl.touched)) {
         <div class="error">

@@ -231,9 +231,9 @@ namespace CleanOrderAPI.Controllers
                 return BadRequest($"Los siguientes RUTs no existen: {string.Join(", ", rutsFaltantes)}");
 
             // Verificar que el vehículo exista
-            if (await _context.Vehiculos.AsNoTracking().
-                                        AnyAsync(v => v.Patente.ToLower() == form.patenteVehiculo.ToLower()))
-                BadRequest($"La patente de vehículo '{form.patenteVehiculo}' no existe.");
+            if (!await _context.Vehiculos.AsNoTracking().
+                AnyAsync(v => v.Patente.ToLower() == form.patenteVehiculo.ToLower()))
+                return BadRequest($"La patente de vehículo '{form.patenteVehiculo}' no existe.");
 
             await using IDbContextTransaction tx = await _context.Database.BeginTransactionAsync();
             try
@@ -400,8 +400,9 @@ namespace CleanOrderAPI.Controllers
             // Empleados ocupados: cualquier orden cuya ventana [FechaAgendada, FechaAgendada + HorasTrabajo) se solape con [inicio, fin)
             List<string> ocupados = await (from o in _context.Ordens
                                   where o.FechaAgendada < fin
-                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio
-                                  join oe in _context.OrdenEmpleados on o.IdOrden equals oe.FkIdOrdenes
+                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio &&
+                                     (o.FkEstado == 1 || o.FkEstado == 2) //Estado agednado o en proceso
+                                           join oe in _context.OrdenEmpleados on o.IdOrden equals oe.FkIdOrdenes
                                   select oe.FkRutEmpleado)
                                  .Distinct()
                                  .ToListAsync();

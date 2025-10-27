@@ -40,11 +40,11 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.error = null;
 
     this.ordenesTrabajoService.getOrdenesTrabajo().subscribe({
-      next: (ordenes) => {
+      next: (ordenes: OrdenTrabajo[]) => {
         this.ordenesTrabajos = ordenes;
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading órdenes:', error);
         this.error = 'No se pudieron cargar las órdenes de trabajo';
         this.loading = false;
@@ -181,11 +181,11 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.ordenesTrabajoService
       .getOrdenesByFechas(fechaInicio, fechaFin)
       .subscribe({
-        next: (ordenes) => {
+        next: (ordenes: OrdenTrabajo[]) => {
           this.ordenesTrabajos = ordenes;
           this.loading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           this.handleError(error, 'filtrar por fechas');
           this.loading = false;
         },

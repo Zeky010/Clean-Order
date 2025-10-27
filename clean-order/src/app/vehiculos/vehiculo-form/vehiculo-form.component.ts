@@ -20,7 +20,7 @@ export class VehiculoForm implements OnInit {
   @Input() set vehiculo(value: vehiculo | undefined) {
     this._vehiculo = value;
     if (value) {
-      this.nuevoVehiculo = { ...value };
+      this.nuevoVehiculo = { ...value, patente: (value.patente ?? '').toUpperCase() };
       this.selectedTipoCargaId = value.tipoCarga?.id ?? null;
       this.activoChecked = value.activo === 'S';
     } else {
@@ -60,14 +60,14 @@ export class VehiculoForm implements OnInit {
 
   ngOnInit() {
     this.tipoCargaService.listar().subscribe({
-      next: (data) => {
+      next: (data: tipoCarga[]) => {
         this.tiposCarga = data;
         // No autoseleccionar: forzar que el usuario elija
         // if (!this.isEditMode && !this.selectedTipoCargaId && this.tiposCarga.length) {
         //   this.selectedTipoCargaId = this.tiposCarga[0].id;
         // }
       },
-      error: (err) => console.error('Error cargando tipos de carga', err),
+      error: (err: any) => console.error('Error cargando tipos de carga', err),
     });
   }
 
@@ -78,7 +78,7 @@ export class VehiculoForm implements OnInit {
       return;
     }
 
-    const patente = this.isEditMode ? (this.vehiculo?.patente ?? '') : this.nuevoVehiculo.patente.trim();
+    const patente = (this.isEditMode ? (this.vehiculo?.patente ?? '') : this.nuevoVehiculo.patente.trim()).toUpperCase();
 
     const payload: vehiculo = {
       patente,
@@ -91,5 +91,10 @@ export class VehiculoForm implements OnInit {
 
   cancelar() {
     this.formCancel.emit();
+  }
+
+  // Nuevo método para forzar mayúsculas mientras se escribe
+  onPatenteChange(value: string) {
+    this.nuevoVehiculo.patente = (value ?? '').toUpperCase();
   }
 }

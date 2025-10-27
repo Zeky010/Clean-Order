@@ -240,7 +240,7 @@ export class OrdenFormComponent implements OnInit, OnChanges {
         fechaRegistro: new Date(),
         fechaAgendada: new Date(formValue.fechaAgendada),
         empleadoAsignar: this.selectedEmpleados,
-        vehiculoAsignado: this.selectedVehiculo!.patente,
+        patenteVehiculo: this.selectedVehiculo!.patente,
       };
       this.submitForm.emit(ordenData);
     } else {

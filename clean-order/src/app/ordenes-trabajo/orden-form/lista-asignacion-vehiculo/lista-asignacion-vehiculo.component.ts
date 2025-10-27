@@ -10,8 +10,8 @@ import { vehiculo } from '../../../vehiculos/vehiculo.types';
 })
 export class ListaAsignacionVehiculoComponent implements OnChanges {
   private vehiculoService: VehiculoService = inject(VehiculoService);
-  @Input() fechaAgendada?: string | Date;
-  @Input() horasTrabajo?: number;
+  @Input() fechaAgendada?: string | null = null;
+  @Input() horasTrabajo?: number | null = null;
 
   // Permite inicializar/recibir el vehículo asignado desde el padre
   @Input() vehiculoAsignado: vehiculo | null = null;
@@ -33,7 +33,8 @@ export class ListaAsignacionVehiculoComponent implements OnChanges {
 
   private cargarDisponibles(): void {
     this.loading = true;
-    this.vehiculoService.listarDisponibles().subscribe({
+    const isoDate = this.toIsoString(this.fechaAgendada!);
+    this.vehiculoService.listarDisponibles(isoDate, this.horasTrabajo!).subscribe({
       next: (data) => {
         this.disponibles = data ?? [];
         this.loading = false;
@@ -59,4 +60,12 @@ export class ListaAsignacionVehiculoComponent implements OnChanges {
   isVehiculoSelected(patente: string): boolean {
     return !!this.seleccionado && this.seleccionado.patente === patente;
   }
+
+  private toIsoString(localDT: string): string {
+    // datetime-local -> ISO (asumiendo zona local)
+    const d = new Date(localDT);
+    return d.toISOString();
+  }
+
 }
+
