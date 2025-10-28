@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-asignar-usuario',
   imports: [CommonModule],
   templateUrl: './asignar-usuario.component.html',
-  styleUrls: ['./asignar-usuario.component.css', '../../shared/entity-table.css']
+  styleUrls: ['./asignar-usuario.component.css', '../../shared/styles/entity-table.css']
 })
 export class AsignarUsuarioComponent implements OnInit {
   @Input({ required: true }) usuario!: Usuario;

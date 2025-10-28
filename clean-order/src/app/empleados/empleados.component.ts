@@ -8,7 +8,7 @@ import { EmpleadoFormComponent } from './empleado-form/empleado-form.component';
   selector: 'app-empleados',
   imports: [CommonModule, EmpleadoFormComponent],
   templateUrl: './empleados.component.html',
-  styleUrls: ['./empleados.component.css', '../shared/entity-table.css']
+  styleUrls: ['./empleados.component.css', '../shared/styles/entity-table.css']
 })
 export class EmpleadosComponent implements OnInit {
   empleados: Empleado[] = [];

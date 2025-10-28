@@ -37,12 +37,11 @@
           min="1"
           inputmode="numeric"
         />
-        <div
-          class="error-message"
-          *ngIf="horasTrabajo?.invalid && horasTrabajo?.touched"
-        >
-          {{ getErrorMessage("horasTrabajo") }}
-        </div>
+        @if (horasTrabajo?.invalid && horasTrabajo?.touched) {
+          <div class="error-message">
+            {{ getErrorMessage("horasTrabajo") }}
+          </div>
+        }
       </div>
     </div>
 
@@ -151,6 +150,20 @@
       </div>
     </div>
 
+    <div class="form-row">
+      <div class="form-group full-width">
+        <app-lista-asignacion-vehiculo
+          [fechaAgendada]="fechaAgendada?.value"
+          [horasTrabajo]="horasTrabajo?.value"
+          [(vehiculoAsignado)]="selectedVehiculo"
+          (vehiculoAsignadoChange)="onVehiculoSeleccionadoChange($event)">
+        </app-lista-asignacion-vehiculo>
+        <div class="error-message" *ngIf="vehiculoSeleccionadoTouched && vehiculoSeleccionadoError">
+          {{ getVehiculoSeleccionadoErrorMessage() }}
+        </div>
+      </div>
+    </div>
+
     <div class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="onCancel()">
         Cancelar
@@ -166,7 +179,7 @@
       <button
         type="submit"
         class="btn btn-primary"
-        [disabled]="ordenForm.invalid || loading"
+        [disabled]="ordenForm.invalid || loading || !selectedVehiculo"
       >
         {{ isEditMode ? "Actualizar" : "Crear" }} Orden
       </button>

@@ -1,5 +1,17 @@
-import { Component, inject, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  inject,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Usuario, UsuarioUpdate } from '../usuario.types';
 import { RolesService } from '../roles.service';
@@ -9,7 +21,10 @@ import { Rol } from '../roles.types';
   selector: 'app-update-usuario-form',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './update-usuario-form.component.html',
-  styleUrl: './update-usuario-form.component.css'
+  styleUrls: [
+    './update-usuario-form.component.css',
+    '../../shared/styles/forms.css',
+  ],
 })
 export class UpdateUsuarioComponent implements OnInit {
   @Input() usuario!: Usuario;
@@ -18,12 +33,12 @@ export class UpdateUsuarioComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private rolesService = inject(RolesService);
-  
+
   roles: Rol[] = [];
 
   usuarioForm: FormGroup = this.fb.group({
     rolId: [null, Validators.required],
-    activo: [true]
+    activo: [true],
   });
 
   ngOnInit(): void {
@@ -36,14 +51,14 @@ export class UpdateUsuarioComponent implements OnInit {
         this.roles = data;
         this.setFormValues();
       },
-      error: (err) => console.error('Error cargando roles:', err)
+      error: (err) => console.error('Error cargando roles:', err),
     });
   }
 
   private setFormValues(): void {
     this.usuarioForm.patchValue({
       rolId: this.usuario.rolId,
-      activo: this.usuario.activo
+      activo: this.usuario.activo,
     });
   }
 
@@ -51,12 +66,12 @@ export class UpdateUsuarioComponent implements OnInit {
     if (this.usuarioForm.valid) {
       const formValue = {
         ...this.usuarioForm.value,
-        activo: this.usuarioForm.value.activo ? 1 : 0
+        activo: this.usuarioForm.value.activo ? 1 : 0,
       };
       const updateData: UsuarioUpdate = {
         correo: this.usuario.correo,
         rolId: Number(formValue.rolId),
-        activo: formValue.activo
+        activo: formValue.activo,
       };
       this.formSubmit.emit(updateData);
     }

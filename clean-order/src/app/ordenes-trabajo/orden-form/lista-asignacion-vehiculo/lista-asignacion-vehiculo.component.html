@@ -1,0 +1,58 @@
+<div class="list-child-wrapper">
+  <h3>Asignación de Vehículo</h3>
+
+  @if (!fechaAgendada || !horasTrabajo) {
+  <div class="info-hint">
+    Ingrese fecha y horas de trabajo para ver disponibilidad.
+  </div>
+  } 
+  @if(loading) {
+    <div class="loading">Cargando vehículos disponibles...</div>
+  } 
+  @if(!loading && fechaAgendada && horasTrabajo) {
+  <div class="listas">
+    <div class="lista disponible">
+      <h4>Disponibles</h4>
+      @if (disponibles.length === 0) {
+      <div class="empty">No hay vehículos disponibles.</div>
+      }
+      <ul>
+        @for (v of disponibles; track $index) {
+        <li>
+          <span>
+            {{ v.patente }} - Capacidad: {{ v.capacidad }} - Tipo:
+            {{ v.tipoCarga.nombreCarga || "N/A" }} - Estado: {{ v.activo }}
+          </span>
+          <button
+            type="button"
+            (click)="agregar(v)"
+            [disabled]="isVehiculoSelected(v.patente)"
+          >
+            +
+          </button>
+        </li>
+        }
+      </ul>
+    </div>
+
+    <div class="lista seleccionados">
+      <h4>Asignado</h4>
+      @if(!seleccionado) {
+      <div class="empty">Sin vehículo asignado.</div>
+      } @if (seleccionado) {
+      <ul>
+        <li>
+          <span>
+            {{ seleccionado!.patente }} - Capacidad:
+            {{ seleccionado!.capacidad }} - Tipo:
+            {{ seleccionado!.tipoCarga.nombreCarga || "N/A" }} - Estado:
+            {{ seleccionado!.activo }}
+          </span>
+          <button type="button" (click)="quitar()">x</button>
+        </li>
+      </ul>
+      }
+    </div>
+  </div>
+  }
+</div>

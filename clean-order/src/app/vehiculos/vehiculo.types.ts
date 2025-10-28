@@ -1,6 +1,14 @@
-export interface Vehiculo {
+export interface vehiculo {
     patente: string;
     capacidad: number;
-    tipo: string;
-    idTipo: number;
+    activo: string;
+    tipoCarga: tipoCarga;
 }
+
+
+export interface tipoCarga {
+    id: number;
+    nombreCarga: string;
+}
+
+export type VehiculoUpdate = Partial<vehiculo>;

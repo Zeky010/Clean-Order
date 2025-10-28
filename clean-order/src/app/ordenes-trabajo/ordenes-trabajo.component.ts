@@ -9,16 +9,20 @@ import { OrdenForm } from './orden-form/orden-form.type';
   selector: 'app-ordenes-trabajo',
   standalone: true,
   templateUrl: './ordenes-trabajo.component.html',
-  styleUrls: ['./ordenes-trabajo.component.css', '../shared/entity-table.css', 
-              '../shared/forms.css', '../shared/buttons.css'],
-  imports: [DatePipe, OrdenFormComponent]
+  styleUrls: [
+    './ordenes-trabajo.component.css',
+    '../shared/styles/entity-table.css',
+    '../shared/styles/forms.css',
+    '../shared/styles/buttons.css',
+  ],
+  imports: [DatePipe, OrdenFormComponent],
 })
 export class OrdenesTrabajoComponent implements OnInit {
   ordenesTrabajos: OrdenTrabajo[] = [];
   selectedOrden: OrdenTrabajo | null = null;
   loading = true;
   error: string | null = null;
-  
+
   // Estados para mostrar formularios/detalles
   showCreateForm = false;
   showEditForm = false;
@@ -34,18 +38,18 @@ export class OrdenesTrabajoComponent implements OnInit {
   loadOrdenesTrabajo(): void {
     this.loading = true;
     this.error = null;
-    
+
     this.ordenesTrabajoService.getOrdenesTrabajo().subscribe({
-      next: (ordenes) => {
+      next: (ordenes: OrdenTrabajo[]) => {
         this.ordenesTrabajos = ordenes;
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading órdenes:', error);
         this.error = 'No se pudieron cargar las órdenes de trabajo';
         this.loading = false;
         this.handleError(error, 'cargar órdenes de trabajo');
-      }
+      },
     });
   }
 
@@ -69,26 +73,27 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.showOrdenDetalle = true;
   }
 
-
   onCreateSubmit(ordenForm: OrdenForm): void {
     this.ordenesTrabajoService.createOrdenTrabajo(ordenForm).subscribe({
       next: () => {
         this.closeForms();
         this.loadOrdenesTrabajo();
       },
-      error: (error) => this.handleError(error, 'crear')
+      error: (error) => this.handleError(error, 'crear'),
     });
   }
 
   onEditSubmit(ordenForm: OrdenForm): void {
     if (!this.selectedOrden) return;
-    this.ordenesTrabajoService.updateOrdenTrabajo(this.selectedOrden.id, ordenForm).subscribe({
-      next: () => {
-        this.closeForms();
-        this.loadOrdenesTrabajo();
-      },
-      error: (error) => this.handleError(error, 'actualizar')
-    });
+    this.ordenesTrabajoService
+      .updateOrdenTrabajo(this.selectedOrden.id, ordenForm)
+      .subscribe({
+        next: () => {
+          this.closeForms();
+          this.loadOrdenesTrabajo();
+        },
+        error: (error) => this.handleError(error, 'actualizar'),
+      });
   }
 
   onCancelForm(): void {
@@ -109,22 +114,24 @@ export class OrdenesTrabajoComponent implements OnInit {
         },
         error: (error) => {
           this.handleError(error, 'suspender');
-        }
+        },
       });
     }
   }
 
   // Métodos para cambiar estado
   cambiarEstado(orden: OrdenTrabajo, nuevoEstadoId: number): void {
-    this.ordenesTrabajoService.cambiarEstado(orden.id, nuevoEstadoId).subscribe({
-      next: (ordenActualizada) => {
-        console.log('Estado cambiado exitosamente:', ordenActualizada);
-        this.loadOrdenesTrabajo();
-      },
-      error: (error) => {
-        this.handleError(error, 'cambiar estado');
-      }
-    });
+    this.ordenesTrabajoService
+      .cambiarEstado(orden.id, nuevoEstadoId)
+      .subscribe({
+        next: (ordenActualizada) => {
+          console.log('Estado cambiado exitosamente:', ordenActualizada);
+          this.loadOrdenesTrabajo();
+        },
+        error: (error) => {
+          this.handleError(error, 'cambiar estado');
+        },
+      });
   }
 
   // Método para reagendar
@@ -136,7 +143,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       },
       error: (error) => {
         this.handleError(error, 'reagendar');
-      }
+      },
     });
   }
 
@@ -151,7 +158,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       error: (error) => {
         this.handleError(error, 'filtrar por cliente');
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -171,16 +178,18 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   filtrarPorFechas(fechaInicio: string, fechaFin: string): void {
     this.loading = true;
-    this.ordenesTrabajoService.getOrdenesByFechas(fechaInicio, fechaFin).subscribe({
-      next: (ordenes) => {
-        this.ordenesTrabajos = ordenes;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.handleError(error, 'filtrar por fechas');
-        this.loading = false;
-      }
-    });
+    this.ordenesTrabajoService
+      .getOrdenesByFechas(fechaInicio, fechaFin)
+      .subscribe({
+        next: (ordenes: OrdenTrabajo[]) => {
+          this.ordenesTrabajos = ordenes;
+          this.loading = false;
+        },
+        error: (error: any) => {
+          this.handleError(error, 'filtrar por fechas');
+          this.loading = false;
+        },
+      });
   }
 
   // Métodos auxiliares
@@ -209,7 +218,6 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Método helper para saber si la orden está en estado 1 (agendada)
   canSuspender(orden: OrdenTrabajo): boolean {
-    
     return orden.idEstado === 1;
   }
 
@@ -233,7 +241,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         break;
       case 500:
         alert('Error interno del servidor.');
-        break;  
+        break;
       default:
         alert(`Error al ${accion}.`);
     }

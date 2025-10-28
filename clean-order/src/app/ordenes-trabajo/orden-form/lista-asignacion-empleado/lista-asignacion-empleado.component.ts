@@ -37,7 +37,7 @@ export class ListaAsignacionEmpleadoComponent implements OnChanges {
     this.loading = true;
     const iso = this.toIsoString(this.fechaAgendada);
     this.service.getEmpleadosDisponibles(iso, this.horasTrabajo).subscribe({
-      next: lista => {
+      next: (lista: empleadoAsignar[]) => {
         this.disponibles = lista || [];
         this.loading = false;
       },
@@ -62,7 +62,6 @@ export class ListaAsignacionEmpleadoComponent implements OnChanges {
     // datetime-local -> ISO (asumiendo zona local)
     const d = new Date(localDT);
     return d.toISOString();
-    // Se podría ajustar según backend si requiere sin Z.
   }
 
   agregar(e: empleadoAsignar): void {

@@ -1,23 +1,69 @@
-<h1>Gestión de Vehículos</h1>
-<app-vehiculo-form (vehiculoCreado)="agregarVehiculo($event)"></app-vehiculo-form>
-
-<table>
-  <thead>
-    <tr>
-      <th>Patente</th>
-      <th>Capacidad</th>
-      <th>Tipo</th>
-      <th>ID Tipo</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for (v of vehiculos; track $index) {
-        <tr>
-            <td>{{ v.patente }}</td>
-            <td>{{ v.capacidad }}</td>
-            <td>{{ v.tipo }}</td>
-            <td>{{ v.idTipo }}</td>
-        </tr>
+<div class="entity-container">
+  <div class="header">
+    <h2>Gestión de Vehículos</h2>
+    @if (!showCreateForm && !showEditForm) {
+      <button class="btn btn-primary" (click)="crearVehiculo()">
+        Nuevo Vehículo
+      </button>
     }
-  </tbody>
-</table>
+  </div>
+
+
+<!-- Formulario Crear -->
+@if(showCreateForm) {
+  <app-vehiculo-form class="entity-container"
+    (formSubmit)="onCreateSubmit($event)"
+    (formCancel)="onCancelForm()"
+  ></app-vehiculo-form>
+}
+<!-- Formulario Editar -->
+@else if(showEditForm && selectedVehiculo) {
+  <app-vehiculo-form class="entity-container"
+    [vehiculo]="selectedVehiculo"
+    (formSubmit)="onEditSubmit($event)"
+    (formCancel)="onCancelForm()"
+  ></app-vehiculo-form>
+}
+@else {
+
+  <table class="entity-table">
+    <thead>
+      <tr>
+        <th>Patente</th>
+        <th>Capacidad</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (v of vehiculos; track $index) {
+      <tr>
+        <td>{{ v.patente }}</td>
+        <td>{{ v.capacidad }}</td>
+        <td>{{ v.tipoCarga.nombreCarga }}</td>
+        <td>
+          <span [class]="v.activo === 'S' ? 'status-active' : 'status-inactive'">
+            {{ v.activo === "S" ? "Activo" : "Inactivo" }}
+          </span>
+        </td>
+        <td>
+          <button class="btn-edit" (click)="editarVehiculo(v)">Editar</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  @if(vehiculos.length === 0 && !loading) {
+    <div class="no-data">No hay vehículos registrados</div>
+  }
+  @if(loading) {
+    <div class="loading">Cargando vehículos...</div>
+  }
+  @if(error) {
+    <div class="error">{{ error }}</div>
+  }
+
+}
+</div>

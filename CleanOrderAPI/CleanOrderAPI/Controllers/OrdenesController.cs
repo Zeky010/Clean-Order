@@ -208,6 +208,9 @@ namespace CleanOrderAPI.Controllers
             if (form.EmpleadoAsignar == null || !form.EmpleadoAsignar.Any())
                 return BadRequest("La orden debe tener al menos un empleado asignado.");
 
+            if(form.patenteVehiculo.IsNullOrEmpty())
+                return BadRequest("La orden debe tener una patente de vehículo asignada.");
+
             // Verificar RUTs antes de iniciar la operación (pre-validación)
             List<string> rutsSolicitados = form.EmpleadoAsignar
                     .Select(e => (e.Rut ?? string.Empty).Trim())
@@ -227,6 +230,11 @@ namespace CleanOrderAPI.Controllers
             if (rutsFaltantes.Any())
                 return BadRequest($"Los siguientes RUTs no existen: {string.Join(", ", rutsFaltantes)}");
 
+            // Verificar que el vehículo exista
+            if (!await _context.Vehiculos.AsNoTracking().
+                AnyAsync(v => v.Patente.ToLower() == form.patenteVehiculo.ToLower()))
+                return BadRequest($"La patente de vehículo '{form.patenteVehiculo}' no existe.");
+
             await using IDbContextTransaction tx = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -242,7 +250,7 @@ namespace CleanOrderAPI.Controllers
                     FkComuna = form.IdComuna,
                     FkEstado = form.IdEstado,
                     FkRutClientes = form.RutCliente.ToString(),
-                    FkPatente = "pat-tent" // placeholder
+                    FkPatente = form.patenteVehiculo
                 };
 
                 _context.Ordens.Add(entity);
@@ -380,7 +388,7 @@ namespace CleanOrderAPI.Controllers
         // POST: /ordenes-trabajo/empleados-disponibles
         // Body: { "fechaAgendada": "2025-01-01T00:00:00", "horasTrabajo": 4 }
         [HttpPost("empleados-disponibles")]
-        public async Task<ActionResult<IEnumerable<EmpleadoAsignar>>> GetEmpleadosDisponibles([FromBody] EmpleadosDisponiblesRequest request)
+        public async Task<ActionResult<IEnumerable<EmpleadoAsignar>>> GetEmpleadosDisponibles([FromBody] DisponibilidadRequest request)
         {
             if (request == null || request.HorasTrabajo <= 0 || request.FechaAgendada == default)
                 return Ok(new List<EmpleadoAsignar>());
@@ -390,24 +398,25 @@ namespace CleanOrderAPI.Controllers
             DateTime fin = inicio.AddHours(request.HorasTrabajo);
 
             // Empleados ocupados: cualquier orden cuya ventana [FechaAgendada, FechaAgendada + HorasTrabajo) se solape con [inicio, fin)
-            var ocupados = await (from o in _context.Ordens
+            List<string> ocupados = await (from o in _context.Ordens
                                   where o.FechaAgendada < fin
-                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio
-                                  join oe in _context.OrdenEmpleados on o.IdOrden equals oe.FkIdOrdenes
+                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio &&
+                                     (o.FkEstado == 1 || o.FkEstado == 2) //Estado agednado o en proceso
+                                           join oe in _context.OrdenEmpleados on o.IdOrden equals oe.FkIdOrdenes
                                   select oe.FkRutEmpleado)
                                  .Distinct()
                                  .ToListAsync();
 
-            var disponibles = await _context.Empleados
-                .AsNoTracking()
-                .Where(e => e.Activo == "S" && !ocupados.Contains(e.RutEmpleado))
-                .Select(e => new EmpleadoAsignar
-                {
-                    Rut = e.RutEmpleado,
-                    Dv = e.Dv,
-                    Nombre = e.Nombre + " " + e.Apellido
-                })
-                .ToListAsync();
+            List<EmpleadoAsignar> disponibles = await _context.Empleados
+                    .AsNoTracking()
+                    .Where(e => e.Activo == "S" && !ocupados.Contains(e.RutEmpleado))
+                    .Select(e => new EmpleadoAsignar
+                    {
+                        Rut = e.RutEmpleado,
+                        Dv = e.Dv,
+                        Nombre = e.Nombre + " " + e.Apellido
+                    })
+                    .ToListAsync();
 
             return Ok(disponibles);
         }
@@ -457,9 +466,5 @@ namespace CleanOrderAPI.Controllers
         }
     }
 
-    public class EmpleadosDisponiblesRequest
-    {
-        public DateTime FechaAgendada { get; set; }
-        public int HorasTrabajo { get; set; }
-    }
+
 }

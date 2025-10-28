@@ -9,6 +9,7 @@ export interface OrdenForm {
   idComuna: number;
   idEstado: number;
   empleadoAsignar?: empleadoAsignar[]; // Lista de empleados seleccionados
+  patenteVehiculo: string;
 }
 
 export interface empleadoAsignar {

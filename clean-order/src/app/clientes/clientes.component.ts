@@ -7,11 +7,11 @@ import { ClienteDetalleComponent } from './cliente-detalle/cliente-detalle.compo
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html',
-  styleUrls: ['./clientes.component.css', '../shared/entity-table.css'],
+  styleUrls: ['./clientes.component.css', '../shared/styles/entity-table.css'],
   imports: [ClienteFormComponent, ClienteDetalleComponent],
 })
 export class ClientesComponent implements OnInit {
-  private clientesService = inject(ClientesService);  
+  private clientesService = inject(ClientesService);
   public clientes: Cliente[] = [];
   public selectedCliente: Cliente | null = null;
   loading = true;
@@ -29,7 +29,7 @@ export class ClientesComponent implements OnInit {
   get filteredClientes(): Cliente[] {
     const q = this.filterText.trim().toLowerCase();
     if (!q) return this.clientes;
-    return this.clientes.filter(c =>
+    return this.clientes.filter((c) =>
       (c.razonSocial ?? '').toLowerCase().includes(q)
     );
   }
@@ -49,7 +49,7 @@ export class ClientesComponent implements OnInit {
         console.error('Error loading clientes:', error);
         this.error = 'No se pudieron cargar los clientes';
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -68,26 +68,25 @@ export class ClientesComponent implements OnInit {
   }
 
   onCreateSubmit(cliente: Cliente): void {
-
     this.clientesService.createCliente(cliente).subscribe({
       next: () => {
         this.closeForms();
         this.loadClientes();
       },
-      error: (err) => this.handleMutationError(err, 'crear')
+      error: (err) => this.handleMutationError(err, 'crear'),
     });
   }
 
   onEditSubmit(cliente: Cliente): void {
-    if (!this.selectedCliente) return;    
-    this.clientesService.updateCliente(cliente.rut,cliente).subscribe({
+    if (!this.selectedCliente) return;
+    this.clientesService.updateCliente(cliente.rut, cliente).subscribe({
       next: () => {
         this.closeForms();
         this.loadClientes();
       },
-      error: (err) =>{
+      error: (err) => {
         this.handleMutationError(err, 'actualizar');
-      } 
+      },
     });
   }
 
