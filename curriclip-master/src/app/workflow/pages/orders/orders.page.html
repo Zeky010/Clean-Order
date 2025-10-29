@@ -1,0 +1,78 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Lista de Órdenes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- === Encabezado visual del usuario logueado === -->
+  <ion-card *ngIf="usuario" class="ion-text-center ion-margin-bottom">
+    <ion-card-header>
+      <ion-avatar class="ion-margin-auto" style="width:80px; height:80px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Usuario">
+      </ion-avatar>
+      <ion-card-title class="ion-padding-top">
+        Bienvenido, 
+        <strong>{{ usuario.FK_ID_ROL === 1 ? 'Administrador' : 'Empleado' }}</strong> 👋
+      </ion-card-title>
+      <ion-card-subtitle>
+        {{ usuario.CORREO }}
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-chip [color]="usuario.FK_ID_ROL === 1 ? 'primary' : 'tertiary'">
+        <ion-icon name="person-circle" color="light"></ion-icon>
+        <ion-label>{{ usuario.FK_ID_ROL === 1 ? 'Administrador' : 'Empleado' }}</ion-label>
+      </ion-chip>
+
+      <ion-button expand="block" color="danger" (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar sesión
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- === Buscador === -->
+  <ion-searchbar [(ngModel)]="q" (ionInput)="apply()" placeholder="N° orden, cliente o empresa..."></ion-searchbar>
+
+  <!-- === Filtros por estado === -->
+  <ion-segment [(ngModel)]="status" (ionChange)="load()" class="ion-margin-bottom">
+    <ion-segment-button value="">Todos</ion-segment-button>
+    <ion-segment-button value="pending">Pendiente</ion-segment-button>
+    <ion-segment-button value="progress">En progreso</ion-segment-button>
+    <ion-segment-button value="done">Completada</ion-segment-button>
+  </ion-segment>
+
+  <!-- === Lista de órdenes === -->
+  <ion-list *ngIf="filtered.length > 0; else noOrders">
+    <ion-item *ngFor="let o of filtered" (click)="go(o)">
+      <ion-label>
+        <h3>
+          {{ o.code }}
+          <ion-chip [color]="chipColor(o.status)">{{ label(o.status) }}</ion-chip>
+        </h3>
+        <p>Cliente: {{ o.client?.name || '-' }}</p>
+        <p>Creada: {{ o.created_at | date:'yyyy-MM-dd' }}</p>
+      </ion-label>
+      <ion-icon name="chevron-forward" slot="end"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <!-- === Mensaje si no hay órdenes === -->
+  <ng-template #noOrders>
+    <div class="ion-text-center ion-margin-top">
+      <ion-icon name="folder-open-outline" size="large" color="medium"></ion-icon>
+      <p>No hay órdenes registradas</p>
+    </div>
+  </ng-template>
+
+  <!-- === Botón flotante para nueva orden === -->
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-fab-button [routerLink]="['/wf','new']">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
