@@ -40,7 +40,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AngularDevClient", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:4200", "https://localhost:4200"
+                "http://localhost:4200", "https://localhost:4200",
+                "http://localhost:8100", "https://localhost:8100"
             // add more origins as needed
             )
             .AllowAnyHeader()

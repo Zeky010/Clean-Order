@@ -18,9 +18,7 @@
     }
   </div>
 
-  <div class="cliente-actions">
-    <button class="btn btn-secondary" (click)="onCancelar()">Volver</button>
-  </div>
+
 
   <!-- Lista de documentos -->
   <div class="entity-container">
@@ -61,4 +59,8 @@
     (documentoSubido)="onDocumentoSubido($event)"
     (canceled)="onCancelar()"
   ></app-documento-upload>
+</div>
+
+<div class="button-group">
+  <button class="btn btn-secondary" (click)="onCancelar()">Volver</button>
 </div>
