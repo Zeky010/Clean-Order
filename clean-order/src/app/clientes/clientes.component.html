@@ -1,41 +1,35 @@
-@if (showCreateForm) {
-  <app-cliente-form
-    [isEditMode]="isEditMode"
-    (save)="onCreateSubmit($event)"
-    (canceled)="onCancelForm()"
-  ></app-cliente-form>
-}
-@else if (showEditForm && selectedCliente) {
-  <app-cliente-form
-    [cliente]="selectedCliente"
-    [isEditMode]="isEditMode"
-    (save)="onEditSubmit($event)"
-    (canceled)="onCancelForm()"
-  ></app-cliente-form>
-}
-@else if(showClienteDetalle && selectedCliente) {
-  <p>Detalle del Cliente</p>
-  <app-cliente-detalle [cliente]="selectedCliente" (canceled)="onCancelForm()"></app-cliente-detalle>
-}
-
-
-@else {
 <div class="entity-container">
   <div class="header">
-    <h2>Lista de Clientes</h2>
-    <div class="actions" style="display:flex; gap:8px; align-items:center;">
-      <input
-        type="text"
-        placeholder="Buscar por nombre / razón social"
-        [value]="filterText"
-        (input)="onFilter($event)"
-        style="padding:6px 8px; min-width:280px;"
-      />
-      @if (filterText) {
-        <button class="btn-secondary" (click)="clearFilter()">Limpiar</button>
-      }
-      <button class="btn-primary" (click)="crearCliente()">Nuevo Cliente</button>
-    </div>
+    <h2>Clientes</h2>
+  </div>
+  @if (showCreateForm) {
+  <app-cliente-form [isEditMode]="isEditMode" (save)="onCreateSubmit($event)"
+    (canceled)="onCancelForm()"></app-cliente-form>
+  }
+  @else if (showEditForm && selectedCliente) {
+  <app-cliente-form [cliente]="selectedCliente" [isEditMode]="isEditMode" (save)="onEditSubmit($event)"
+    (canceled)="onCancelForm()"></app-cliente-form>
+  }
+  @else if(showClienteDetalle && selectedCliente) {
+  <p>Detalle del Cliente</p>
+  <app-cliente-detalle [cliente]="selectedCliente" (canceled)="onCancelForm()"></app-cliente-detalle>
+  }
+
+
+  @else {
+
+
+  <div class="btn-group">
+    <button class="btn btn-primary" (click)="crearCliente()">Nuevo Cliente</button>
+  </div>
+  <div class="actions" style="display:flex; gap:8px; margin-bottom: 10px; align-items:center;">
+    <input type="text" placeholder="Buscar por nombre / razón social" [value]="filterText" (input)="onFilter($event)"
+      style="padding:6px 8px; min-width:280px;" />
+    @if (filterText) {
+    <button class="btn-secondary" (click)="clearFilter()">Limpiar</button>
+    }
+
+
   </div>
   <table class="entity-table">
     <thead>
@@ -62,19 +56,17 @@
         </td>
         <td>
           <button class="btn-edit" (click)="editarCliente(cliente)">Editar</button>
-          <button (click)="verDetalles(cliente)">Detalles</button>
+          <button class="btn-assign" (click)="verDetalles(cliente)">Detalles</button>
         </td>
       </tr>
       }
     </tbody>
   </table>
   @if (clientes.length === 0) {
-    <div class="no-data">No hay clientes registrados</div>
+  <div class="no-data">No hay clientes registrados</div>
   }
   @else if (filteredClientes.length === 0) {
-    <div class="no-data">No hay resultados para "{{ filterText }}"</div>
+  <div class="no-data">No hay resultados para "{{ filterText }}"</div>
+  }
   }
 </div>
-}
-
-

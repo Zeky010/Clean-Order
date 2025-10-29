@@ -5,100 +5,101 @@
   </div>
 
   <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()" class="cliente-form">
-    <div class="row-inline">
-      <div class="form-group small">
-        <label for="rut">RUT *</label>
-        <input id="rut" type="text" formControlName="rut" [readonly]="isEditMode" [class.readonly]="isEditMode" 
-        maxlength="8" minlength="7" placeholder="12345678" />
-        @if(clienteForm.get('rut')?.touched && clienteForm.get('rut')?.invalid){
-          <div class="error">
-            @if(clienteForm.get('rut')?.errors?.['required']){
-              <span>Obligatorio</span>
-            }
-            @if (clienteForm.get('rut')?.errors?.['pattern']) {
-              <span>El RUT debe ser numérico</span>
-            }
-            @if(clienteForm.get('rut')?.errors?.['minlength']){
-              <span>Rut mínimo debe tener 7 dígitos</span>
-            }
-            @if(clienteForm.get('rut')?.errors?.['maxlength']){
-              <span>Máximo 8 dígitos</span>
-            }
+    <div class="form-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rut">RUT *</label>
+          <input id="rut" type="text" formControlName="rut" class="form-control" [readonly]="isEditMode" [class.readonly]="isEditMode"
+                 maxlength="8" minlength="7" placeholder="12345678" />
+          @if(clienteForm.get('rut')?.touched && clienteForm.get('rut')?.invalid){
+            <div class="error-message">
+              @if(clienteForm.get('rut')?.errors?.['required']){
+                <div>Obligatorio</div>
+              }
+              @if(clienteForm.get('rut')?.errors?.['pattern']){
+                <div>El RUT debe ser numérico</div>
+              }
+              @if(clienteForm.get('rut')?.errors?.['minlength']){
+                <div>Rut mínimo debe tener 7 dígitos</div>
+              }
+              @if(clienteForm.get('rut')?.errors?.['maxlength']){
+                <div>Máximo 8 dígitos</div>
+              }
+            </div>
+          }
+        </div>
 
+        <div class="form-group">
+          <label for="dv">DV *</label>
+          <input id="dv" type="text" maxlength="1" formControlName="dv" class="form-control" [readonly]="isEditMode" [class.readonly]="isEditMode" />
+          @if(clienteForm.get('dv')?.touched && clienteForm.get('dv')?.invalid){
+            <div class="error-message">
+              @if(clienteForm.get('dv')?.errors?.['required']){
+                <div>Digito Verificador Obligatorio</div>
+              }
+              @if(clienteForm.get('dv')?.errors?.['pattern']){
+                <div>Digito debe ser numero o K</div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="razonSocial">Razón Social *</label>
+        <input id="razonSocial" type="text" formControlName="razonSocial" placeholder="Nombre o Razón Social" class="form-control" />
+        @if(clienteForm.get('razonSocial')?.touched && clienteForm.get('razonSocial')?.invalid){
+          <div class="error-message">
+            @if(clienteForm.get('razonSocial')?.errors?.['required']){
+              <div>Campo Obligatorio</div>
+            }
+            @if(clienteForm.get('razonSocial')?.errors?.['minlength']){
+              <div>Razon Social debe ser de al menos 3 caracteres</div>
+            }
           </div>
         }
-
       </div>
-      <div class="form-group tiny">
-        <label for="dv">DV *</label>
-        <input id="dv" type="text" maxlength="1" formControlName="dv" [readonly]="isEditMode" [class.readonly]="isEditMode" />
-        @if (clienteForm.get('dv')?.touched && clienteForm.get('dv')?.invalid) {
-          @if(clienteForm.get('dv')?.errors?.['required']) {
-            <div class="error">
-              <span>Digito Verificador Obligatorio</span>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="correo">Correo</label>
+          <input id="correo" type="email" formControlName="correo" placeholder="cliente@dominio.com" class="form-control" />
+          @if(clienteForm.get('correo')?.touched && clienteForm.get('correo')?.invalid){
+            <div class="error-message">
+              @if(clienteForm.get('correo')?.errors?.['email']){
+                <div>Email inválido</div>
+              }
             </div>
           }
-          @if(clienteForm.get('dv')?.errors?.['pattern']) {
-            <div class="error">
-              <span>Digito debe ser numero o K</span>
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" type="tel" formControlName="telefono" placeholder="+56912345678" class="form-control" />
+          @if(clienteForm.get('telefono')?.touched && clienteForm.get('telefono')?.invalid){
+            <div class="error-message">
+              @if(clienteForm.get('telefono')?.errors?.['pattern']){
+                <div>Formato inválido. Ej: +56912345678 o 912345678</div>
+              }
             </div>
           }
-        }
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="razonSocial">Razón Social *</label>
-      <input id="razonSocial" type="text" formControlName="razonSocial" placeholder="Nombre o Razón Social" />
-      @if(clienteForm.get('razonSocial')?.touched && clienteForm.get('razonSocial')?.invalid){
-        <div class="error">
-          @if(clienteForm.get('razonSocial')?.errors?.['required']) {
-            <span>Campo Obligatorio</span>
+      <div class="form-group">
+        <label for="activo" class="activo-label">Activo</label>
+        <input id="activo" type="checkbox" formControlName="activo" />
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid || isSubmitting">
+          @if(isSubmitting){
+            <span class="spinner"></span>
           }
-          @if(clienteForm.get('razonSocial')?.errors?.['minLength']) {
-            <span>Razon Social debe ser de almenos 3 caracteres</span>
-          }
-        </div>
-      }
-    </div>
-
-    <div class="form-group">
-      <label for="correo">Correo</label>
-      <input id="correo" type="email" formControlName="correo" placeholder="cliente@dominio.com" />
-      @if(clienteForm.get('correo')?.touched && clienteForm.get('correo')?.invalid){
-        <div class="error">
-          @if(clienteForm.get('correo')?.errors?.['email']) {
-            <span>Email inválido</span>
-          }
-        </div>      
-      }
-    </div>
-
-    <div class="form-group">
-      <label for="telefono">Teléfono</label>
-      <input id="telefono" type="tel" formControlName="telefono" placeholder="+56912345678" />
-      @if (clienteForm.get('telefono')?.touched && clienteForm.get('telefono')?.invalid) {
-        <div class="error">
-          @if (clienteForm.get('telefono')?.errors?.['pattern']) {
-            <span>Formato inválido. Ej: +56912345678 o 912345678</span>
-          }
-        </div>
-      }
-    </div>
-
-    <div class="inline">
-      <label for="activo" class="activo-label">Activo</label>
-      <input id="activo" type="checkbox" formControlName="activo" /> 
-    </div>
-
-    <div class="form-actions">
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
-      <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid || isSubmitting">
-        @if(isSubmitting){
-          <span class="spinner"></span>
-        }
-        {{ isEditMode ? 'Actualizar' : 'Crear' }}
-      </button>
+          {{ isEditMode ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
     </div>
   </form>
 </div>

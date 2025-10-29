@@ -9,7 +9,9 @@ import { Rol } from '../roles.types';
   selector: 'app-create-usuario-form',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-usuario-form.component.html',
-  styleUrls: ['./create-usuario-form.component.css', '../../shared/styles/forms.css'],
+  styleUrls: ['./create-usuario-form.component.css',
+              '../../shared/styles/forms.css',
+              '../../shared/styles/buttons.css'],
 })
 export class CreateUsuarioFormComponent implements OnInit {
   @Output() formSubmit = new EventEmitter<UsuarioCreation>();
@@ -17,7 +19,7 @@ export class CreateUsuarioFormComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private rolesService = inject(RolesService);
-  
+
   roles: Rol[] = [];
 
   usuarioForm: FormGroup = this.fb.group({
@@ -35,7 +37,7 @@ export class CreateUsuarioFormComponent implements OnInit {
   private passwordMatchValidator(control: AbstractControl): Record<string, unknown> | null {
     const password = control.get('password');
     const repeatPassword = control.get('repeatPassword');
-    
+
     if (password && repeatPassword && password.value !== repeatPassword.value) {
       return { passwordMismatch: true };
     }
@@ -67,7 +69,7 @@ export class CreateUsuarioFormComponent implements OnInit {
   }
 
   get isPasswordMismatch(): boolean {
-    return this.usuarioForm.errors?.['passwordMismatch'] && 
-           this.usuarioForm.get('repeatPassword')?.touched || false;
+    return this.usuarioForm.errors?.['passwordMismatch'] &&
+      this.usuarioForm.get('repeatPassword')?.touched || false;
   }
 }

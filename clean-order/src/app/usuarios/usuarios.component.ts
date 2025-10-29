@@ -10,8 +10,9 @@ import { AsignarUsuarioComponent } from './asignar-usuario/asignar-usuario.compo
   selector: 'app-usuarios',
   imports: [CommonModule, CreateUsuarioFormComponent, UpdateUsuarioComponent, AsignarUsuarioComponent],
   templateUrl: './usuarios.component.html',
-  styleUrls: ['./usuarios.component.css', '../shared/styles/entity-table.css'
-              , '../shared/styles/buttons.css'] 
+  styleUrls: ['./usuarios.component.css',
+    '../shared/styles/entity-table.css'
+    , '../shared/styles/buttons.css']
 })
 export class UsuarioComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
@@ -54,7 +55,7 @@ export class UsuarioComponent implements OnInit {
         this.loadUsuarios();
         this.closeCreateForm();
       },
-      error: (error) =>{
+      error: (error) => {
         switch (error.status) {
           case 400:
             alert('Error: Usuario con este correo ya existe.');
@@ -74,7 +75,7 @@ export class UsuarioComponent implements OnInit {
       console.error('No selected usuario for update');
       return;
     }
-    
+
     // Pass the selected usuario's ID
     this.usuarioService.updateUsuario(data).subscribe({
       next: () => {
@@ -98,7 +99,7 @@ export class UsuarioComponent implements OnInit {
 
         if (error.status === 404) {
           alert("Error: Usuario no encontrado.");
-        } 
+        }
       }
     });
   }

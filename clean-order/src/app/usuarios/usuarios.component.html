@@ -1,4 +1,7 @@
 <div class="entity-container">
+  <div class="header">
+    <h2>Usuarios</h2>
+  </div>
   @if (showCreateForm) {
   <app-create-usuario-form
     (formSubmit)="onCreateSubmit($event)"
@@ -20,10 +23,12 @@
   >
   </app-asignar-usuario>
   } @else {
-  <div class="header">
-    <h2>Lista de Usuarios</h2>
-    <button class="btn-primary" (click)="crearUsuario()">Nuevo Usuario</button>
+
+
+  <div class="btn-group">
+    <button class="btn btn-primary" (click)="crearUsuario()">Nuevo Usuario</button>
   </div>
+
   <table class="entity-table">
     <thead>
       <tr>

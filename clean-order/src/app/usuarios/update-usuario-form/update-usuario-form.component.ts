@@ -24,6 +24,7 @@ import { Rol } from '../roles.types';
   styleUrls: [
     './update-usuario-form.component.css',
     '../../shared/styles/forms.css',
+    '../../shared/styles/buttons.css',
   ],
 })
 export class UpdateUsuarioComponent implements OnInit {

@@ -86,7 +86,6 @@ textarea.form-control {
   margin-top: 5px;
   margin-left: 5px;
 }
-
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -95,7 +94,6 @@ textarea.form-control {
   padding-top: 20px;
   border-top: 1px solid #eee;
 }
-
 .form-columns { display: flex; gap: 1rem; }
 .form-columns .form-group { flex: 1; min-width: 0; }
 

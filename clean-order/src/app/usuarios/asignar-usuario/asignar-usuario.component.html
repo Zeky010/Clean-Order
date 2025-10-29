@@ -1,9 +1,10 @@
 <div class="entity-container">
   <div class="entity-header">
     <h2>Asignar Empleado al Usuario: {{ usuario.correo }}</h2>
-    <button class="btn-secondary" (click)="cancelar()">Cancelar</button>
   </div>
-
+  <div class="btn-group">
+      <button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+  </div>
   <div class="entity-content">
     <table class="entity-table">
       <thead>
@@ -29,7 +30,7 @@
           </td>
           <td>
             <button 
-              class="btn btn-primary btn-sm" 
+              class="btn-assign" 
               (click)="asignarUsuario(empleado.rut)"
               [disabled]="!empleado.activo">
               Asignar a este Empleado

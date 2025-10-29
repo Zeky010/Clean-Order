@@ -7,7 +7,9 @@ import { ClienteDetalleComponent } from './cliente-detalle/cliente-detalle.compo
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html',
-  styleUrls: ['./clientes.component.css', '../shared/styles/entity-table.css'],
+  styleUrls: ['./clientes.component.css', 
+    '../shared/styles/entity-table.css',
+    '../shared/styles/buttons.css'],
   imports: [ClienteFormComponent, ClienteDetalleComponent],
 })
 export class ClientesComponent implements OnInit {

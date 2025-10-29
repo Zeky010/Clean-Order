@@ -1,0 +1,65 @@
+/* Estilos específicos para la vista detalle de cliente (prefijo cliente-*) */
+
+.cliente-title {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Meta información (rut + estado) */
+.cliente-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  color: #555;
+  font-size: 14px;
+}
+
+.cliente-rut {
+  font-weight: 500;
+  color: #444;
+}
+
+/* Estado: activo / inactivo (nombres únicos, no duplican las existentes) */
+.cliente-estado {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-block;
+}
+
+.cliente-estado.activo {
+  color: #2e7d32;
+  background: #e8f5e9;
+  border: 1px solid rgba(46,125,50,0.12);
+}
+
+.cliente-estado.inactivo {
+  color: #c62828;
+  background: #fff5f5;
+  border: 1px solid rgba(198,40,40,0.08);
+}
+
+/* Contenido principal */
+.cliente-body p {
+  margin: 0 0 8px 0;
+  color: #444;
+  line-height: 1.4;
+}
+
+/* Acciones (usar .btn compartida para estilos de botón) */
+.cliente-actions {
+  margin-top: 14px;
+}
+
+/* Ajustes responsivos menores para mobile */
+@media (max-width: 600px) {
+  .cliente-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
