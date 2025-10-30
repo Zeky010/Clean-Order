@@ -27,6 +27,7 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<OrdenEstado> OrdenEstados { get; set; }
     public virtual DbSet<Region> Regions { get; set; }
     public virtual DbSet<Reporte> Reportes { get; set; }
+    public virtual DbSet<ReporteTipo> ReporteTipos { get; set; }
     public virtual DbSet<Rol> Rols { get; set; }
     public virtual DbSet<TipoCarga> TipoCargas { get; set; }
     public virtual DbSet<Usuario> Usuarios { get; set; }
@@ -327,6 +328,7 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("reporte");
 
             entity.HasIndex(e => e.FkIdOrden, "ORDEN_REPORTE");
+            entity.HasIndex(e => e.FK_TIPO, "REPORTE_TIPO");
 
             entity.Property(e => e.IdReporte)
                 .HasColumnType("int(11)")
@@ -340,11 +342,33 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Observacion)
                 .HasMaxLength(100)
                 .HasColumnName("OBSERVACION");
+            entity.Property(e => e.FK_TIPO)
+                .HasColumnType("int(11)")
+                .HasColumnName("FK_TIPO");
 
             entity.HasOne(d => d.FkIdOrdenNavigation).WithMany(p => p.Reportes)
                 .HasForeignKey(d => d.FkIdOrden)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ORDEN_REPORTE");
+
+            entity.HasOne(d => d.FK_TIPONavigation).WithMany(p => p.REPORTES)
+                .HasForeignKey(d => d.FK_TIPO)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("REPORTE_TIPO");
+        });
+
+        modelBuilder.Entity<ReporteTipo>(entity =>
+        {
+            entity.HasKey(e => e.CODIGO).HasName("PRIMARY");
+
+            entity.ToTable("reporte_tipo");
+
+            entity.Property(e => e.CODIGO)
+                .HasColumnType("int(11)")
+                .HasColumnName("CODIGO");
+            entity.Property(e => e.NOMBRE)
+                .HasMaxLength(30)
+                .HasColumnName("NOMBRE");
         });
 
         modelBuilder.Entity<Rol>(entity =>
