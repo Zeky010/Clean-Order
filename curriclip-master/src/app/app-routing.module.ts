@@ -40,18 +40,6 @@ const routes: Routes = [
     import('src/app/pages/olvide/olvide.page').then(m => m.OlvidePage),
 },
 
-
-
-
-
-
-  {
-    path: 'wf',
-    canActivate: [AuthGuard], // si no quieres protegerla, borra esta línea
-    loadChildren: () =>
-      import('./workflow/workflow.module').then(m => m.WorkflowModule),
-  },
-
   { path: '**', redirectTo: 'pages/login' },
 ];
 

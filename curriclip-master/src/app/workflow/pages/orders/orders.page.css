@@ -1,21 +1,168 @@
-ion-card {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  border-radius: 16px;
+/* ======= ESTILO GENERAL ======= */
+ion-content {
+  --background: #eef3ee; /* fondo verde suave */
+  font-family: 'Poppins', sans-serif;
+  color: #2c3e2c;
+  min-height: 100vh;
 }
 
+/* ======= TARJETA DE USUARIO ======= */
+ion-card {
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(96, 125, 88, 0.25);
+  padding: 16px;
+  margin-bottom: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+ion-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(96, 125, 88, 0.35);
+}
+
+/* ======= AVATAR ======= */
 ion-avatar img {
   border-radius: 50%;
-  border: 2px solid var(--ion-color-primary);
+  border: 3px solid #607d58;
 }
 
-ion-searchbar {
-  --background: #f2f2f2;
-  --border-radius: 12px;
+/* ======= CHIP DE ROL ======= */
+ion-chip[color="tertiary"] {
+  background: #d4e8d0;
+  color: #375738;
+  font-weight: 600;
+  border-radius: 14px;
+  box-shadow: 0 2px 5px rgba(96, 125, 88, 0.3);
 }
 
-ion-segment {
-  margin-top: 8px;
-  --background: #f9f9f9;
+/* ======= BOTÓN DE CERRAR SESIÓN ======= */
+ion-button[color="danger"] {
+  --background: #3d6045;
+  --background-activated: #2e4733;
+  font-weight: 600;
   border-radius: 10px;
+  margin-top: 14px;
+  box-shadow: 0 3px 6px rgba(96, 125, 88, 0.4);
+  --color: #fff;
+}
+
+/* ======= BUSCADOR ======= */
+ion-searchbar {
+  --background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(96, 125, 88, 0.25);
+  margin-bottom: 18px;
+  --icon-color: #607d58;
+}
+
+/* ======= SEGMENTO DE FILTROS ======= */
+ion-segment {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(96, 125, 88, 0.25);
   padding: 4px;
+  margin-bottom: 20px;
+}
+
+ion-segment-button {
+  --color: #2c3e2c;
+  --color-checked: #ffffff;
+  --indicator-color: #607d58;
+  --background-checked: #607d58;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* ======= TARJETAS DE ÓRDENES ======= */
+ion-card.order-card {
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(96, 125, 88, 0.25);
+  padding: 12px;
+  margin: 16px 0;
+  transition: all 0.25s ease;
+}
+
+ion-card.order-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(96, 125, 88, 0.35);
+}
+
+ion-card.order-card ion-card-header {
+  background: #607d58; /* encabezado verde */
+  color: #ffffff;
+  border-radius: 12px 12px 0 0;
+  padding: 10px 16px;
+}
+
+ion-card.order-card h2 {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+ion-card.order-card ion-card-content {
+  padding: 14px;
+}
+
+ion-card.order-card p {
+  margin: 4px 0;
+  color: #2c3e2c;
+  font-size: 0.95rem;
+}
+
+/* ======= CHIP DE ESTADO ======= */
+ion-chip[color="warning"] {
+  background: #f8f3d6;
+  color: #766b18;
+  font-weight: 600;
+}
+
+ion-chip[color="tertiary"] {
+  background: #e0f0e0;
+  color: #3d6045;
+  font-weight: 600;
+}
+
+ion-chip[color="success"] {
+  background: #cde8cd;
+  color: #2e5c2e;
+  font-weight: 600;
+}
+
+/* ======= BOTÓN FLOTANTE ======= */
+ion-fab-button {
+  background: #607d58;
+  box-shadow: 0 6px 16px rgba(96, 125, 88, 0.45);
+  border-radius: 50%;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+}
+
+ion-fab-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(96, 125, 88, 0.55);
+}
+
+/* ======= MODO OSCURO ======= */
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: #1f261f;
+    color: #e5e7eb;
+  }
+
+  ion-card,
+  ion-searchbar,
+  ion-segment {
+    background: #2c3e2c;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  }
+
+  ion-card.order-card ion-card-header {
+    background: #375738;
+  }
+
+  ion-chip[color="tertiary"] {
+    background: #3c553c;
+    color: #d0f0d0;
+  }
 }

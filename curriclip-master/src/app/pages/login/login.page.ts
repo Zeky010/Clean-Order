@@ -4,7 +4,6 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { loginData } from '../ordenes/login-data.type';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +20,7 @@ export class LoginPage {
 
   constructor(private auth: AuthService, private router: Router) {}
 
- submit() {
+  submit() {
     this.loading = true;
     this.error = '';
 
@@ -32,37 +31,28 @@ export class LoginPage {
     }
 
     this.auth.login(this.email, this.password).subscribe({
-      next: (response: loginData) => {
-        console.log('🔹 Respuesta del servidor:', response);
+  next: (res) => {
+    console.log('✅ Login exitoso:', res);
 
-        // ✅ Si la API devuelve correo y role, consideramos login exitoso
-        if (response && response.correo) {
-          // Guardamos la sesión (puede ser en sessionStorage o localStorage)
-          this.auth.guardarSesion(response);
-          console.log('✅ Usuario autenticado:', response.correo);
+    // Guarda usuario y token
+    this.auth.guardarSesion(res);
 
-          // Redirigir a la página principal o dashboard
-          this.router.navigateByUrl('/wf');
-        } else {
-          this.error = 'Credenciales incorrectas';
-        }
-      },
-      error: (err) => {
-        console.error('❌ Error de login:', err);
-        if (err.status === 401 || err.status === 403) {
-          this.error = 'Credenciales incorrectas';
-        } else {
-          this.error = 'Error de conexión con el servidor';
-        }
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    });
+    // Redirige correctamente
+    this.router.navigateByUrl('/wf', { replaceUrl: true });
+  },
+  error: (err) => {
+    console.error('❌ Error de login:', err);
+    this.error = 'Error de conexión con el servidor';
+    this.loading = false;
+  },
+  complete: () => {
+    this.loading = false;
+  }
+});
+
   }
 
-  // 🔹 Ir a la página de recuperación de contraseña
   irARecuperar() {
-    this.router.navigateByUrl('/pages/olvide');
+    this.router.navigateByUrl('/pages/olvide'); // Ajusta si la ruta es diferente
   }
 }

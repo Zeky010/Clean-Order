@@ -7,47 +7,48 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7226'; // ✅ Usa el mismo puerto que Swagger
+  private apiUrl = 'https://localhost:7226'; // ajusta si tu backend usa otro puerto
+  private usuarioActual: any = null;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // 🔐 LOGIN con API .NET (envía y recibe cookie AuthToken)
+  // 🔐 LOGIN con API .NET
   login(correo: string, password: string): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}/login`,
-      { correo, password },
-      { withCredentials: true } // 🔥 permite recibir la cookie AuthToken
-    );
+    return this.http.post<any>(`${this.apiUrl}/login`, { correo, password });
   }
 
-  // 🔐 CERRAR SESIÓN (elimina cookie en el backend y limpia sessionStorage)
-  logout(): Observable<void> {
-    return this.http.post<void>(
-      `${this.apiUrl}/logout`,
-      {},
-      { withCredentials: true }
-    );
-  }
-
-  // 💾 Guarda la sesión del usuario localmente (correo + rol)
+  // ✅ Guarda los datos de sesión
   guardarSesion(usuario: any) {
+    this.usuarioActual = usuario;
     sessionStorage.setItem('usuario', JSON.stringify(usuario));
+    if (usuario.token) {
+      sessionStorage.setItem('token', usuario.token);
+    }
   }
 
-  // 🔎 Obtiene la sesión actual del usuario
+  // ✅ Obtiene el usuario autenticado
   obtenerUsuario() {
-    const user = sessionStorage.getItem('usuario');
-    return user ? JSON.parse(user) : null;
+    if (this.usuarioActual) return this.usuarioActual;
+
+    const data = sessionStorage.getItem('usuario');
+    return data ? JSON.parse(data) : null;
   }
 
-  // 🚪 Cierra sesión localmente (opcional si el backend ya elimina cookie)
+  // ✅ Cierra sesión
   cerrarSesion() {
-    sessionStorage.removeItem('usuario');
+    this.usuarioActual = null;
+    sessionStorage.clear();
     this.router.navigate(['/login']);
   }
 
-  // 🧩 Verifica si hay sesión activa
+  // ✅ Verifica si hay sesión activa
   estaAutenticado(): boolean {
-    return !!sessionStorage.getItem('usuario');
+    const token = sessionStorage.getItem('token');
+    return !!token;
+  }
+
+  // (Opcional) para otros componentes
+  getToken(): string | null {
+    return sessionStorage.getItem('token');
   }
 }

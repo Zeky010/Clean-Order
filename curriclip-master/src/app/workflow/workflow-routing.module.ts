@@ -7,10 +7,13 @@ import { OrderDetailPage } from './pages/order-detail/order-detail.page';
 import { NewOrderPage } from './pages/new-order/new-order.page';
 
 const routes: Routes = [
-  { path: '', component: OrdersPage },
+  { path: '', redirectTo: 'orders', pathMatch: 'full' },
+  { path: 'orders', component: OrdersPage },
   { path: 'detail/:id', component: OrderDetailPage },
-  { path: 'new', component: NewOrderPage }
+  { path: 'new', component: NewOrderPage },
+
 ];
+
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
