@@ -20,4 +20,13 @@
         public string? NombreRegion { get; set; }
 
     }
+    public class EmpleadoApp
+    {
+        public required string Rut { get; set; }
+        public required string Dv { get; set; } = null!;
+        public required string Nombre { get; set; } = null!;
+        public required string Apellido { get; set; } = null!;
+        public required string Correo { get; set; } = null!;
+    }
+
 }

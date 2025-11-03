@@ -1,7 +1,12 @@
 
 INSERT INTO `gestion-ot`.rol (NOMBRE) VALUES
-	 ('ADMIN');
+	 ('ADMIN'),
+	 ('EMPLEADO');
 	 
+INSERT INTO `gestion-ot`.reporte_tipo (NOMBRE) VALUES
+	 ('PREVIO'),
+	 ('CIERRE');
+
 INSERT INTO `gestion-ot`.usuario (CORREO,PASSWORD,ACTIVO,FK_ID_ROL,FK_RUT_EMPLEADO) VALUES
 	 ('pass@pass.cl','$2a$12$NnJUKkon0EmXbDDeHBQ0C.G5wPlri83i8.LEGgh6x8joH.Y43x6Fm',1,1,NULL);
 

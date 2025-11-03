@@ -115,7 +115,77 @@ namespace CleanOrderAPI.Controllers
                 role = user.FindFirst(ClaimTypes.Role)?.Value
             });
         }
+
+        [HttpPost]
+        [Route("login-app")]
+        public async Task<IActionResult> LoginApp([FromBody] LoginRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.correo) || string.IsNullOrWhiteSpace(request.password))
+            {
+                return BadRequest("Correo y password son obligatorios.");
+            }
+
+            // Find user by email only
+            Usuario? user = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Correo == request.correo);
+
+            if (user is null)
+            {
+                return Unauthorized("Correo o password invalidos.");
+            }
+            if(user.FkIdRol != 2)
+            {
+                return StatusCode(403, "Acceso no autorizado para este tipo de usuario.");
+            }
+
+            if (user.Activo != 1)
+            {
+                return StatusCode(403, "Usuario inactivo. Contacte al administrador.");
+            }
+
+
+            // Verify password using BCrypt
+            bool isPasswordValid = _passwordService.VerifyPassword(request.password, user.Password);
+
+            if (!isPasswordValid)
+            {
+                return Unauthorized("Correo o password invalidos.");
+            }
+
+            // Check if user is active
+            if (user.Activo != 1)
+            {
+                return Unauthorized("Usuario inactivo.");
+            }
+
+            // Generate JWT Token
+            string token = _jwtService.GenerateJwtToken(user);
+
+            // Set HttpOnly cookie for Angular (requires HTTPS + SameSite=None)
+            CookieOptions cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,                 // requires HTTPS on both API and Angular
+                SameSite = SameSiteMode.None,  // allow cross-site from Angular origin
+                Expires = DateTimeOffset.UtcNow.AddHours(1),
+                Path = "/",
+                IsEssential = true
+            };
+
+            Response.Cookies.Append(JwtCookieName, token, cookieOptions);
+
+            // Optionally return some basic info (not the token)
+            return Ok(new
+            {
+                correo = user.Correo,
+                role = user.FkIdRol
+            });
+        }
+
+
     }
+
+
 
     public class LoginRequest
     {

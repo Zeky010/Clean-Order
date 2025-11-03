@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\new\**" />
+    <Content Remove="Models\new\**" />
+    <EmbeddedResource Remove="Models\new\**" />
+    <None Remove="Models\new\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Data\ApplicationDbContext.cs" />
   </ItemGroup>
 
@@ -24,9 +31,5 @@
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\new\" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,6 @@ namespace CleanOrderAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "1")]
     public class EmpleadoController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -40,6 +39,7 @@ namespace CleanOrderAPI.Controllers
 
         // GET: Empleado/
         [HttpGet]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult<IEnumerable<EmpleadoModel>>> GetAll([FromQuery] bool? onlyActive = null)
         {
             IQueryable<Empleado> query = _context.Empleados.AsNoTracking();
@@ -59,6 +59,7 @@ namespace CleanOrderAPI.Controllers
 
         // GET: Empleado/{rut}
         [HttpGet("{rut}")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult<EmpleadoModel>> GetByRut(string rut)
         {
             if (string.IsNullOrWhiteSpace(rut))
@@ -78,6 +79,7 @@ namespace CleanOrderAPI.Controllers
 
         // POST: Empleado
         [HttpPost]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult<EmpleadoModel>> Create([FromBody] EmpleadoModel model)
         {
             if (model == null)
@@ -125,6 +127,7 @@ namespace CleanOrderAPI.Controllers
 
         // PUT: Empleado/
         [HttpPut]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult<EmpleadoModel>> Update([FromBody] EmpleadoModel model)
         {
             if (model == null)
@@ -158,6 +161,7 @@ namespace CleanOrderAPI.Controllers
 
         // DELETE: Empleado/{rut}
         [HttpDelete("{rut}")]
+        [Authorize(Roles = "1")]
         public async Task<IActionResult> Delete(string rut)
         {
             if (string.IsNullOrWhiteSpace(rut))
@@ -171,6 +175,29 @@ namespace CleanOrderAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("get-by-user/{correo}")]
+        [Authorize(Roles = "2")]
+        public async Task<ActionResult<EmpleadoApp>> GetEmpleadoByUser(string correo)
+        {
+            if (string.IsNullOrWhiteSpace(correo))
+                return BadRequest("Correo requerido.");
+            EmpleadoApp? empleado = await (from e in _context.Empleados
+                                     join u in _context.Usuarios on e.RutEmpleado equals u.FkRutEmpleado
+                                     where u.Correo == correo
+                                     select new EmpleadoApp
+                                     {
+                                         Rut = e.RutEmpleado,
+                                         Dv = e.Dv,
+                                         Nombre = e.Nombre,
+                                         Apellido = e.Apellido,
+                                         Correo = u.Correo
+                                     }).FirstOrDefaultAsync();
+            if (empleado == null)
+                return NotFound();
+            else
+                return Ok(empleado);
         }
     }
 }
