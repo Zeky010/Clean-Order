@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 namespace CleanOrderAPI.Controllers
 {
     [Route("ordenes-trabajo")] // Base path expected by Angular service
-    [ApiController]
-    [Authorize(Roles = "1")] // Ajustar roles según necesidad
+    [ApiController]     // Ajustar roles según necesidad
     public class OrdenesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +20,7 @@ namespace CleanOrderAPI.Controllers
         }
 
         // GET: /ordenes-trabajo/folio/{folio}
+        [Authorize(Roles = "1")]
         [HttpGet("folio/{folio}")]
         public async Task<ActionResult<string>> FolioExiste(string folio)
         {
@@ -36,55 +37,47 @@ namespace CleanOrderAPI.Controllers
         }
 
         // GET: /ordenes-trabajo
+        [Authorize(Roles = "1")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrdenTrabajoModel>>> GetAll()
         {
-            var data = await _context.Ordens
+            List<OrdenTrabajoModel> data = await _context.Ordens
                 .AsNoTracking()
-                .Include(o => o.FkComunaNavigation).ThenInclude(c => c.FkCodigoRegionNavigation)
-                .Include(o => o.FkEstadoNavigation)
-                .Include(o => o.FkRutClientesNavigation)
-                .Select(o => new
+                .Select(o => new OrdenTrabajoModel
                 {
-                    o.IdOrden,
-                    o.HorasTrabajo,
-                    o.FechaRegistro,
-                    o.FechaAgendada,
-                    o.FechaFinalizado,
-                    o.Observacion,
-                    o.Direccion,
-                    o.Folio,
-                    Comuna = o.FkComunaNavigation,
-                    Region = o.FkComunaNavigation.FkCodigoRegionNavigation,
-                    o.FkRutClientes,
-                    ClienteNombre = o.FkRutClientesNavigation.RazonSocial,
-                    EstadoId = o.FkEstadoNavigation.IdEstado,
-                    EstadoNombre = o.FkEstadoNavigation.Nombre
+                    Id = o.IdOrden,
+                    HorasTrabajo = o.HorasTrabajo,
+                    FechaRegistro = o.FechaRegistro,
+                    FechaAgendada = o.FechaAgendada,
+                    FechaFinalizado = o.FechaFinalizado,
+                    Observaciones = o.Observacion ?? string.Empty,
+                    Direccion = o.Direccion,
+                    Folio = o.Folio.ToString(),
+                    Comuna = new ComunaModel
+                    {
+                        Id = o.FkComunaNavigation.Codigo,
+                        Nombre = o.FkComunaNavigation.Nombre,
+                        RegionId = o.FkComunaNavigation.FkCodigoRegion
+                    },
+                    Region = new RegionModel
+                    {
+                        Id = o.FkComunaNavigation.FkCodigoRegionNavigation.Codigo,
+                        Nombre = o.FkComunaNavigation.FkCodigoRegionNavigation.Nombre
+                    },
+                    IdCliente = o.FkRutClientes != null && o.FkRutClientes != "" ? Convert.ToInt32(o.FkRutClientes) : 0,
+                    Cliente = o.FkRutClientesNavigation.RazonSocial,
+                    IdEstado = o.FkEstadoNavigation.IdEstado,
+                    Estado = o.FkEstadoNavigation.Nombre ?? string.Empty,
+                    PatenteVehiculo = o.FkPatente
                 })
                 .ToListAsync();
 
-            List<OrdenTrabajoModel> list = data.Select(o => new OrdenTrabajoModel
-            {
-                Id = o.IdOrden,
-                HorasTrabajo = o.HorasTrabajo,
-                FechaRegistro = o.FechaRegistro,
-                FechaAgendada = o.FechaAgendada,
-                FechaFinalizado = o.FechaFinalizado,
-                Observaciones = o.Observacion ?? string.Empty,
-                Direccion = o.Direccion,
-                Folio = o.Folio.ToString(),
-                Comuna = new ComunaModel { Id = o.Comuna.Codigo, Nombre = o.Comuna.Nombre, RegionId = o.Comuna.FkCodigoRegion },
-                Region = new RegionModel { Id = o.Region.Codigo, Nombre = o.Region.Nombre },
-                IdCliente = int.TryParse(o.FkRutClientes, out var tmpRut) ? tmpRut : 0,
-                Cliente = o.ClienteNombre,
-                IdEstado = o.EstadoId,
-                Estado = o.EstadoNombre ?? string.Empty
-            }).ToList();
 
-            return Ok(list);
+            return Ok(data);
         }
 
         // GET: /ordenes-trabajo/cliente/{idCliente}
+        [Authorize(Roles = "1")]
         [HttpGet("cliente/{idCliente}")]
         public async Task<ActionResult<IEnumerable<OrdenTrabajoModel>>> GetByCliente(int idCliente)
         {
@@ -108,7 +101,8 @@ namespace CleanOrderAPI.Controllers
                     o.FkRutClientes,
                     ClienteNombre = o.FkRutClientesNavigation.RazonSocial,
                     EstadoId = o.FkEstadoNavigation.IdEstado,
-                    EstadoNombre = o.FkEstadoNavigation.Nombre
+                    EstadoNombre = o.FkEstadoNavigation.Nombre,
+                    Patente = o.FkPatente
                 })
                 .ToListAsync();
 
@@ -128,13 +122,15 @@ namespace CleanOrderAPI.Controllers
                     IdCliente = idCliente,
                     Cliente = o.ClienteNombre,
                     IdEstado = o.EstadoId,
-                    Estado = o.EstadoNombre ?? string.Empty
+                    Estado = o.EstadoNombre ?? string.Empty,
+                    PatenteVehiculo = o.Patente
                 })
                 .ToList();
             return Ok(list);
         }
 
         // GET: /ordenes-trabajo/estado
+        [Authorize(Roles = "1")]
         [HttpGet("estado")]
         public async Task<ActionResult<IEnumerable<OrdenEstadoModel>>> GetEstados()
         {
@@ -146,6 +142,7 @@ namespace CleanOrderAPI.Controllers
         }
 
         // GET: /ordenes-trabajo/fechas?inicio=yyyy-MM-dd&fin=yyyy-MM-dd
+        [Authorize(Roles = "1")]
         [HttpGet("fechas")]
         public async Task<ActionResult<IEnumerable<OrdenTrabajoModel>>> GetByFechas([FromQuery] DateTime inicio, [FromQuery] DateTime fin)
         {
@@ -173,7 +170,8 @@ namespace CleanOrderAPI.Controllers
                     o.FkRutClientes,
                     ClienteNombre = o.FkRutClientesNavigation.RazonSocial,
                     EstadoId = o.FkEstadoNavigation.IdEstado,
-                    EstadoNombre = o.FkEstadoNavigation.Nombre
+                    EstadoNombre = o.FkEstadoNavigation.Nombre,
+                    Patente = o.FkPatente
                 })
                 .ToListAsync();
 
@@ -192,12 +190,14 @@ namespace CleanOrderAPI.Controllers
                 IdCliente = int.TryParse(o.FkRutClientes, out var tmpRut) ? tmpRut : 0,
                 Cliente = o.ClienteNombre,
                 IdEstado = o.EstadoId,
-                Estado = o.EstadoNombre ?? string.Empty
+                Estado = o.EstadoNombre ?? string.Empty,
+                PatenteVehiculo = o.Patente
             }).ToList();
             return Ok(list);
         }
 
         // POST: /ordenes-trabajo
+        [Authorize(Roles = "1")]
         [HttpPost]
         public async Task<ActionResult<OrdenTrabajoModel>> Create([FromBody] OrdenForm form)
         {
@@ -208,7 +208,7 @@ namespace CleanOrderAPI.Controllers
             if (form.EmpleadoAsignar == null || !form.EmpleadoAsignar.Any())
                 return BadRequest("La orden debe tener al menos un empleado asignado.");
 
-            if(form.patenteVehiculo.IsNullOrEmpty())
+            if (form.patenteVehiculo.IsNullOrEmpty())
                 return BadRequest("La orden debe tener una patente de vehículo asignada.");
 
             // Verificar RUTs antes de iniciar la operación (pre-validación)
@@ -279,6 +279,7 @@ namespace CleanOrderAPI.Controllers
         }
 
         // PUT: /ordenes-trabajo/{id}
+        [Authorize(Roles = "1")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult<OrdenTrabajoModel>> Update(int id, [FromBody] OrdenForm form)
         {
@@ -314,6 +315,7 @@ namespace CleanOrderAPI.Controllers
         }
 
         // DELETE: /ordenes-trabajo/{id}
+        [Authorize(Roles = "1")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -326,6 +328,7 @@ namespace CleanOrderAPI.Controllers
         }
 
         // PATCH: /ordenes-trabajo/suspender/{id}
+        [Authorize(Roles = "1")]
         [HttpPatch("suspender/{id:int}")]
         public async Task<ActionResult<OrdenTrabajoModel>> Suspender(int id)
         {
@@ -360,6 +363,7 @@ namespace CleanOrderAPI.Controllers
 
 
         // PATCH: /ordenes-trabajo/{id}/estado
+        [Authorize(Roles = "1")]
         [HttpPatch("{id:int}/estado")]
         public async Task<ActionResult<OrdenTrabajoModel>> CambiarEstado(int id, [FromBody] dynamic body)
         {
@@ -373,6 +377,7 @@ namespace CleanOrderAPI.Controllers
         }
 
         // PATCH: /ordenes-trabajo/{id}/reagendar
+        [Authorize(Roles = "1")]
         [HttpPatch("{id:int}/reagendar")]
         public async Task<ActionResult<OrdenTrabajoModel>> Reagendar(int id, [FromBody] dynamic body)
         {
@@ -387,6 +392,7 @@ namespace CleanOrderAPI.Controllers
 
         // POST: /ordenes-trabajo/empleados-disponibles
         // Body: { "fechaAgendada": "2025-01-01T00:00:00", "horasTrabajo": 4 }
+        [Authorize(Roles = "1")]
         [HttpPost("empleados-disponibles")]
         public async Task<ActionResult<IEnumerable<EmpleadoAsignar>>> GetEmpleadosDisponibles([FromBody] DisponibilidadRequest request)
         {
@@ -399,11 +405,11 @@ namespace CleanOrderAPI.Controllers
 
             // Empleados ocupados: cualquier orden cuya ventana [FechaAgendada, FechaAgendada + HorasTrabajo) se solape con [inicio, fin)
             List<string> ocupados = await (from o in _context.Ordens
-                                  where o.FechaAgendada < fin
-                                     && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio &&
-                                     (o.FkEstado == 1 || o.FkEstado == 2) //Estado agednado o en proceso
+                                           where o.FechaAgendada < fin
+                                              && o.FechaAgendada.AddHours(o.HorasTrabajo) > inicio &&
+                                              (o.FkEstado == 1 || o.FkEstado == 2) //Estado agednado o en proceso
                                            join oe in _context.OrdenEmpleados on o.IdOrden equals oe.FkIdOrdenes
-                                  select oe.FkRutEmpleado)
+                                           select oe.FkRutEmpleado)
                                  .Distinct()
                                  .ToListAsync();
 
@@ -420,6 +426,86 @@ namespace CleanOrderAPI.Controllers
 
             return Ok(disponibles);
         }
+
+
+        [HttpGet("mine/")]
+        [Authorize(Roles = "2")]
+        public async Task<ActionResult<IEnumerable<OrdenTrabajoModel>>> GetMine()
+        {
+            // Obtiene el correo del usuario autenticado desde el token JWT
+            // ✅ Busca el claim "Correo" o "sub" del token JWT
+            string? correoClaim = HttpContext.User.FindFirst("Correo")?.Value
+                           ?? HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(correoClaim))
+                return Unauthorized("No se encontró el correo en el token.");
+
+
+            // Busca el usuario por correo
+            Usuario? usuario = await _context.Usuarios
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Correo == correoClaim);
+
+            if (usuario == null)
+                return Unauthorized("No se encontró el usuario autenticado.");
+
+            // Busca el empleado vinculado a ese usuario (por RUT)
+            Empleado? empleado = await _context.Empleados
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.RutEmpleado == usuario.FkRutEmpleado);
+
+
+            if (empleado == null)
+                return Unauthorized("No se encontró el empleado asociado a este usuario.");
+
+            // Busca las órdenes asignadas a ese empleado
+            List<int> ordenesIds = await _context.OrdenEmpleados
+                .Where(oe => oe.FkRutEmpleado == empleado.RutEmpleado)
+                .Select(oe => oe.FkIdOrdenes)
+                .ToListAsync();
+
+            if (!ordenesIds.Any())
+                return Ok(new List<OrdenTrabajoModel>());
+
+            // Carga los detalles de las órdenes asignadas
+            List<OrdenTrabajoModel> list = await _context.Ordens
+                        .AsNoTracking()
+                        .Where(o => ordenesIds.Contains(o.IdOrden))
+                        .Select(o => new OrdenTrabajoModel
+                        {
+                            Id = o.IdOrden,
+                            HorasTrabajo = o.HorasTrabajo,
+                            FechaRegistro = o.FechaRegistro,
+                            FechaAgendada = o.FechaAgendada,
+                            FechaFinalizado = o.FechaFinalizado,
+                            Observaciones = o.Observacion ?? string.Empty,
+                            Direccion = o.Direccion,
+                            Folio = o.Folio.ToString(),
+                            Comuna = new ComunaModel
+                            {
+                                Id = o.FkComunaNavigation.Codigo,
+                                Nombre = o.FkComunaNavigation.Nombre,
+                                RegionId = o.FkComunaNavigation.FkCodigoRegion
+                            },
+                            Region = new RegionModel
+                            {
+                                Id = o.FkComunaNavigation.FkCodigoRegionNavigation.Codigo,
+                                Nombre = o.FkComunaNavigation.FkCodigoRegionNavigation.Nombre
+                            },
+                            IdCliente = o.FkRutClientes != null && o.FkRutClientes != "" ? Convert.ToInt32(o.FkRutClientes) : 0,
+                            Cliente = o.FkRutClientesNavigation.RazonSocial,
+                            IdEstado = o.FkEstadoNavigation.IdEstado,
+                            Estado = o.FkEstadoNavigation.Nombre!,
+                            PatenteVehiculo = o.FkPatente
+
+                        })
+                        .ToListAsync();
+
+            return Ok(list);
+        }
+
+
+
 
         private async Task<OrdenTrabajoModel> ProjectOrden(int id)
         {
@@ -443,7 +529,8 @@ namespace CleanOrderAPI.Controllers
                     o.FkRutClientes,
                     ClienteNombre = o.FkRutClientesNavigation.RazonSocial,
                     EstadoId = o.FkEstadoNavigation.IdEstado,
-                    EstadoNombre = o.FkEstadoNavigation.Nombre
+                    EstadoNombre = o.FkEstadoNavigation.Nombre,
+                    Patente = o.FkPatente
                 })
                 .FirstAsync();
 
@@ -461,7 +548,8 @@ namespace CleanOrderAPI.Controllers
                 IdCliente = int.TryParse(o.FkRutClientes, out var tmpRut) ? tmpRut : 0,
                 Cliente = o.ClienteNombre,
                 IdEstado = o.EstadoId,
-                Estado = o.EstadoNombre ?? string.Empty
+                Estado = o.EstadoNombre ?? string.Empty,
+                PatenteVehiculo = o.Patente
             };
         }
     }

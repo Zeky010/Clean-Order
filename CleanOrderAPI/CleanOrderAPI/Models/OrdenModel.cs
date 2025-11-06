@@ -43,5 +43,6 @@ namespace CleanOrderAPI.Models
         public string Cliente { get; set; } = string.Empty; // Nombre del cliente
         public int IdEstado { get; set; }
         public string Estado { get; set; } = string.Empty; // Descripción del estado
+        public required string PatenteVehiculo { get; set; }
     }
 }

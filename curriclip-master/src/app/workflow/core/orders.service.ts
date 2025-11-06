@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { Orden } from './types';
 
 export type OrderStatus = 'pending' | 'progress' | 'done';
 
-export interface Order {
+export interface OrderOld {
   id: number;
   code: string;
   status: OrderStatus;
@@ -23,61 +24,33 @@ export class OrdersService {
   constructor(private http: HttpClient) {}
 
   /** 🔹 Obtener órdenes reales del empleado autenticado */
-  list(status?: string): Observable<Order[]> {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      console.error('⚠️ No se encontró token en sessionStorage');
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    return this.http.get<Order[]>(`${this.base}/ordenes-trabajo/mine`, { headers });
+  list(status?: string): Observable<Orden[]> {
+    // Cookie JWT will be attached by interceptor
+    return this.http.get<Orden[]>(`${this.base}/ordenes-trabajo/mine`);
   }
 
   /** 🔹 Detalle de una orden */
-  detail(id: number): Observable<Order> {
-    const token = sessionStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    return this.http.get<Order>(`${this.base}/ordenes-trabajo/${id}`, { headers });
+  detail(id: number): Observable<Orden> {
+    return this.http.get<Orden>(`${this.base}/ordenes-trabajo/${id}`);
   }
 
   /** 🔹 Subir evidencia (si aplica) */
   uploadEvidence(id: number, kind: 'before' | 'after', file: Blob, notes?: string): Observable<any> {
-    const token = sessionStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
     const fd = new FormData();
     fd.append('file', file);
     fd.append('kind', kind);
     if (notes) fd.append('notes', notes);
 
-    return this.http.post(`${this.base}/ordenes-trabajo/${id}/evidence`, fd, { headers });
+    return this.http.post(`${this.base}/ordenes-trabajo/${id}/evidence`, fd);
   }
 
   /** 🔹 Marcar orden como completada */
   markDone(id: number): Observable<any> {
-    const token = sessionStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    return this.http.post(`${this.base}/ordenes-trabajo/${id}/done`, {}, { headers });
+    return this.http.post(`${this.base}/ordenes-trabajo/${id}/done`, {});
   }
 
   /** 🔹 Crear nueva orden (si aplica desde móvil) */
   create(data: any): Observable<any> {
-    const token = sessionStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    return this.http.post(`${this.base}/ordenes-trabajo`, data, { headers });
+    return this.http.post(`${this.base}/ordenes-trabajo`, data);
   }
 }

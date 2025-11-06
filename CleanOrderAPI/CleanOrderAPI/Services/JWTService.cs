@@ -31,6 +31,7 @@ namespace CleanOrderAPI.Services
             List<Claim> claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Correo),
+                new Claim("Correo", user.Correo), // Added explicit Correo claim
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("UserId", user.IdUsuario.ToString()),
                 new Claim(ClaimTypes.Role, roleId) // role as string id (e.g., "1")
