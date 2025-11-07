@@ -504,6 +504,23 @@ namespace CleanOrderAPI.Controllers
             return Ok(list);
         }
 
+        // GET: /ordenes-trabajo/mine/{id}
+        [Authorize(Roles = "2")]
+        [HttpGet("mine/{id:int}")]
+        public async Task<ActionResult<OrdenTrabajoModel>> GetById(int id)
+        {
+            bool exists = await _context.Ordens
+                .AsNoTracking()
+                .AnyAsync(o => o.IdOrden == id && 
+                        o.FkEstado != 3 &&
+                        o.FkEstado != 4);
+
+            if (!exists)
+                return NotFound();
+
+            return Ok(await ProjectOrden(id));
+        }
+
 
 
 
@@ -521,6 +538,7 @@ namespace CleanOrderAPI.Controllers
                     o.HorasTrabajo,
                     o.FechaRegistro,
                     o.FechaAgendada,
+                    o.FechaFinalizado,
                     o.Observacion,
                     o.Direccion,
                     o.Folio,
@@ -540,6 +558,7 @@ namespace CleanOrderAPI.Controllers
                 HorasTrabajo = o.HorasTrabajo,
                 FechaRegistro = o.FechaRegistro,
                 FechaAgendada = o.FechaAgendada,
+                FechaFinalizado = o.FechaFinalizado,
                 Observaciones = o.Observacion ?? string.Empty,
                 Direccion = o.Direccion,
                 Folio = o.Folio.ToString(),

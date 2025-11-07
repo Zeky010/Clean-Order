@@ -31,7 +31,7 @@ export class OrdersService {
 
   /** 🔹 Detalle de una orden */
   detail(id: number): Observable<Orden> {
-    return this.http.get<Orden>(`${this.base}/ordenes-trabajo/${id}`);
+    return this.http.get<Orden>(`${this.base}/ordenes-trabajo/mine/${id}`);
   }
 
   /** 🔹 Subir evidencia (si aplica) */

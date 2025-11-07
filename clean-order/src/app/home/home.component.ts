@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -13,11 +13,8 @@ import { AuthService } from '../services/auth.service';
 export class HomeComponent implements OnInit {
 
   displayName = 'Usuario';
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
 
   ngOnInit(): void {
     // 1) Nombre guardado directamente
@@ -68,10 +65,19 @@ export class HomeComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('displayName');
-    this.authService.logout?.();
-    this.router.navigate(['/login']);
+
+    this.authService.logout().subscribe({
+      next: () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('displayName');
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        localStorage.removeItem('AuthToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('displayName');
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }
