@@ -1,52 +1,233 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { EvidenceUploaderComponent } from '../../components/evidence-uploader/evidence-uploader.component';
 import { OrdersService } from '../../core/orders.service';
+import { Orden } from '../../core/types';
+import { Reporte, ImagenesReporte } from '../../core/reporte.type';
+import { AuthService } from '../../../services/auth.service';
+import { ReporteService, ReporteResponse } from '../../core/Reporte.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, EvidenceUploaderComponent],
-  templateUrl: './order-detail.page.html'
+  templateUrl: './order-detail.page.html',
 })
 export class OrderDetailPage implements OnInit {
   id!: number;
-  data?: any;
+  orden?: Orden;
   notesBefore = '';
   notesAfter = '';
   uploading = false;
-  before?: Blob;
-  after?: Blob;
+  imagenesAntes: ImagenesReporte[] = [];
+  imagenesDespues: ImagenesReporte[] = [];
+  private user: any;
+  private authService: AuthService = inject(AuthService);
+  private ordersService: OrdersService = inject(OrdersService);
+  private reporteService: ReporteService = inject(ReporteService);
+  private route: ActivatedRoute = inject(ActivatedRoute);
 
-  constructor(private route: ActivatedRoute, private api: OrdersService) {}
+  ngOnInit() {
+    this.id = Number(this.route.snapshot.paramMap.get('id'));
+    this.ordersService
+      .detail(this.id)
+      .subscribe((d: Orden) => (this.orden = d));
+    this.user = this.authService.obtenerUsuario();
+  }
 
-ngOnInit() {
-  this.id = Number(this.route.snapshot.paramMap.get('id'));
-  this.api.detail(this.id).subscribe((d: any) => this.data = d);
-}
+  // Muestra formulario ANTES solo si está AGENDADO
+  shouldShowBeforeForm(): boolean {
+    return this.orden?.estado === 'AGENDADO';
+  }
 
-onBefore(e: { blob: Blob, dataUrl: string }) { this.before = e.blob; }
-onAfter(e:  { blob: Blob, dataUrl: string }) { this.after  = e.blob; }
+  // Muestra formulario DESPUÉS solo si está EN PROCESO
+  shouldShowAfterForm(): boolean {
+    return this.orden?.estado === 'EN PROCESO';
+  }
 
-upload(kind: 'before'|'after') {
-  const file = kind === 'before' ? this.before : this.after;
-  const notes = kind === 'before' ? this.notesBefore : this.notesAfter;
-  if (!file) return;
+  // Muestra mensaje si está REALIZADO o SUSPENDIDO
+  shouldShowCompletedMessage(): boolean {
+    return (
+      this.orden?.estado === 'REALIZADO' || this.orden?.estado === 'SUSPENDIDO'
+    );
+  }
 
-  this.uploading = true;
-  this.api.uploadEvidence(this.id, kind, file, notes).subscribe({
-    next: () => {},
-    complete: () => this.uploading = false
-  });
-}
+  onBefore(e: ImagenesReporte) {
+    if (this.imagenesAntes.length >= 3) {
+      alert('Solo se permiten 3 imágenes antes');
+      return;
+    }
+    else{
+      this.imagenesAntes.push(e);
+    }
+  }
 
-markDone() {
-  this.api.markDone(this.id).subscribe(() => {
-    // toast/navegar si quieres
-  });
-}
+  onAfter(e: ImagenesReporte) {
+    if (this.imagenesDespues.length >= 3) {
+      alert('Solo se permiten 3 imágenes después');
+      return;
+    }
+    else{
+      this.imagenesDespues.push(e);
+    }
 
   }
+
+  upload(kind: 'before' | 'after') {
+    const imagenes =
+      kind === 'before' ? this.imagenesAntes : this.imagenesDespues;
+    const notes = kind === 'before' ? this.notesBefore : this.notesAfter;
+
+    if (imagenes.length === 0 || !this.user?.correo) return;
+
+    // Construir el reporte según la interfaz
+    const reporte: Reporte = {
+      correoUsuario: this.user.correo,
+      idOrden: this.id,
+      observacion: notes,
+      tipoReporte: kind === 'before' ? 1 : 2, // 1 = ANTES, 2 = DESPUÉS
+      fecha: new Date(),
+      imagenesReporte: imagenes,
+    };
+
+    this.uploading = true;
+    this.reporteService.uploadReporte(reporte).subscribe({
+      next: (response: ReporteResponse) => {
+        console.log(`Reporte subido exitosamente: ${response.mensaje}`);
+        console.log(
+          `ID Reporte: ${response.idReporte}, Imágenes: ${response.cantidadImagenes}`
+        );
+
+        // Limpiar campos después de subir
+        if (kind === 'before') {
+          this.imagenesAntes = [];
+          this.notesBefore = '';
+        } else {
+          this.imagenesDespues = [];
+          this.notesAfter = '';
+        }
+        // Recargar la orden para actualizar el estado
+        this.ordersService
+          .detail(this.id)
+          .subscribe((d: Orden) => (this.orden = d));
+      },
+      error: (error: HttpErrorResponse) => {
+        this.uploading = false;
+
+        this.handleError(error);
+      },
+      complete: () => (this.uploading = false),
+    });
+  }
+
+  private handleError(error: HttpErrorResponse) {
+
+    // Extraer el mensaje de error del servidor (siempre viene en formato ReporteResponse)
+
+    let errorMessage = 'Error desconocido';
+    if (
+      error.error &&
+      typeof error.error === 'object' &&
+      'mensaje' in error.error
+    ) 
+    {
+      const errorResponse = error.error as ReporteResponse;
+      errorMessage = errorResponse.mensaje;
+      console.error(
+        `Error del servidor - ID Reporte: ${errorResponse.idReporte}, Mensaje: ${errorResponse.mensaje}`
+      );
+    }
+
+    switch (error.status) {
+      case 400:
+        console.error('Error 400 - Solicitud incorrecta:', errorMessage);
+        alert(`Error: ${errorMessage}`);
+        break;
+      case 401:
+        console.error('Error 401 - No autorizado:', errorMessage);
+        alert(
+          `Error: ${
+            errorMessage || 'No está autorizado para realizar esta acción'
+          }`
+        );
+        break;
+      case 403:
+        console.error('Error 403 - Prohibido:', errorMessage);
+        alert(
+          `Error: ${errorMessage || 'No tiene permisos para subir evidencias'}`
+        );
+        break;
+      case 404:
+        console.error('Error 404 - No encontrado:', errorMessage);
+        alert(`Error: ${errorMessage}`);
+        break;
+      case 409:
+        console.error('Error 409 - Conflicto:', errorMessage);
+        alert(`Error: ${errorMessage}`);
+        break;
+      case 413:
+        console.error('Error 413 - Archivo muy grande:', errorMessage);
+        alert(
+          `Error: ${errorMessage || 'Una o más imágenes son demasiado grandes'}`
+        );
+        break;
+      case 415:
+        console.error(
+          'Error 415 - Tipo de archivo no soportado:',
+          errorMessage
+        );
+        alert(
+          `Error: ${
+            errorMessage || 'El formato de una o más imágenes no es válido'
+          }`
+        );
+        break;
+      case 500:
+        console.error('Error 500 - Error del servidor:', errorMessage);
+        alert(`Error: ${errorMessage}`);
+        break;
+      case 503:
+        console.error('Error 503 - Servicio no disponible:', errorMessage);
+        alert(
+          `Error: ${
+            errorMessage || 'El servicio no está disponible temporalmente'
+          }`
+        );
+        break;
+      default:
+        console.error('Error desconocido:', error);
+        alert(`Error al subir evidencia: ${errorMessage}`);
+    }
+  }
+
+  markDone() {
+    this.ordersService.markDone(this.id).subscribe(() => {
+      // Recargar la orden para actualizar el estado
+      this.ordersService
+        .detail(this.id)
+        .subscribe((d: Orden) => (this.orden = d));
+    });
+  }
+
+  // Método helper para crear el reporte
+  private createReporte(kind: 'before' | 'after'): Reporte | null {
+    const imagenes =
+      kind === 'before' ? this.imagenesAntes : this.imagenesDespues;
+    const notes = kind === 'before' ? this.notesBefore : this.notesAfter;
+
+    if (imagenes.length === 0 || !this.user?.correo) return null;
+
+    return {
+      correoUsuario: this.user.correo,
+      idOrden: this.id,
+      observacion: notes,
+      tipoReporte: kind === 'before' ? 1 : 2,
+      fecha: new Date(),
+      imagenesReporte: imagenes,
+    };
+  }
+}

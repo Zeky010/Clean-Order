@@ -25,5 +25,6 @@ public partial class Reporte
 
     public virtual Orden FkIdOrdenNavigation { get; set; } = null!;
     public virtual ReporteTipo FK_TIPONavigation { get; set; } = null!;
+    public virtual Usuario FkUsuarioNavigation { get; set; } = null!;
     public virtual ICollection<ImagenesReporte> ImagenesReportes { get; set; } = new List<ImagenesReporte>();
 }

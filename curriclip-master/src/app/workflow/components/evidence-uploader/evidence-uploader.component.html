@@ -4,12 +4,13 @@
   </ion-card-header>
 
   <ion-card-content>
-    <div *ngIf="preview; else empty">
-      <img [src]="preview" alt="preview" style="width: 100%; border-radius: 8px;" />
-    </div>
-    <ng-template #empty>
+    @if (preview) {
+      <div>
+        <img [src]="preview" alt="preview" style="width: 100%; border-radius: 8px;" />
+      </div>
+    } @else {
       <ion-text color="medium"><p>Sin imagen.</p></ion-text>
-    </ng-template>
+    }
 
     <ion-grid class="ion-no-padding ion-margin-top">
       <ion-row>

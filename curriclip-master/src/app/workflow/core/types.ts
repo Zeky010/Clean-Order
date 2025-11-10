@@ -1,5 +1,5 @@
 export interface Client { id: number; name: string; }
-export type OrderStatus = 'pending'|'progress'|'done';
+export type OrderStatus = 'AGENDADO' | 'EN PROCESO' | 'REALIZADO' | 'SUSPENDIDO';
 
 export type ISODateString = string;
 

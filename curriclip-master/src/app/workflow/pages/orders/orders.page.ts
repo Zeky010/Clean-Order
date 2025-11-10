@@ -1,31 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { OrdersService } from '../../core/orders.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { Orden } from '../../core/types'
 
 type OrderStatus = 'pending' | 'progress' | 'done';
 
-interface Order {
-  id: number;
-  code: string;
-  status: OrderStatus;
-  created_at: string;
-  client?: { name?: string };
-  company?: { name?: string };
-  address?: string;
-  description?: string;
-  hours?: number;
-  fechaAgendada?: string;
-  fechaFinalizado?: string;
-}
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule, DatePipe],
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule],
   templateUrl: './orders.page.html',
   styleUrls: ['./orders.page.css']
 })
@@ -34,8 +22,8 @@ export class OrdersPage implements OnInit {
   q = '';
   status: '' | OrderStatus = '';
   loading = false;
-  data: Order[] = [];
-  filtered: Order[] = [];
+  data: Orden[] = [];
+  filtered: Orden[] = [];
 
   constructor(
     private api: OrdersService,
@@ -61,11 +49,11 @@ export class OrdersPage implements OnInit {
     this.loading = true;
 
     this.api.list().subscribe({
-      next: (rows: any[]) => {
+      next: (rows: Orden[]) => {
         console.log('✅ Datos recibidos del backend:', rows);
 
         this.data = rows.map(o => ({
-          id: o.id,
+          ...o,
           code: o.folio?.toString() || '-',
           status:
             o.estado === 'AGENDADO'
@@ -79,10 +67,8 @@ export class OrdersPage implements OnInit {
             ? new Date(o.fechaRegistro).toISOString().split('T')[0]
             : '',
           client: { name: o.cliente || 'Sin cliente' },
-          company: { name: o.region?.nombre || 'Sin región' },
           address: o.direccion || 'Sin dirección',
           description: o.observaciones || 'Sin observación',
-          hours: o.horasTrabajo || 0,
           fechaAgendada: o.fechaAgendada
             ? new Date(o.fechaAgendada).toLocaleString()
             : 'No registrada',
@@ -103,38 +89,29 @@ export class OrdersPage implements OnInit {
     const q = this.q.trim().toLowerCase();
     this.filtered = this.data.filter(o => {
       const hay = (
-        o.code +
+        o.id +
         ' ' +
-        (o.client?.name || '') +
+        (o.cliente) +
         ' ' +
-        (o.company?.name || '') +
-        ' ' +
-        (o.address || '')
+        (o.direccion || '')
       ).toLowerCase();
       return !q || hay.includes(q);
     });
   }
 
   /** 🔹 Colores según estado */
-  chipColor(s: OrderStatus) {
-    return s === 'pending'
+  chipColor(s: string) {
+    return s === 'AGENDADO'
       ? 'warning'
-      : s === 'progress'
+      : s === 'EN PROCESO'
       ? 'tertiary'
-      : 'success';
-  }
-
-  /** 🔹 Texto legible del estado */
-  label(s: OrderStatus) {
-    return s === 'pending'
-      ? 'Pendiente'
-      : s === 'progress'
-      ? 'En progreso'
-      : 'Completada';
+      : s === 'REALIZADO'
+      ? 'success'
+      : 'danger'; // SUSPENDIDO
   }
 
   /** 🔹 Navegar al detalle */
-  go(o: Order) {
+  go(o: Orden) {
     this.router.navigate(['/wf', 'detail', o.id]);
   }
 }

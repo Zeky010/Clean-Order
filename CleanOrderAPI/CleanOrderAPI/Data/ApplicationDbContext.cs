@@ -350,7 +350,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.FkIdOrden)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ORDEN_REPORTE");
-
+            entity.HasOne(d => d.FkUsuarioNavigation).WithMany(p => p.Reportes)
+                .HasForeignKey(d => d.FkUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("USUARIO_REPORTE");
             entity.HasOne(d => d.FK_TIPONavigation).WithMany(p => p.REPORTES)
                 .HasForeignKey(d => d.FK_TIPO)
                 .OnDelete(DeleteBehavior.ClientSetNull)

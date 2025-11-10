@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { catchError, map, Observable, of } from 'rxjs';
 import type { EmpleadoApp } from './empleado.service';
 
+
+
 @Injectable({
   providedIn: 'root'
 })

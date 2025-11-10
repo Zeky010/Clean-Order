@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { ImagenesReporte } from '../../core/reporte.type'
+
 
 @Component({
   selector: 'wf-evidence-uploader',
@@ -11,7 +13,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 })
 export class EvidenceUploaderComponent {
   @Input() label = 'Foto';
-  @Output() fileSelected = new EventEmitter<{ blob: Blob, dataUrl: string }>();
+  @Output() fileSelected = new EventEmitter<ImagenesReporte>();
   preview?: string;
   busy = false;
 
@@ -25,8 +27,10 @@ export class EvidenceUploaderComponent {
       });
       const dataUrl = image.dataUrl!;
       const blob = this.dataUrlToBlob(dataUrl);
+      const mime = blob.type;
+      const file = new File([blob], `image-${Date.now()}.jpg`, { type: mime });
       this.preview = dataUrl;
-      this.fileSelected.emit({ blob, dataUrl });
+      this.fileSelected.emit({ tipoMime: mime, imagenes: file });
     } finally {
       this.busy = false;
     }
@@ -39,7 +43,7 @@ export class EvidenceUploaderComponent {
     reader.onload = () => {
       const dataUrl = String(reader.result);
       this.preview = dataUrl;
-      this.fileSelected.emit({ blob: file, dataUrl });
+      this.fileSelected.emit({ tipoMime: file.type, imagenes: file });
     };
     reader.readAsDataURL(file);
   }

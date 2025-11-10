@@ -7,32 +7,65 @@
 
 <ion-content class="ion-padding">
 
-  <ion-card *ngIf="data">
+  <ion-card *ngIf="orden">
     <ion-card-header>
-      <ion-card-title>{{ data?.code }}</ion-card-title>
+      <ion-card-title>{{ orden.id }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <p><strong>Cliente:</strong> {{ data?.client?.name || '-' }}</p>
-      <p><strong>Empresa:</strong> {{ data?.company?.name || '-' }}</p>
-      <p><strong>Dirección:</strong> {{ data?.address || '-' }}</p>
-      <p><strong>Descripción:</strong> {{ data?.description || '-' }}</p>
+      <p><strong>Cliente:</strong> {{ orden.cliente || '-' }}</p>
+      <p><strong>Horas de Trabajo:</strong> {{ orden.horasTrabajo }}</p>
+      <p><strong>Dirección:</strong> {{ orden.direccion || '-' }}</p>
+      <p><strong>Descripción:</strong> {{ orden.observaciones || '-' }}</p>
+      <p><strong>Estado:</strong> {{ orden.estado || '-' }}</p>
     </ion-card-content>
   </ion-card>
 
-  <wf-evidence-uploader label="Foto Antes" (fileSelected)="onBefore($event)"></wf-evidence-uploader>
-  <ion-item lines="none">
-    <ion-textarea placeholder="Notas (Antes)" [(ngModel)]="notesBefore"></ion-textarea>
-  </ion-item>
-  <ion-button expand="block" (click)="upload('before')" [disabled]="uploading">Subir 'Antes'</ion-button>
+  <!-- Formulario ANTES - Solo se muestra si está AGENDADO -->
+  <div *ngIf="shouldShowBeforeForm()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Evidencia Inicial</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <wf-evidence-uploader label="Foto Antes" (fileSelected)="onBefore($event)"></wf-evidence-uploader>
+        <ion-item lines="none">
+          <ion-textarea placeholder="Notas (Antes)" [(ngModel)]="notesBefore"></ion-textarea>
+        </ion-item>
+        <ion-button expand="block" (click)="upload('before')" [disabled]="uploading">
+          Subir 'Antes' e Iniciar Trabajo
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-  <wf-evidence-uploader label="Foto Después" (fileSelected)="onAfter($event)"></wf-evidence-uploader>
-  <ion-item lines="none">
-    <ion-textarea placeholder="Notas (Después)" [(ngModel)]="notesAfter"></ion-textarea>
-  </ion-item>
-  <ion-button expand="block" (click)="upload('after')" [disabled]="uploading">Subir 'Después'</ion-button>
+  <!-- Formulario DESPUÉS - Solo se muestra si está EN PROCESO -->
+  <div *ngIf="shouldShowAfterForm()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Evidencia Final</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <wf-evidence-uploader label="Foto Después" (fileSelected)="onAfter($event)"></wf-evidence-uploader>
+        <ion-item lines="none">
+          <ion-textarea placeholder="Notas (Después)" [(ngModel)]="notesAfter"></ion-textarea>
+        </ion-item>
+        <ion-button expand="block" (click)="upload('after')" [disabled]="uploading">
+          Subir 'Después'
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-  <ion-button expand="block" color="success" class="ion-margin-top" (click)="markDone()">
-    Marcar como completada
-  </ion-button>
+  <!-- Mensaje si ya está REALIZADO o SUSPENDIDO -->
+  <ion-card *ngIf="shouldShowCompletedMessage()">
+    <ion-card-content>
+      <p class="ion-text-center">
+        <ion-icon name="checkmark-circle" color="success" size="large"></ion-icon>
+      </p>
+      <p class="ion-text-center">
+        <strong>Esta orden ya está {{ orden?.estado }}</strong>
+      </p>
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>
