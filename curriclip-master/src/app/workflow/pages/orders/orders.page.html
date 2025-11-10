@@ -14,7 +14,7 @@
       </ion-avatar>
       <ion-card-title class="ion-padding-top">
         Bienvenido,
-        <strong>{{ usuario.FK_ID_ROL === 1 ? 'Administrador' : 'Empleado' }}</strong> 👋
+        <strong>{{ empleado?.nombre || 'Empleado' }}</strong> 👋
       </ion-card-title>
       <ion-card-subtitle>
         {{ usuario.CORREO }}

@@ -21,18 +21,21 @@ export class ReporteService {
       // Agregar datos del reporte
       fd.append('correoUsuario', reporte.correoUsuario);
       fd.append('idOrden', reporte.idOrden.toString());
-      fd.append('observacion', reporte.observacion);
+      fd.append('observacion', reporte.observacion || ''); // Asegurar que no sea null/undefined
       fd.append('tipoReporte', reporte.tipoReporte.toString());
       fd.append('fecha', reporte.fecha.toISOString());
       
-      // Agregar todas las imágenes del arreglo imagenesReporte
-      reporte.imagenesReporte.forEach((img, index) => {
-      fd.append(`imagenes[${index}]`, img.imagenes, img.imagenes.name);
-      fd.append(`tipoMime[${index}]`, img.tipoMime);
+      // Agregar todas las imágenes con el MISMO nombre de campo
+      reporte.imagenesReporte.forEach((img) => {
+        fd.append('imagenes', img.imagenes, img.imagenes.name);
       });
 
-      // NO establecer headers - HttpClient lo hace automáticamente con el boundary correcto
-      return this.http.post<ReporteResponse>(`${this.base}/reportes/${reporte.idOrden}/evidence`, fd);
+      console.log('FormData a enviar:');
+      fd.forEach((value, key) => {
+        console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
+      });
+
+      return this.http.post<ReporteResponse>(`${this.base}/Reportes/`, fd);
   }
 }
 

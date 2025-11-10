@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { OrdersService } from '../../core/orders.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Orden } from '../../core/types'
+import { EmpleadoApp } from 'src/app/services/empleado.service';
 
 type OrderStatus = 'pending' | 'progress' | 'done';
 
@@ -19,17 +20,16 @@ type OrderStatus = 'pending' | 'progress' | 'done';
 })
 export class OrdersPage implements OnInit {
   usuario: any = null;
+  empleado: EmpleadoApp | null = null;
   q = '';
   status: '' | OrderStatus = '';
   loading = false;
   data: Orden[] = [];
   filtered: Orden[] = [];
+  private api: OrdersService = inject(OrdersService);
+  private router: Router = inject(Router);
+  private auth: AuthService = inject(AuthService);
 
-  constructor(
-    private api: OrdersService,
-    private router: Router,
-    private auth: AuthService
-  ) {}
 
   ngOnInit() {
     this.usuario = this.auth.obtenerUsuario();
@@ -37,6 +37,8 @@ export class OrdersPage implements OnInit {
       this.auth.cerrarSesion();
       return;
     }
+    this.empleado = this.auth.getEmpleado() as EmpleadoApp;
+
     this.load();
   }
 

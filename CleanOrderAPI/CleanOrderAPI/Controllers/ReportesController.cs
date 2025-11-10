@@ -20,14 +20,14 @@ namespace CleanOrderAPI.Controllers
         }
 
         [Authorize(Roles = "2")]
-        [HttpPost("/{id}")]
+        [HttpPost()]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadReport(
-                                                       int id,
                                                        [FromForm] string correoUsuario,
                                                        [FromForm] int idOrden,
                                                        [FromForm] string observacion,
                                                        [FromForm] int tipoReporte,
-                                                       [FromForm] DateTime fecha,
+                                                       [FromForm] string fecha,
                                                        [FromForm] List<IFormFile> imagenes)
         {
             Orden? orden = await _context.Ordens.FirstOrDefaultAsync(o => o.IdOrden == idOrden);
@@ -67,7 +67,7 @@ namespace CleanOrderAPI.Controllers
                 IdOrden = idOrden,
                 Observacion = observacion,
                 TipoReporte = tipoReporte,
-                Fecha = fecha,
+                Fecha = DateTime.Now,
                 Imagenes = imagenes ?? new List<IFormFile>()
             };
 

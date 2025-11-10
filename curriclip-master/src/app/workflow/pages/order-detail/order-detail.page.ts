@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EvidenceUploaderComponent } from '../../components/evidence-uploader/evidence-uploader.component';
 import { OrdersService } from '../../core/orders.service';
 import { Orden } from '../../core/types';
@@ -30,6 +30,7 @@ export class OrderDetailPage implements OnInit {
   private ordersService: OrdersService = inject(OrdersService);
   private reporteService: ReporteService = inject(ReporteService);
   private route: ActivatedRoute = inject(ActivatedRoute);
+  private router: Router = inject(Router);
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
@@ -111,9 +112,7 @@ export class OrderDetailPage implements OnInit {
           this.notesAfter = '';
         }
         // Recargar la orden para actualizar el estado
-        this.ordersService
-          .detail(this.id)
-          .subscribe((d: Orden) => (this.orden = d));
+        this.router.navigate(['/workflow/orders']);
       },
       error: (error: HttpErrorResponse) => {
         this.uploading = false;
@@ -144,62 +143,58 @@ export class OrderDetailPage implements OnInit {
 
     switch (error.status) {
       case 400:
+        errorMessage = 'Solicitud incorrecta';
         console.error('Error 400 - Solicitud incorrecta:', errorMessage);
         alert(`Error: ${errorMessage}`);
         break;
       case 401:
+        errorMessage = 'No está autorizado para realizar esta acción';
         console.error('Error 401 - No autorizado:', errorMessage);
         alert(
-          `Error: ${
-            errorMessage || 'No está autorizado para realizar esta acción'
-          }`
+          `Error: ${errorMessage}`
         );
         break;
       case 403:
+        errorMessage = 'No tiene permisos para subir evidencias';
         console.error('Error 403 - Prohibido:', errorMessage);
         alert(
-          `Error: ${errorMessage || 'No tiene permisos para subir evidencias'}`
+          `Error: ${errorMessage}`
         );
         break;
       case 404:
+        errorMessage = 'Recurso no encontrado';
         console.error('Error 404 - No encontrado:', errorMessage);
         alert(`Error: ${errorMessage}`);
         break;
       case 409:
+        errorMessage = 'Conflicto al procesar la solicitud';
         console.error('Error 409 - Conflicto:', errorMessage);
         alert(`Error: ${errorMessage}`);
         break;
       case 413:
+        errorMessage = 'Una o más imágenes son demasiado grandes';
         console.error('Error 413 - Archivo muy grande:', errorMessage);
         alert(
-          `Error: ${errorMessage || 'Una o más imágenes son demasiado grandes'}`
+          `Error: ${errorMessage}`
         );
         break;
       case 415:
-        console.error(
-          'Error 415 - Tipo de archivo no soportado:',
-          errorMessage
-        );
-        alert(
-          `Error: ${
-            errorMessage || 'El formato de una o más imágenes no es válido'
-          }`
-        );
+        errorMessage = 'Tipo de archivo no soportado';
+        console.error(`Error: ${errorMessage}`);
+        alert(`Error: ${errorMessage}`);
         break;
       case 500:
+        errorMessage = 'Error interno del servidor';
         console.error('Error 500 - Error del servidor:', errorMessage);
         alert(`Error: ${errorMessage}`);
         break;
       case 503:
-        console.error('Error 503 - Servicio no disponible:', errorMessage);
-        alert(
-          `Error: ${
-            errorMessage || 'El servicio no está disponible temporalmente'
-          }`
-        );
+        errorMessage = 'Servicio no disponible temporalmente';
+        console.error(`Error: ${errorMessage}`);
+        alert(`Error: ${errorMessage}`);
         break;
       default:
-        console.error('Error desconocido:', error);
+        console.error(`Error: ${errorMessage}`);
         alert(`Error al subir evidencia: ${errorMessage}`);
     }
   }
