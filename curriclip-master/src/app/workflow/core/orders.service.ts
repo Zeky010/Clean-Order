@@ -37,8 +37,5 @@ export class OrdersService {
     return this.http.post(`${this.base}/ordenes-trabajo/${id}/done`, {});
   }
 
-  /** 🔹 Crear nueva orden (si aplica desde móvil) */
-  create(data: any): Observable<any> {
-    return this.http.post(`${this.base}/ordenes-trabajo`, data);
-  }
+
 }

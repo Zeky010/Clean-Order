@@ -83,7 +83,16 @@ export class OrderDetailPage implements OnInit {
       kind === 'before' ? this.imagenesAntes : this.imagenesDespues;
     const notes = kind === 'before' ? this.notesBefore : this.notesAfter;
 
-    if (imagenes.length === 0 || !this.user?.correo) return;
+    if (imagenes.length === 0 || !this.user?.correo) {
+      alert('Debe seleccionar al menos una imagen');
+      return;
+    }
+
+    // Validar que la observación no esté vacía
+    if (!notes || notes.trim() === '') {
+      alert('Debe ingresar una observación');
+      return;
+    }
 
     // Construir el reporte según la interfaz
     const reporte: Reporte = {
@@ -112,7 +121,7 @@ export class OrderDetailPage implements OnInit {
           this.notesAfter = '';
         }
         // Recargar la orden para actualizar el estado
-        this.router.navigate(['/workflow/orders']);
+        this.router.navigate(['/wf/orders']);
       },
       error: (error: HttpErrorResponse) => {
         this.uploading = false;

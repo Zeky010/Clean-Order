@@ -6,7 +6,6 @@ import { WorkflowRoutingModule } from './workflow-routing.module';
 
 import { OrdersPage } from './pages/orders/orders.page';
 import { OrderDetailPage } from './pages/order-detail/order-detail.page';
-import { NewOrderPage } from './pages/new-order/new-order.page';
 import { EvidenceUploaderComponent } from './components/evidence-uploader/evidence-uploader.component';
 
 @NgModule({
@@ -18,7 +17,6 @@ import { EvidenceUploaderComponent } from './components/evidence-uploader/eviden
     WorkflowRoutingModule,
     OrdersPage,
     OrderDetailPage,
-    NewOrderPage,
     EvidenceUploaderComponent
   ]
 })
