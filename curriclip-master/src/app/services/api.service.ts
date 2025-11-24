@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment'; // 👈 importa el environment
+import { environmentTest } from 'src/environments/environment.test';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { environment } from 'src/environments/environment'; // 👈 importa el e
 export class ApiService {
 
   // ✅ URL base tomada del environment (según tu entorno)
-  private baseUrl = environment.apiUrl;
+  private baseUrl = environmentTest.apiUrl;
 
   constructor(private http: HttpClient) {}
 

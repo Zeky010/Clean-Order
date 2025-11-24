@@ -41,9 +41,12 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:4200", "https://localhost:4200",
-                "http://localhost:8100", "https://localhost:8100"
-            // add more origins as needed
-            )
+                "http://localhost:8100", "https://localhost:8100",
+                "http://10.0.2.2:8100", "https://10.0.2.2:8100",
+                "capacitor://localhost"       // Capacitor packaged app
+                , "https://localhost",
+                "https://127.0.0.1:8100"
+                )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

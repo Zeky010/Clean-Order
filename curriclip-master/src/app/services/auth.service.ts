@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, of } from 'rxjs';
 import type { EmpleadoApp } from './empleado.service';
+import { environment } from 'src/environments/environment';
+import { environmentTest } from 'src/environments/environment.test';
 
 
 
@@ -10,7 +12,7 @@ import type { EmpleadoApp } from './empleado.service';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7226'; // ajusta si tu backend usa otro puerto
+  private apiUrl = environment.apiUrl; 
   private usuarioActual: any = null;
   private readonly EMPLEADO_KEY = 'empleado';
 

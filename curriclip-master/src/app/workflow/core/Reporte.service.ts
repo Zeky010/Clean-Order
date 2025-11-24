@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Reporte } from './reporte.type';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { environmentTest } from 'src/environments/environment.test';
 
 export interface ReporteResponse {
   mensaje: string;
@@ -12,7 +13,7 @@ export interface ReporteResponse {
 
 @Injectable({ providedIn: 'root' })
 export class ReporteService {
-  private base = environment.apiUrl;
+  private base = environmentTest.apiUrl;
   private http: HttpClient = inject(HttpClient);
 
   uploadReporte(reporte: Reporte): Observable<ReporteResponse> {
