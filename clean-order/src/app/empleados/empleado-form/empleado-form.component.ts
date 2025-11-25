@@ -9,7 +9,9 @@ import { ComunaRegionSelectorComponent } from '../../comuna-region/comuna-region
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ComunaRegionSelectorComponent],
   templateUrl: './empleado-form.component.html',
-  styleUrls: ['./empleado-form.component.css']
+  styleUrls: ['./empleado-form.component.css',
+              '../../shared/styles/forms.css',
+              '../../shared/styles/buttons.css']
 })
 export class EmpleadoFormComponent implements OnInit, OnChanges {
   @Input() empleado: Empleado | null = null;

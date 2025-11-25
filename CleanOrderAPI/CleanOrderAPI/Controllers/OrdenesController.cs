@@ -352,7 +352,7 @@ namespace CleanOrderAPI.Controllers
 
                 await tx.CommitAsync();
             }
-            catch
+            catch (Exception ex)
             {
                 await tx.RollbackAsync();
                 throw;

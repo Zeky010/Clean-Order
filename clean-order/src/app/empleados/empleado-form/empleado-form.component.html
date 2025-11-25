@@ -3,7 +3,7 @@
     <h3>{{ isEditMode ? 'Editar Empleado' : 'Crear Empleado' }}</h3>
   </div>
 
-  <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()" class="empleado-form">
+  <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()" class="form-body">
     
     <!-- RUT Field -->
     <div class="form-group">
@@ -11,6 +11,7 @@
       <input 
         type="text"
         id="rut" 
+        class="form-control"
         formControlName="rut"
         maxlength="8"
         minlength="7"
@@ -31,6 +32,7 @@
       <input 
         type="text" 
         id="dv" 
+        class="form-control"
         formControlName="dv"
         maxlength="1"
         [readonly]="isEditMode"
@@ -60,6 +62,7 @@
       <input 
         type="text" 
         id="nombre" 
+        class="form-control"
         formControlName="nombre"
         placeholder="Ingrese el nombre">
       @if (empleadoForm.get('nombre')?.invalid && empleadoForm.get('nombre')?.touched) {
@@ -80,6 +83,7 @@
       <input 
         type="text" 
         id="apellido" 
+        class="form-control"
         formControlName="apellido"
         placeholder="Ingrese el apellido">
       @if (empleadoForm.get('apellido')?.invalid && empleadoForm.get('apellido')?.touched) {
@@ -100,6 +104,7 @@
       <input 
         type="text" 
         id="direccion" 
+        class="form-control"
         formControlName="direccion"
         placeholder="Ingrese la dirección">
       @if (empleadoForm.get('direccion')?.invalid && empleadoForm.get('direccion')?.touched) {
@@ -114,7 +119,8 @@
       <label for="telefono">Teléfono *</label>
       <input 
         type="tel" 
-        id="telefono" 
+        id="telefono"
+        class="form-control" 
         formControlName="telefono"
         placeholder="Ej: +56912345678">
       @if (empleadoForm.get('telefono')?.invalid && empleadoForm.get('telefono')?.touched) {
@@ -131,16 +137,18 @@
 
     <!-- Comuna Field -->
     <div class="form-row">
-      <label class="form-label" for="idComuna">Región / Comuna</label>
-      <app-comuna-region-selector
-        formControlName="idComuna">
-      </app-comuna-region-selector>
-      @if (empleadoForm.get('idComuna')?.touched && empleadoForm.get('idComuna')?.invalid) 
-      {
-        <div class="error-message">
-          Seleccione una comuna.
-        </div>
-      }
+      <div class="form-group">
+        <label for="idComuna">Región / Comuna</label>
+        <app-comuna-region-selector
+          formControlName="idComuna">
+        </app-comuna-region-selector>
+        @if (empleadoForm.get('idComuna')?.touched && empleadoForm.get('idComuna')?.invalid) 
+        {
+          <div class="error-message">
+            Seleccione una comuna.
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Estado Field -->

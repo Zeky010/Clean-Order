@@ -1,13 +1,16 @@
 <div class="entity-container">
   <div class="header">
     <h2>Empleados</h2>
-    @if (!showCreateForm && !showEditForm) {
-      <button class="btn-primary" (click)="crearEmpleado()">
+
+  </div>
+  @if (!showCreateForm && !showEditForm) {
+    <div class="btn-group">
+      <button class="btn btn-primary" (click)="crearEmpleado()">
         Nuevo Empleado
       </button>
-    }
-  </div>
+    </div>
 
+  }
   <!-- Formulario Crear -->
   @if(showCreateForm) {
   <app-empleado-form
