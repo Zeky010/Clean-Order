@@ -11,7 +11,8 @@ import { OrdenTrabajo } from '../ordenes-trabajo.types';
   imports: [DatePipe],
   styleUrls: ['./visor-reportes.component.css',
   '../../shared/styles/buttons.css',
-  '../../shared/styles/entity-table.css']
+  '../../shared/styles/entity-table.css'
+  ]
 })
 export class VisorReportesComponent implements OnInit {
   @Input({required: true}) orden!: OrdenTrabajo;

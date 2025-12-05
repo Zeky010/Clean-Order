@@ -15,7 +15,8 @@ import { VisorReportesComponent } from './visor-reportes/visor-reportes.componen
     '../shared/styles/entity-table.css',
     '../shared/styles/forms.css',
     '../shared/styles/buttons.css',
-    './ordenes-trabajo.component.css'
+    './ordenes-trabajo.component.css',
+    '../shared/styles/order-status.css'
   ],
   imports: [DatePipe, OrdenFormComponent, VisorReportesComponent],
 })
