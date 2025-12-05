@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace CleanOrderAPI.Controllers
 {
@@ -32,7 +34,7 @@ namespace CleanOrderAPI.Controllers
         {
             Orden? orden = await _context.Ordens.FirstOrDefaultAsync(o => o.IdOrden == idOrden);
             Usuario? usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo == correoUsuario);
-            
+
             if (orden == null || usuario == null)
             {
                 return NotFound("Orden o Usuario no encontrado.");
@@ -130,7 +132,7 @@ namespace CleanOrderAPI.Controllers
             {
                 // Revertir todos los cambios en caso de error
                 await transaction.RollbackAsync();
-                
+
                 return StatusCode(StatusCodes.Status500InternalServerError, new ReporteResponseModel
                 {
                     Mensaje = $"Error al guardar el reporte: {ex.Message}",
@@ -152,20 +154,20 @@ namespace CleanOrderAPI.Controllers
             // Estado 1: Agendada, Estado 2: En proceso
             if (orden.FkEstado != 1 && orden.FkEstado != 2)
             {
-                return (false, 
+                return (false,
                     $"La orden debe estar en estado Agendada (1) o En Proceso (2). Estado actual: {orden.FkEstado}");
             }
 
             // Validar que el tipo de reporte sea correcto según el estado de la orden
             if (tipoReporte == 1 && orden.FkEstado != 1)
             {
-                return (false, 
+                return (false,
                     "Solo se puede crear un reporte de inicio cuando la orden está Agendada (estado 1)");
             }
 
             if (tipoReporte == 2 && orden.FkEstado != 2)
             {
-                return (false, 
+                return (false,
                     "Solo se puede crear un reporte de finalización cuando la orden está En Proceso (estado 2)");
             }
 
@@ -180,6 +182,52 @@ namespace CleanOrderAPI.Controllers
                 await file.CopyToAsync(memoryStream);
                 return memoryStream.ToArray();
             }
+        }
+
+        [Authorize(Roles = "1")]
+        [HttpGet("{IdOrden}")]
+        public async Task<ActionResult<List<ReporteDetalleModel>>> GetReportesByOrden(int IdOrden)
+        {
+            List<Reporte> reportes = await _context.Reportes
+                .Include(r => r.FK_TIPONavigation)
+                .Include(r => r.FkUsuarioNavigation)
+                .Include(r => r.ImagenesReportes)
+                .Where(r => r.FkIdOrden == IdOrden)
+                .ToListAsync();
+
+            if (reportes == null || reportes.Count == 0)
+            {
+                return NotFound("No se encontraron reportes para la orden especificada.");
+            }
+
+            List<ReporteDetalleModel> detalle = reportes.Select(r => new ReporteDetalleModel
+            {
+                IdReporte = r.IdReporte,
+                Observacion = r.Observacion ?? string.Empty,
+                Usuario = new UsuarioModel
+                {
+                    Id = r.FkUsuarioNavigation.IdUsuario,
+                    Correo = r.FkUsuarioNavigation.Correo,
+                    Activo = r.FkUsuarioNavigation.Activo,
+                    Rol = r.FkUsuarioNavigation.FkIdRolNavigation?.Nombre ?? string.Empty,
+                    RutEmpleado = r.FkUsuarioNavigation.FkRutEmpleado,
+                    RolId = r.FkUsuarioNavigation.FkIdRol
+                },
+                TipoReporte = new ReporteTipoModel
+                {
+                    Codigo = r.FK_TIPO,
+                    Nombre = r.FK_TIPONavigation?.NOMBRE ?? string.Empty
+                },
+                Imagenes = r.ImagenesReportes.Select(img => new ImagenReporteModel
+                {
+                    IdImagen = img.IdImgReporte,
+                    TipoMime = img.TipoMime,
+                    imagenBase64 = Convert.ToBase64String(img.Archivo),
+                    IdReporte = img.FkIdReporte
+                }).ToList()
+            }).ToList();
+
+            return Ok(detalle);
         }
     }
 }

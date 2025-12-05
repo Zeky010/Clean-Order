@@ -57,7 +57,7 @@
               <p><strong>Tipo:</strong> {{ reportesFin.tipoReporte.nombre }}</p>
             </div>
             <div class="report-images">
-              @if (reportesFin.imagenes?.length) {
+              @if (reportesFin.imagenes.length) {
                 <div class="image-grid">
                   @for (img of reportesFin.imagenes; track img.idImagen) {
                     <figure class="image-card">

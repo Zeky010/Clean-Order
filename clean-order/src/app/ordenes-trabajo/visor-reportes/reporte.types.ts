@@ -2,7 +2,7 @@ import { Usuario } from '../../usuarios/usuario.types';
 
 
 
-export interface Reporte {
+export interface ReporteDetalle {
     idReporte: number;
     observacion: string;
     usuario: Usuario;
@@ -18,6 +18,6 @@ export interface ReporteTipo {
 export interface imagenReporte {
     idImagen: number;
     tipoMime: string;
-    imagen: File;
+    imagenBase64: string;
     idReporte: number;
 }

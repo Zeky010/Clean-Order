@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, Input, Output, EventEmitter } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { VisorReportesService } from './visor-reportes.service';
-import { Reporte, imagenReporte } from './reporte.types';
+import { ReporteDetalle, imagenReporte } from './reporte.types';
 import { OrdenTrabajo } from '../ordenes-trabajo.types';
 
 @Component({
@@ -17,8 +17,8 @@ export class VisorReportesComponent implements OnInit {
   @Input({required: true}) orden!: OrdenTrabajo;
   @Output() closed = new EventEmitter<void>();
   private visorReportesService: VisorReportesService = inject(VisorReportesService);
-  public reportesInicio: Reporte | null = null;
-  public reportesFin: Reporte | null = null; 
+  public reportesInicio: ReporteDetalle | null = null;
+  public reportesFin: ReporteDetalle | null = null; 
 
   public loading = false;  
 
@@ -58,10 +58,10 @@ export class VisorReportesComponent implements OnInit {
   }
 
   getImageUrl(img: imagenReporte): string {
-    // Si ya tienes una URL en el backend, usa esa propiedad en lugar de crear objectURL
-    const url = URL.createObjectURL(img.imagen);
-    this.objectUrls.push(url);
-    return url;
+    // Build a data URL from Base64
+    if (!img?.imagenBase64) return '';
+    const mime = img.tipoMime || 'image/jpeg';
+    return `data:${mime};base64,${img.imagenBase64}`;
   }
 
 }
