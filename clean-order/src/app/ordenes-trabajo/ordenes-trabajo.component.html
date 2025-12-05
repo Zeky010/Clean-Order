@@ -53,6 +53,11 @@
                   Suspender
                 </button>
               }
+              @if (canVerReporte(o)) {
+                <button class="btn btn-small btn-info" (click)="verReporte(o)">
+                  Ver Reporte
+                </button>
+              }
 
             </td>
           </tr>
@@ -71,5 +76,9 @@
     (cancelForm)="onCancelForm()"
   >
   </app-orden-form>
+  }
+
+  @if (showOrdenDetalle && selectedOrden) {
+    <app-visor-reportes [orden]="selectedOrden" (closed)="onCloseReportes()"></app-visor-reportes>
   }
 </div>

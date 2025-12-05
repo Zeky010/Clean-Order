@@ -1,0 +1,78 @@
+<div class="entity-container">
+  <div class="entity-header">
+    <h2>Reportes de Orden</h2>
+    <button class="btn btn-small btn-secondary" (click)="closed.emit()">Volver</button>
+  </div>
+  <div class="report-viewer">
+    @if (loading) {
+      <div>Cargando reporte...</div>
+    } 
+    @else {
+      <div>
+        <span>
+          <strong>Cliente: </strong>{{ orden.cliente }}
+        </span>
+        <span>
+          <strong>Folio: </strong>{{ orden.folio }}
+        </span>
+        <span>
+          <strong>Fecha Agendada: </strong>{{ orden.fechaAgendada | date:'medium' }}
+        </span>
+        <span>
+          <strong>Estado: </strong><span [class]="getEstadoClass(orden.estado)">{{ orden.estado }}</span>
+        </span>
+      </div>
+      <div>
+        @if(reportesInicio){
+          <div class="report-section">
+            <h3>Reporte de Inicio de Servicio</h3>
+            <div class="report-meta">
+              <p><strong>Observación:</strong> {{ reportesInicio.observacion }}</p>
+              <p><strong>Usuario:</strong> {{ reportesInicio.usuario.correo }}</p>
+              <p><strong>Tipo:</strong> {{ reportesInicio.tipoReporte.nombre }}</p>
+            </div>
+            <div class="report-images">
+              @if (reportesInicio.imagenes.length) {
+                <div class="image-grid">
+                  @for (img of reportesInicio.imagenes; track img.idImagen) {
+                    <figure class="image-card">
+                      <img [src]="getImageUrl(img)" [alt]="'Imagen ' + img.idImagen" [title]="img.tipoMime" />
+                      <figcaption>Imagen {{ img.idImagen }}</figcaption>
+                    </figure>
+                  }
+                </div>
+              } @else {
+                <div>No hay imágenes en este reporte.</div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (reportesFin) {
+          <div class="report-section">
+            <h3>Reporte de Fin de Servicio</h3>
+            <div class="report-meta">
+              <p><strong>Observación:</strong> {{ reportesFin.observacion }}</p>
+              <p><strong>Usuario:</strong> {{ reportesFin.usuario.correo }}</p>
+              <p><strong>Tipo:</strong> {{ reportesFin.tipoReporte.nombre }}</p>
+            </div>
+            <div class="report-images">
+              @if (reportesFin.imagenes?.length) {
+                <div class="image-grid">
+                  @for (img of reportesFin.imagenes; track img.idImagen) {
+                    <figure class="image-card">
+                      <img [src]="getImageUrl(img)" [alt]="'Imagen ' + img.idImagen" [title]="img.tipoMime" />
+                      <figcaption>Imagen {{ img.idImagen }}</figcaption>
+                    </figure>
+                  }
+                </div>
+              } @else {
+                <div>No hay imágenes en este reporte.</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

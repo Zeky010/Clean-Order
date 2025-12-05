@@ -4,6 +4,7 @@ import { OrdenTrabajo } from './ordenes-trabajo.types';
 import { OrdenesTrabajoService } from './ordenes-trabajo.service';
 import { OrdenFormComponent } from './orden-form/orden-form.component';
 import { OrdenForm } from './orden-form/orden-form.type';
+import { VisorReportesComponent } from './visor-reportes/visor-reportes.component'; 
 
 @Component({
   selector: 'app-ordenes-trabajo',
@@ -14,8 +15,9 @@ import { OrdenForm } from './orden-form/orden-form.type';
     '../shared/styles/entity-table.css',
     '../shared/styles/forms.css',
     '../shared/styles/buttons.css',
+    './ordenes-trabajo.component.css'
   ],
-  imports: [DatePipe, OrdenFormComponent],
+  imports: [DatePipe, OrdenFormComponent, VisorReportesComponent],
 })
 export class OrdenesTrabajoComponent implements OnInit {
   ordenesTrabajos: OrdenTrabajo[] = [];
@@ -44,7 +46,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.ordenesTrabajos = ordenes;
         this.loading = false;
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         console.error('Error loading órdenes:', error);
         this.error = 'No se pudieron cargar las órdenes de trabajo';
         this.loading = false;
@@ -185,7 +187,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           this.ordenesTrabajos = ordenes;
           this.loading = false;
         },
-        error: (error: any) => {
+        error: (error: unknown) => {
           this.handleError(error, 'filtrar por fechas');
           this.loading = false;
         },
@@ -219,6 +221,20 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Método helper para saber si la orden está en estado 1 (agendada)
   canSuspender(orden: OrdenTrabajo): boolean {
     return orden.idEstado === 1;
+  }
+
+  canVerReporte(orden: OrdenTrabajo): boolean {
+    return orden.idEstado === 2 || orden.idEstado === 3;
+  }
+
+  verReporte(orden: OrdenTrabajo): void {
+    this.closeForms();
+    this.selectedOrden = orden;
+    this.showOrdenDetalle = true;
+  }
+
+  onCloseReportes(): void {
+    this.closeForms();
   }
 
   private handleError(error: unknown, accion: string): void {
