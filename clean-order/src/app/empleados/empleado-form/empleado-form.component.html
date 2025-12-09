@@ -164,9 +164,9 @@
     </div>
 
     <!-- Submit / Cancel buttons -->
-    <div class="actions">
-      <button type="button" (click)="onSubmit()" [disabled]="isSubmitting">Guardar</button>
-      <button type="button" (click)="onCancel()" [disabled]="isSubmitting">Cancelar</button>
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isSubmitting">Guardar</button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="isSubmitting">Cancelar</button>
     </div>
 
   </form>

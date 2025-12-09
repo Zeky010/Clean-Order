@@ -65,11 +65,10 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
 
   loadRegions(): void {
     this.regionService.getRegions().subscribe({
-      next: regs => this.regions = regs,
+      next: regs => this.regions = regs.sort((a, b) => a.nombre.localeCompare(b.nombre)),
       error: err => {
         console.error('Error loading regions', err)
       }
-        
     });
   }
 
@@ -93,7 +92,7 @@ export class ComunaRegionSelectorComponent implements OnInit, OnChanges, Control
   private loadComunasByRegion(regionId: number, after?: () => void): void {
     this.comunaService.getComunasByRegion(regionId).subscribe({
       next: comunas => {
-        this.comunas = comunas;
+        this.comunas = comunas.sort((a, b) => a.nombre.localeCompare(b.nombre));
         if (after) after();
       },
       error: (error) => {
